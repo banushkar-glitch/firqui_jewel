@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIRQUI JEWELS - Luxury Designer Jewellery</title>
+    <meta name="description" content="Appreciating design-centric yet aesthetic fashioned jewellery brand. Explore stunning necklaces, earrings, bracelets, rings and brooches.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Almarai:wght@400;700&family=Caveat:wght@500;600;700&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+     OPENING ENVELOPE INTRO
+====================================================== -->
+<div class="intro-screen" id="introScreen">
+
+    <div class="envelope">
+
+        <div class="envelope-back"></div>
+
+        <div class="envelope-flap"></div>
+
+        <div class="intro-logo">
+            <img src="assets\Logo Pink 1.png" alt="Firqui Jewels">
+        </div>
+
+    </div>
+
+</div>
+
+<div class="page" id="home">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+    <header class="header">
+        <!-- Logo -->
+        <a href="#home" class="header-logo" aria-label="FIRQUI JEWELS Home">
+            <img src="assets/Logo Pink 1.png" alt="FIRQUI JEWELS Logo">
+        </a>
+
+        <!-- Navigation -->
+        <nav class="navigation" aria-label="Primary Navigation">
+            <a href="#home" class="nav-link active">Home</a>
+            <span class="nav-dot"></span>
+            <a href="collection/pearls-gone-rogue.html" class="nav-link">Collections</a>
+            <span class="nav-dot"></span>
+            <a href="#categories" class="nav-link nav-has-dropdown">Categories </a>
+            <span class="nav-dot"></span>
+            <a href="about.html" class="nav-link">About</a>
+            <span class="nav-dot"></span>
+            <a href="contact.html" class="nav-link">Contact</a>
+        </nav>
+
+        <!-- Header Actions -->
+        <div class="header-icons">
+           <button
+    type="button"
+    class="header-icon-btn"
+    id="openLoginModal"
+    aria-label="Login"
+>
+    <i class="fa-regular fa-user"></i>
+</button>
+            <button class="header-icon-btn" aria-label="Search Collection">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button class="header-icon-btn" aria-label="Wishlist" onclick="window.location.href='products/wishlist.html'">
+                <i class="fa-regular fa-heart"></i>
+            </button>
+            <button class="header-icon-btn" aria-label="Shopping Cart" onclick="window.location.href='products/cart.html'">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </button>
+        </div>
+    </header>
+
+
+    <!-- =====================================================
+         HERO SECTION
+    ====================================================== -->
+    <section class="hero">
+        <!-- Decorative Side Shapes -->
+        <div class="hero-side hero-side-left" aria-hidden="true"></div>
+        <div class="hero-side hero-side-right" aria-hidden="true"></div>
+
+        <!-- Hero Slider Frame -->
+        <div class="hero-slider" id="heroSlider">
+            <!-- Slider Viewport (Displays 3 cards on Desktop, 1 on Mobile) -->
+            <div class="slides-viewport">
+                <div class="slides" id="slidesTrack">
+                    <!-- Slide 1: Fearless -->
+                    <div class="slide" data-index="0">
+                        <div class="slide-header">
+                            <span class="slide-subtitle">Unleash the</span>
+                            <h2 class="slide-title title-fearless">Fearless</h2>
+                        </div>
+                        <div class="slide-bg-shape" aria-hidden="true"></div>
+                        <div class="image-upload-box">
+                            <img
+                                src="assets\page_01_image_01.png"
+                                alt="Hero Jewellery Slide 1"
+                                class="uploaded-img"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Slide 2: Magnificent -->
+                    <div class="slide" data-index="1">
+                        <div class="slide-header">
+                            <span class="slide-subtitle">Unleash the</span>
+                            <h2 class="slide-title title-magnificent">Magnificent</h2>
+                        </div>
+                        <div class="slide-bg-shape" aria-hidden="true"></div>
+                        <div class="image-upload-box">
+                            <img
+                                src="assets\page_07_image_02.png"
+                                alt="Hero Jewellery Slide 2"
+                                class="uploaded-img"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Slide 3: Surreal -->
+                    <div class="slide" data-index="2">
+                        <div class="slide-header">
+                            <span class="slide-subtitle">Unleash the</span>
+                            <h2 class="slide-title title-surreal">Surreal</h2>
+                        </div>
+                        <div class="slide-bg-shape" aria-hidden="true"></div>
+                        <div class="image-upload-box">
+                            <img
+                                src="assets\FN1003 Ice Cream Necklace.png"
+                                alt="Hero Jewellery Slide 3"
+                                class="uploaded-img"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Slide 4: Vibrant -->
+                    <div class="slide" data-index="3">
+                        <div class="slide-header">
+                            <span class="slide-subtitle">Unleash the</span>
+                            <h2 class="slide-title title-vibrant">Vibrant</h2>
+                        </div>
+                        <div class="slide-bg-shape" aria-hidden="true"></div>
+                        <div class="image-upload-box">
+                            <img
+                                src="assets\Heart Pearl Ring.png"
+                                alt="Hero Jewellery Slide 4"
+                                class="uploaded-img"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: Spectacular -->
+                    <div class="slide" data-index="4">
+                        <div class="slide-header">
+                            <span class="slide-subtitle">Unleash the</span>
+                            <h2 class="slide-title title-spectacular">Spectacular</h2>
+                        </div>
+                        <div class="slide-bg-shape" aria-hidden="true"></div>
+                        <div class="image-upload-box">
+                            <img
+                                src="assets\Cuffs.png"
+                                alt="Hero Jewellery Slide 5"
+                                class="uploaded-img"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Left Arrow (Figma Arrow left: 122x98, border: 3.5px solid #FFB9B3) -->
+            <button class="slider-arrow slider-arrow-left" id="prevButton" aria-label="Previous slide">
+                <i class="fa-solid fa-arrow-left-long"></i>
+            </button>
+
+            <button class="slider-arrow slider-arrow-right" id="nextButton" aria-label="Next slide">
+    <i class="fa-solid fa-arrow-right-long"></i>
+</button>
+
+            <!-- Side Typography: "Side Of YOU" -->
+            <div class="side-text" aria-hidden="true">
+                <span class="side-word side-top">Side</span>
+                <span class="side-connector">Of</span>
+                <span class="side-word side-bottom">YOU</span>
+            </div>
+        </div>
+
+        <!-- Slider Pagination Dots (Figma Ellipse 5, 6, 7, 8, 9) -->
+        <div class="slider-dots" role="tablist" aria-label="Slider navigation">
+            <button class="slider-dot active" data-slide="0" aria-label="Slide 1"></button>
+            <button class="slider-dot" data-slide="1" aria-label="Slide 2"></button>
+            <button class="slider-dot" data-slide="2" aria-label="Slide 3"></button>
+            <button class="slider-dot" data-slide="3" aria-label="Slide 4"></button>
+            <button class="slider-dot" data-slide="4" aria-label="Slide 5"></button>
+        </div>
+    </section>
+
+
+    
+
+   <!-- =====================================================
+     CATEGORIES SECTION
+====================================================== -->
+
+<section class="categories" id="categories">
+    <div class="category-grid">
+
+        <!-- COLUMN 1: LEFT SIDE (2 Stacked Cards, Zero Gap) -->
+        <div class="category-col category-col-left">
+
+            <!-- Card 1: Left Top (Necklaces) -->
+            <article
+                class="category-card card-necklaces"
+                onclick="window.location.href='products/necklaces.html'"
+            >
+                <div class="category-image-wrap">
+                    <img
+                        src="assets/page_06_image_02.png"
+                        alt="Necklaces"
+                        class="category-image"
+                    >
+                </div>
+                <h2 class="category-title">Necklaces</h2>
+            </article>
+
+            <!-- Card 2: Left Bottom (Rings) -->
+            <article
+                class="category-card card-rings"
+                onclick="window.location.href='products/rings.html'"
+            >
+                <div class="category-image-wrap">
+                    <img
+                        src="assets\Heart Pearl Ring.png"
+                        alt="Rings"
+                        class="category-image"
+                    >
+                </div>
+                <h2 class="category-title">Rings</h2>
+            </article>
+
+        </div>
+
+        <!-- COLUMN 2: CENTER (1 Large Tall Card, Zero Gap) -->
+        <div class="category-col category-col-center">
+
+            <!-- Card 3: Center Big (Earrings) -->
+            <article
+                class="category-card card-earrings card-center-big"
+                onclick="window.location.href='products/earrings.html'"
+            >
+                <div class="category-image-wrap">
+                    <img
+                        src="assets/page_07_image_02.png"
+                        alt="Earrings"
+                        class="category-image"
+                    >
+                </div>
+                <h2 class="category-title">Earrings</h2>
+            </article>
+
+        </div>
+
+        <!-- COLUMN 3: RIGHT SIDE (2 Stacked Cards, Zero Gap) -->
+        <div class="category-col category-col-right">
+
+            <!-- Card 4: Right Top (Bracelets & Cuffs) -->
+            <article
+                class="category-card card-bracelets"
+                onclick="window.location.href='products/bracelets_cuffs.html'"
+            >
+                <div class="category-image-wrap">
+                    <img
+                        src="assets\Cuffs.png"
+                        alt="Bracelets &amp; Cuffs"
+                        class="category-image"
+                    >
+                </div>
+                <h2 class="category-title">Bracelets &amp; Cuffs</h2>
+            </article>
+
+            <!-- Card 5: Right Bottom (Brooches) -->
+            <article
+                class="category-card card-brooches"
+                onclick="window.location.href='products/brooches.html'"
+            >
+                <div class="category-image-wrap">
+                    <img
+                        src="assets/page_01_image_01.png"
+                        alt="Brooches"
+                        class="category-image"
+                    >
+                </div>
+                <h2 class="category-title">Brooches</h2>
+            </article>
+
+        </div>
+
+    </div>
+</section>
+
+
+    <!-- =====================================================
+         LOWER COLLECTION / BRAND INFO SECTION (Rectangle 14)
+    ====================================================== -->
+    <section class="lower-section" id="collections">
+        <div class="lower-card">
+            <!-- Brand Heading Inside Card -->
+            <h3 class="lower-brand-title">2026 - FIRQUI JEWELS</h3>
+
+            <!-- 5 Columns Grid -->
+            <div class="lower-columns">
+                <!-- Col 1: About -->
+                <div class="lower-col col-about">
+                    <h4>ABOUT</h4>
+                    <p>Welcome to Firqui Jewels. We blend contemporary design with surrealistic wonder to create wearable art that demands a second look.</p>
+                    <p>Inspired by the whimsical and the avant-garde, our pieces are crafted for those who refuse to be predictable and dare to stand out. Not just accessories—stories you wear</p>
+                </div>
+
+                <!-- Col 2: Support -->
+                <div class="lower-col col-links">
+                    <h4>SUPPORT</h4>
+                    <ul>
+                        <li><a href="#shipping">Shipping</a></li>
+                        <li><a href="#returns">Returns &amp; Exchanges</a></li>
+                        <li><a href="#warranty">Warranty</a></li>
+                        <li><a href="#care">Product Care</a></li>
+                        <li><a href="#faqs">FAQs</a></li>
+                        <li><a href="#privacy">Privacy Policy</a></li>
+                        <li><a href="#terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Shop -->
+                <div class="lower-col col-links">
+                    <h4>SHOP</h4>
+                    <ul>
+                        <li><a href="../frontend/products/rings.html">Rings</a></li>
+                        <li><a href="../frontend/products/earrings.html">Earrings</a></li>
+                        <li><a href="../frontend/products/necklaces.html">Necklaces</a></li>
+                        <li><a href="../frontend/products/bracelets_cuffs.html">Cuffs</a></li>
+                        <li><a href="../frontend/products/brooches.html">Brooches</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 4: Explore -->
+                <div class="lower-col col-links">
+                    <h4>EXPLORE</h4>
+                    <ul>
+                        <li><a href="#crystals">Crystals</a></li>
+                        <li><a href="#journal">Journal</a></li>
+                        <li><a href="../frontend/about.html">About</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 5: Newsletter -->
+                <div class="lower-col col-newsletter">
+                    <h4>NEWSLETTER</h4>
+                    <p>Sign up to get never-before-seen exclusive offers:</p>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input type="email" placeholder="E-mail" required aria-label="Email address for newsletter" class="newsletter-input">
+                        <button type="submit" class="btn-subscribe">SUBSCRIBE</button>
+                    </form>
+
+                    <div class="footer-social-icons">
+    <a href="#" class="social-icon" aria-label="Instagram" target="_blank">
+        <i class="fa-brands fa-instagram"></i>
+    </a>
+
+    <a href="#" class="social-icon" aria-label="Facebook" target="_blank">
+        <i class="fa-brands fa-facebook-f"></i>
+    </a>
+
+    <a href="#" class="social-icon" aria-label="Twitter" target="_blank">
+        <i class="fa-brands fa-x-twitter"></i>
+    </a>
+</div>
+                    <div class="newsletter-msg" id="newsletterMsg" style="display: none;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- =====================================================
+         FOOTER BAR
+    ====================================================== -->
+    <footer class="footer" id="contact">
+        <div class="footer-copy">2026 - FIRQUI JEWELS</div>
+        <div class="footer-credit">Powered by <strong>GENEXA TECH</strong></div>
+    </footer>
+
+</div>
+
+<script src="js/script.js"></script>
+<script src="js/search.js"></script>
+
+<!-- =====================================================
+     AUTH MODAL
+===================================================== -->
+
+<div class="auth-modal-overlay" id="authModalOverlay">
+
+    <div class="auth-modal-box">
+
+        <button
+            class="auth-modal-close"
+            id="authModalClose"
+            aria-label="Close login"
+        >
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <iframe
+            id="authModalFrame"
+            src=""
+            title="Firqui Jewels Login"
+        ></iframe>
+
+    </div>
+
+</div>
+</body>
+</html>

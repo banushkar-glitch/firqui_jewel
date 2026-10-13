@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firqui Jewels | Orders</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         ORDERS CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="orders.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="../dashboard.html"
+            class="header-logo"
+        >
+
+            <img
+                src="../assets/Logo Pink 1.png"
+                alt="Firqui Jewels"
+            >
+
+        </a>
+
+
+        <!-- NAVIGATION -->
+
+        <nav
+            class="navigation"
+            aria-label="Admin Navigation"
+        >
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="products.html"
+                class="nav-link"
+            >
+                Products
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../categories/categories.html"
+                class="nav-link"
+            >
+                Categories
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../collections/collections.html"
+                class="nav-link"
+            >
+                Collections
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link active"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellation Requests
+            </a>
+
+        </nav>
+
+
+        <!-- HEADER ICONS -->
+
+        <div class="header-icons">
+
+
+            <button
+                class="header-icon-btn"
+                id="adminButton"
+                type="button"
+                aria-label="Admin"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="searchButton"
+                type="button"
+                aria-label="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="notificationButton"
+                type="button"
+                aria-label="Notifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="logoutButton"
+                type="button"
+                aria-label="Logout"
+            >
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+
+        <section
+            class="orders-section"
+            id="orders"
+        >
+
+
+            <!-- =================================================
+                 PAGE HEADING
+            ================================================== -->
+
+            <div class="orders-heading">
+
+                <div>
+
+                    <span class="page-label">
+                        ORDER MANAGEMENT
+                    </span>
+
+                    <h1>
+                        Orders
+                    </h1>
+
+                    <p>
+                        Manage and track your FIRQUI JEWELS customer orders.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ORDERS CONTAINER
+            ================================================== -->
+
+            <div class="orders-container">
+
+
+                <!-- =================================================
+                     ORDER SUMMARY
+                ================================================== -->
+
+                <div class="order-summary">
+
+
+                    <!-- TOTAL ORDERS -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-bag-shopping"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TOTAL ORDERS
+                            </span>
+
+                            <strong id="totalOrders">
+                                12
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PENDING -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PENDING
+                            </span>
+
+                            <strong id="pendingOrders">
+                                3
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- SHIPPED -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-truck"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                SHIPPED
+                            </span>
+
+                            <strong id="shippedOrders">
+                                4
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- DELIVERED -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-check"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                DELIVERED
+                            </span>
+
+                            <strong id="deliveredOrders">
+                                5
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ORDERS CARD
+                ================================================== -->
+
+                <div class="orders-card">
+
+
+                    <!-- CARD HEADER -->
+
+                    <div class="orders-card-header">
+
+                        <div>
+
+                            <span class="section-label">
+                                CUSTOMER ORDERS
+                            </span>
+
+                            <h2>
+                                All Orders
+                            </h2>
+
+                        </div>
+
+
+                        <div class="orders-count">
+
+                            <span id="visibleOrderCount">
+                                12
+                            </span>
+
+                            Orders
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         FILTERS
+                    ================================================== -->
+
+                    <div class="orders-filters">
+
+
+                        <!-- SEARCH -->
+
+                        <div class="order-search">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input
+                                type="text"
+                                id="orderSearch"
+                                placeholder="Search order or customer..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+
+                        <!-- STATUS FILTER -->
+
+                        <div class="filter-select">
+
+                            <select id="statusFilter">
+
+                                <option value="all">
+                                    All Status
+                                </option>
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Confirmed">
+                                    Confirmed
+                                </option>
+
+                                <option value="Processing">
+                                    Processing
+                                </option>
+
+                                <option value="Shipped">
+                                    Shipped
+                                </option>
+
+                                <option value="Delivered">
+                                    Delivered
+                                </option>
+
+                                <option value="Cancelled">
+                                    Cancelled
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- PAYMENT FILTER -->
+
+                        <div class="filter-select">
+
+                            <select id="paymentFilter">
+
+                                <option value="all">
+                                    All Payments
+                                </option>
+
+                                <option value="Paid">
+                                    Paid
+                                </option>
+
+                                <option value="Pending">
+                                    Pending
+                                </option>
+
+                                <option value="Failed">
+                                    Failed
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ORDERS TABLE
+                    ================================================== -->
+
+                    <div class="orders-table-wrapper">
+
+
+                        <table class="orders-table">
+
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        ORDER
+                                    </th>
+
+                                    <th>
+                                        CUSTOMER
+                                    </th>
+
+                                    <th>
+                                        DATE
+                                    </th>
+
+                                    <th>
+                                        ITEMS
+                                    </th>
+
+                                    <th>
+                                        AMOUNT
+                                    </th>
+
+                                    <th>
+                                        PAYMENT
+                                    </th>
+
+                                    <th>
+                                        STATUS
+                                    </th>
+
+                                    <th>
+                                        ACTION
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody id="ordersTableBody">
+
+                                <!--
+                                    Orders will be inserted
+                                    dynamically using orders.js
+                                -->
+
+                            </tbody>
+
+                        </table>
+
+
+
+                        <!-- =================================================
+                             EMPTY STATE
+                        ================================================== -->
+
+                        <div
+                            class="empty-orders"
+                            id="emptyOrders"
+                        >
+
+                            <div class="empty-icon">
+
+                                <i class="fa-solid fa-box-open"></i>
+
+                            </div>
+
+
+                            <h3>
+                                No Orders Found
+                            </h3>
+
+
+                            <p>
+                                No orders match your current search or filters.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             LOWER BRAND / FOOTER INFORMATION
+        ====================================================== -->
+
+        <section
+            class="lower-section"
+            id="collections"
+        >
+
+            <div class="lower-card">
+
+
+                <div class="lower-brand-title">
+                    2026 - FIRQUI JEWELS
+                </div>
+
+
+                <div class="lower-columns">
+
+
+                    <!-- ABOUT -->
+
+                    <div class="lower-col">
+
+                        <h4>
+                            ABOUT
+                        </h4>
+
+                        <p>
+                            FIRQUI JEWELS brings timeless jewellery
+                            designed to make every moment special.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- QUICK LINKS -->
+
+                    <div class="lower-col">
+
+                        <h4>
+                            QUICK LINKS
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../dashboard.html">
+                                    Dashboard
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../products/products.html">
+                                    Products
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="orders.html">
+                                    Orders
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- PRODUCTS -->
+
+                    <div class="lower-col">
+
+                        <h4>
+                            PRODUCTS
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../products/products.html">
+                                    Rings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../products/products.html">
+                                    Necklaces
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../products/products.html">
+                                    Earrings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../products/products.html">
+                                    Bracelets
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- SUPPORT -->
+
+                    <div class="lower-col">
+
+                        <h4>
+                            SUPPORT
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="#">
+                                    Contact
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Shipping
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Returns
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- NEWSLETTER -->
+
+                    <div class="lower-col col-newsletter">
+
+                        <h4>
+                            NEWSLETTER
+                        </h4>
+
+                        <p>
+                            Subscribe for updates, new arrivals
+                            and exclusive jewellery collections.
+                        </p>
+
+
+                        <form
+                            class="newsletter-form"
+                            id="newsletterForm"
+                        >
+
+                            <input
+                                type="email"
+                                class="newsletter-input"
+                                id="newsletterEmail"
+                                placeholder="Your email address"
+                                required
+                            >
+
+
+                            <button
+                                type="submit"
+                                class="btn-subscribe"
+                            >
+                                Subscribe
+                            </button>
+
+                        </form>
+
+
+                        <div
+                            class="newsletter-msg"
+                            id="newsletterMsg"
+                        ></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer
+        class="footer"
+        id="footer"
+    >
+
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+
+
+        <div class="footer-credit">
+
+            Powered by
+
+            <strong>
+                GENEXA TECH
+            </strong>
+
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     ORDERS JAVASCRIPT
+====================================================== -->
+
+<script src="orders.js"></script>
+<script src="admin-search.js"></script>
+
+</body>
+
+</html>

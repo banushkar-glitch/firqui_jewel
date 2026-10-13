@@ -1,0 +1,2858 @@
+/* =========================================================
+   FIRQUI JEWELS - MAIN STYLESHEET
+   Accurately crafted from Figma CSS & Design Reference
+   ========================================================= */
+
+/* RESET & BASE */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --dark-teal: #0A373B;
+    --header-teal:  #0A373B;
+    --header-overlay: rgba(123, 107, 105, 0.49);
+    --pink: #EC9E96;
+    --cream: #FAF5EE;
+    --light-pink: #FFB9B3;
+    --text-muted: rgba(44, 44, 44, 0.67);
+    --text-dark: #2C2C2C;
+    --font-inter: 'Inter', sans-serif;
+    --font-imprima: 'Imprima', sans-serif;
+    --font-hurricane: 'Hurricane', cursive;
+    --font-almarai: 'Almarai', sans-serif;
+    --font-hand: 'Caveat', cursive;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--dark-teal);
+    font-family: var(--font-inter);
+    color: var(--pink);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+button {
+    font-family: inherit;
+    border: none;
+    background: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* =========================================================
+   PAGE CONTAINER (Figma Artboard: 1440px)
+   ========================================================= */
+.page {
+    position: relative;
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    background: var(--dark-teal);
+    overflow: hidden;
+}
+
+/* =========================================================
+   HEADER (Rectangle 3 + Rectangle 5)
+   ========================================================= */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    background: linear-gradient(
+        to bottom,
+        var(--header-teal) 0px,
+        var(--header-teal) 55px,
+        var(--header-overlay) 55px,
+        var(--header-overlay) 110px
+    );
+    z-index: 100;
+}
+
+/* Logo (Figma Logo Pink 1: 248x248, scaled to 80x80) */
+.header-logo {
+    position: absolute;
+    left: 24px;
+    top: 15px;
+    width: 80px;
+    height: 80px;
+    z-index: 110;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease;
+}
+
+.header-logo:hover {
+    transform: scale(1.02);
+}
+
+.header-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Navigation (Figma: top: 42px, font-size: 18px) */
+.navigation {
+    position: absolute;
+    left: 337px;
+    top: 42px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    z-index: 110;
+     position: relative;
+      transform: translateY(25px);
+}
+
+.nav-link {
+    font-family: var(--font-inter);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 24px;
+    color: var(--pink);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: var(--cream);
+}
+
+.nav-arrow {
+    font-size: 14px;
+    transform: translateY(-1px);
+    transition: transform 0.2s ease;
+}
+
+.nav-has-dropdown:hover .nav-arrow {
+    transform: translateY(1px);
+}
+
+/* Navigation Dots */
+.nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pink);
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+/* Header Action Icons */
+.header-icons {
+    position: absolute;
+    right: 40px;
+    top: 38px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 110;
+     transform: translateY(25px);
+}
+
+.header-icon-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--pink);
+    font-size: 20px;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.header-icon-btn:hover {
+    color: var(--cream);
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   HERO SECTION
+   ========================================================= */
+.hero {
+    position: relative;
+    width: 100%;
+    height: 820px;
+    background: var(--dark-teal);
+    overflow: hidden;
+}
+
+/* Decorative Pink Side Shapes - replaced by dynamic moving .slide-bg-shape inside slides */
+.hero-side {
+    display: none;
+}
+
+/* =========================================================
+   HERO SLIDER
+   ========================================================= */
+.hero-slider {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+/* Cream Arch Frame Behind */
+.hero-frame {
+    display: none;
+}
+
+/* Slider Viewport: Fixed window showing exactly 3 cards on Desktop (2 hidden) */
+.slides-viewport {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 135px;
+    width: 1310px;
+    padding: 0 50px;
+    box-sizing: border-box;
+    height: 615px;
+    overflow: hidden;
+    z-index: 15;
+}
+
+/* Slides Track: Horizontal row with increased spacing */
+.slides {
+    display: flex;
+    gap: 95px;
+    width: max-content;
+    will-change: transform;
+    transition: transform 0.6s ease;
+}
+
+/* Slide Item: Wraps Title + Background Offset Shape + Image Card together */
+.slide {
+    flex: 0 0 340px;
+    width: 340px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    user-select: none;
+    transform-origin: bottom center;
+    transition: transform 0.65s cubic-bezier(0.25, 1, 0.35, 1), opacity 0.65s ease;
+}
+
+
+.slide-bg-shape {
+    position: absolute;
+    width: 340px;
+    height: 460px;
+    border-radius: 170px 170px 0 0;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(calc(-50% + 22px));
+    z-index: 2;
+    pointer-events: none;
+    display: block !important;
+    opacity: 1 !important;
+    transition: background-color 0.65s cubic-bezier(0.25, 1, 0.35, 1),
+                transform 0.65s cubic-bezier(0.25, 1, 0.35, 1),
+                box-shadow 0.65s ease,
+                opacity 0.65s ease;
+}
+
+/* Sparkle accent in bottom-right corner of shadow pattern like Figma */
+.slide-bg-shape::after {
+    content: '✦';
+    position: absolute;
+    right: 7px;
+    bottom: 5px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1;
+    pointer-events: none;
+    opacity: 0.75;
+    transition: color 0.6s ease, opacity 0.6s ease;
+}
+
+/* Secondary (left and right) slides: Dusty Rose / Mauve shadow pattern */
+.slide:not(.center-active) {
+    transform: scale(0.92);
+    opacity: 0.92;
+}
+
+.slide:not(.center-active) .slide-bg-shape {
+    background-color: #8E6864;
+    transform: translateX(calc(-50% + 20px)) translateY(0);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28);
+}
+
+.slide:not(.center-active) .image-upload-box {
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+    filter: brightness(0.94);
+}
+
+/* Center active slide: Pure White (#FFFFFF) shadow pattern with floating animation */
+.slide.center-active {
+    transform: scale(1.02);
+    opacity: 1;
+    z-index: 10;
+}
+
+.slide.center-active .slide-bg-shape {
+    background-color: #FFFFFF;
+    transform: translateX(calc(-50% + 22px)) translateY(0);
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3), 0 3px 10px rgba(255, 255, 255, 0.15);
+    animation: centerWhiteShadowPulse 4s ease-in-out infinite;
+}
+
+.slide.center-active .slide-bg-shape::after {
+    color: rgba(142, 104, 100, 0.65);
+    opacity: 0.85;
+}
+
+.slide.center-active .image-upload-box {
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+    filter: brightness(1.02);
+    animation: centerImageFloat 4s ease-in-out infinite;
+}
+
+/* Center Image & White Shadow Floating Animation */
+@keyframes centerWhiteShadowPulse {
+    0%, 100% {
+        transform: translateX(calc(-50% + 22px)) translateY(0);
+        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3), 0 3px 10px rgba(255, 255, 255, 0.15);
+    }
+    50% {
+        transform: translateX(calc(-50% + 25px)) translateY(-4px);
+        box-shadow: 0 14px 34px rgba(255, 255, 255, 0.48), 0 6px 16px rgba(255, 255, 255, 0.22);
+    }
+}
+
+@keyframes centerImageFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes activeImageGlow {
+    0% {
+        transform: scale(1.0);
+        filter: brightness(0.97);
+    }
+    100% {
+        transform: scale(1.02);
+        filter: brightness(1.02);
+    }
+}
+
+/* Smooth zoom and brilliance reveal on active slide image */
+.slide .uploaded-img {
+    transition: transform 0.8s cubic-bezier(0.25, 1, 0.35, 1);
+}
+
+.slide.center-active .uploaded-img {
+    animation: activeImageGlow 0.75s cubic-bezier(0.25, 1, 0.35, 1) forwards;
+}
+
+/* Per-Slide Typography Header */
+.slide-header {
+    text-align: center;
+    margin-bottom: 14px;
+    pointer-events: none;
+    width: 100%;
+    height: 95px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+
+    position: relative;
+    left: -90px;
+    top: 80px;
+}
+.slide-subtitle {
+    font-family: var(--font-imprima);
+    font-size: 30px;
+    line-height: 22px;
+    color: var(--pink);
+    letter-spacing: 0.5px;
+    display: block;
+    
+}
+
+.slide:has(.title-spectacular) .slide-subtitle {
+    position: relative;
+    left: -40px;
+}
+
+.slide:has(.title-magnificent) .slide-subtitle {
+    position: relative;
+    left: -40px;
+}
+
+.slide-title {
+    font-weight: 400;
+    color: #FFFFFF;
+    text-align: center;
+    white-space: nowrap;
+    margin: 0;
+    line-height: 1.1;
+}
+
+/* Custom typography per slide */
+.title-fearless {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: 160px !important;
+    letter-spacing: 1px;
+}
+
+.title-magnificent {
+    font-family: var(--font-hurricane);
+    font-size: 160px !important;
+}
+
+.title-surreal {
+    font-family: 'Alex Brush', cursive;
+    font-size: 160px !important;
+}
+
+.title-vibrant {
+   
+    font-size: 255px !important;
+}
+
+.title-spectacular {
+    font-family: var(--font-hurricane);
+    font-size: 160px !important;
+
+    position: relative;
+    left: 25px;
+}
+
+/* Slide Image Box: Fixed dimensions, arch curve */
+.slide .image-upload-box {
+    width: 340px;
+    height: 460px;
+    border-radius: 170px 170px 0 0;
+    overflow: hidden;
+    box-sizing: border-box;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.22);
+    border: none;
+    cursor: default;
+    position: relative;
+    z-index: 5;
+    transform-origin: bottom center;
+    transition: transform 0.6s ease, opacity 0.6s ease, box-shadow 0.6s ease;
+}
+
+.slide .image-upload-box:hover {
+    border: none;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28);
+    background: transparent;
+}
+
+/* =========================================================
+   BLANK IMAGE UPLOAD BOXES (Clean space ready for upload)
+   ========================================================= */
+.image-upload-box {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #114246;
+    border: 2px dashed rgba(236, 158, 150, 0.4);
+    border-radius: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: border-color 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.image-upload-box:hover {
+    border-color: var(--pink);
+    background: #154c51;
+    box-shadow: 0 0 20px rgba(236, 158, 150, 0.2);
+}
+
+.image-upload-box.drag-over {
+    border-color: #FFFFFF;
+    background: #1c5f65;
+}
+
+.image-upload-box .file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.image-upload-box .uploaded-img {
+    display: block !important;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 5;
+    border-radius: inherit;
+}
+
+.upload-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
+    z-index: 2;
+    pointer-events: none;
+    color: var(--pink);
+}
+
+.upload-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+    color: var(--pink);
+    opacity: 0.85;
+    transition: transform 0.25s ease;
+}
+
+.image-upload-box:hover .upload-icon {
+    transform: translateY(-4px) scale(1.1);
+    color: var(--cream);
+}
+
+.upload-title {
+    font-family: var(--font-imprima);
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--cream);
+    margin-bottom: 4px;
+}
+
+.upload-hint {
+    font-size: 13px;
+    color: var(--pink);
+    opacity: 0.9;
+    margin-bottom: 6px;
+}
+
+.upload-size {
+    font-size: 11px;
+    color: rgba(250, 245, 238, 0.6);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+/* Category Cards have Cream background, so upload box adapts */
+.category-card .image-upload-box {
+    background: rgba(10, 55, 59, 0.06);
+    border: 2px dashed rgba(10, 55, 59, 0.25);
+}
+
+.category-card .image-upload-box:hover {
+    background: rgba(10, 55, 59, 0.1);
+    border-color: var(--dark-teal);
+    box-shadow: 0 4px 15px rgba(10, 55, 59, 0.15);
+}
+
+.category-card .upload-placeholder {
+    color: var(--dark-teal);
+}
+
+.category-card .upload-icon {
+    color: var(--dark-teal);
+}
+
+.category-card .upload-title {
+    color: var(--dark-teal);
+}
+
+.category-card .upload-hint {
+    color: rgba(10, 55, 59, 0.75);
+}
+
+.category-card .upload-size {
+    color: var(--dark-teal);
+    background: rgba(10, 55, 59, 0.08);
+}
+
+/* When image is successfully loaded, hide placeholder */
+.image-upload-box.has-image .upload-placeholder {
+    display: none;
+}
+
+.image-upload-box.has-image {
+    border: none;
+}
+/* Actual image */
+
+.category-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+
+    object-fit: cover;
+}
+
+
+/* Earrings card image */
+
+.card-earrings .category-image {
+    object-fit: cover;
+}
+
+
+/* Bracelets image */
+
+.card-bracelets .category-image {
+    object-fit: cover;
+}
+
+
+/* Rings image */
+
+.card-rings .category-image {
+    object-fit: cover;
+}
+
+
+/* Brooches image */
+
+.card-brooches .category-image {
+    object-fit: cover;
+}
+/* =========================================================
+   HERO CONTROLS & SIDE TEXT
+   ========================================================= */
+
+/* Left Circular Arrow - situated cleanly with generous spacing between left and center images */
+.slider-arrow-left {
+    position: absolute;
+    left: calc(50% - 218px);
+    right: auto;
+    top: 650px;
+    width: 44px;
+    height: 44px;
+    border: 2px solid var(--light-pink);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--light-pink);
+    font-size: 17px;
+    z-index: 35;
+    background: rgba(10, 55, 59, 0.85);
+    backdrop-filter: blur(6px);
+    cursor: pointer;
+    box-shadow: 4px 6px 14px rgba(255, 255, 255, 0.08), 0 4px 18px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease, transform 0.3s cubic-bezier(0.25, 1, 0.35, 1), color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    transform: translate(-50%, -50%);
+}
+
+.slider-arrow-left:hover {
+    background: var(--pink);
+    color: var(--dark-teal);
+    border-color: var(--pink);
+    transform: translate(-50%, -50%) scale(1.12);
+    box-shadow: 0 0 20px rgba(236, 158, 150, 0.5);
+}
+
+.slider-arrow-left:hover i {
+    transform: translateX(-2px);
+    transition: transform 0.2s ease;
+}
+
+/* Right Circular Arrow - situated cleanly with generous spacing between center and right images */
+
+
+.slider-arrow-right {
+    position: absolute;
+    left: calc(50% + 225px);
+    right: auto;
+    top: 405px;
+
+    width: 0;
+    height: 0;
+
+    border-left: 22px solid transparent;
+    border-right: 22px solid transparent;
+    border-bottom: 38px solid var(--light-pink);
+    border-top: none;
+
+    border-radius: 0;
+    padding: 0;
+
+    display: block;
+    font-size: 0;
+    z-index: 35;
+
+    background: transparent;
+    cursor: pointer;
+    box-shadow: none;
+    backdrop-filter: none;
+
+    transform: translate(-50%, -50%) rotate(90deg);
+    transition: none;
+    animation: none;
+}
+
+
+.slider-arrow-right,
+.slider-arrow-right:hover,
+.slider-arrow-right:active,
+.slider-arrow-right:focus,
+.slider-arrow-right:focus-visible {
+    top: 405px !important;
+    left: calc(50% + 225px) !important;
+
+    transform: translate(-50%, -50%) rotate(90deg) !important;
+
+    transition: none !important;
+    animation: none !important;
+
+    margin: 0 !important;
+    box-shadow: none !important;
+}
+
+
+.slider-arrow-right i {
+    display: none;
+}
+
+
+
+
+
+.slider-arrow-left:active,
+.slider-arrow-right:active {
+    transform: translate(-50%, -50%) scale(0.94);
+}
+
+/* Side Text: hidden to prevent overlapping cards */
+.side-text {
+    display: none;
+}
+
+.side-word {
+    font-family: var(--font-imprima);
+    font-size: 26px;
+    line-height: 30px;
+    color: var(--pink);
+    text-align: center;
+    transform: rotate(90deg);
+    display: inline-block;
+}
+
+.side-connector {
+    font-family: var(--font-hand);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--pink);
+    margin: 2px 0;
+    display: inline-block;
+}
+
+/* Slider Pagination Dots (Figma Ellipse: top: 710px) */
+.slider-dots {
+    position: absolute;
+    left: 50%;
+    top: 765px;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 30;
+}
+
+.slider-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--pink);
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.25s ease, background 0.25s ease, border 0.25s ease, width 0.25s ease, height 0.25s ease;
+}
+
+.slider-dot.active {
+    width: 18px;
+    height: 18px;
+    background: var(--pink);
+    border: 2px solid var(--cream);
+    box-sizing: border-box;
+}
+
+.slider-dot:hover:not(.active) {
+    transform: scale(1.2);
+}
+
+/* =========================================================
+   TESTIMONIAL SECTION (Rectangle 13: 1436x390, top: 1509px)
+   ========================================================= */
+.testimonial {
+    position: relative;
+    width: 90%;
+    margin-top: 100px;
+    padding-bottom: 120px;
+    z-index: 10;
+}
+
+.testimonial-card {
+    position: relative;
+    left: 0;
+    width: 90%;
+    max-width: 1300px;
+    min-height: 280px;
+    background: var(--cream);
+    border-radius: 0 101px 101px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 60px 40px 100px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.testimonial-card p {
+    max-width: 1069px;
+    font-family: var(--font-imprima);
+    font-size: 32px;
+    line-height: 42px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.testimonial-author {
+    display: block;
+    margin-top: 16px;
+    font-family: var(--font-imprima);
+    font-size: 30px;
+    color: var(--text-muted);
+}
+
+/* =========================================================
+   CATEGORIES SECTION - SEAMLESS ZERO-GAP MOSAIC (FIGMA MATCH)
+   - Zero spacing between images (gap: 0)
+   - Left edge to right edge (uses available width, no outer spacing)
+   - Left Column: 2 stacked images (Necklaces top, Rings bottom)
+   - Center Column: 1 large tall image (Earrings) spanning full height
+   - Right Column: 2 stacked images (Bracelets top, Brooches bottom)
+   - No white/cream card background or padding
+   - Titles positioned directly ON the images
+   ========================================================= */
+/* =========================================================
+   CATEGORIES SECTION - SEAMLESS ZERO-GAP MOSAIC (FIGMA MATCH)
+   - All 5 category images fully visible with explicit heights
+   - Zero spacing between images (gap: 0)
+   - Left edge to right edge (uses available width, no outer spacing)
+   - Left Column: 2 stacked images (Necklaces top, Rings bottom)
+   - Center Column: 1 large tall image (Earrings) spanning full height
+   - Right Column: 2 stacked images (Bracelets top, Brooches bottom)
+   - No white/cream card background, padding, or borders
+   - Titles positioned directly ON the images
+   ========================================================= */
+.categories {
+    position: relative;
+    width: 100%;
+    padding: 0 0 100px 0 !important;
+    margin: 0 !important;
+    z-index: 10;
+    display: block !important;
+    box-sizing: border-box;
+}
+
+.categories .category-grid {
+    display: flex !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    align-items: stretch !important;
+    justify-content: center !important;
+    box-sizing: border-box;
+    background: transparent !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* Side Columns (Left & Right): Stack of 2 images with zero gap */
+.categories .category-col-left,
+.categories .category-col-right {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 1 1 26% !important;
+    box-sizing: border-box;
+}
+
+/* Center Column: 1 large tall image spanning full height with zero gap */
+.categories .category-col-center {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    flex: 1.85 1 48% !important;
+    box-sizing: border-box;
+}
+
+/* Category Card: Pure seamless image container (No white/cream background) */
+.categories .category-card {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    background: transparent !important;
+    background-color: transparent !important;
+    border-radius: 0 !important;
+    border: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+
+.categories .category-card:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Side cards height: Two 350px cards = 700px total height matching center card */
+.categories .category-col-left .category-card,
+.categories .category-col-right .category-card {
+    flex: 0 0 350px !important;
+    height: 350px !important;
+    min-height: 350px !important;
+}
+
+/* Center card: 700px matches the exact height of the two side cards combined */
+.categories .category-col-center .category-card,
+.categories .card-center-big {
+    flex: 0 0 700px !important;
+    height: 700px !important;
+    min-height: 700px !important;
+}
+
+/* Image Wrapper: fills the entire card in normal flow */
+.categories .category-image-wrap {
+    width: 100% !important;
+    height: 100% !important;
+    position: relative !important;
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    overflow: hidden !important;
+    background: transparent !important;
+}
+
+/* Category Images: Guaranteed visible, full bleed, object-fit cover */
+.categories .category-card img,
+.categories .category-image {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transition: transform 0.5s ease;
+}
+
+.categories .category-card:hover img {
+    transform: scale(1.04);
+}
+
+/* Category Title: Positioned directly ON the image */
+.categories .category-title {
+    position: absolute !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    z-index: 10 !important;
+    pointer-events: none;
+    font-family: var(--font-inter), sans-serif;
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: 0.5px;
+    transition: transform 0.3s ease;
+}
+
+.categories .category-card:hover .category-title {
+    transform: translateY(-2px);
+}
+
+/* Necklaces (Left Top): Bottom-left of image, soft pink as in Figma */
+.categories .card-necklaces .category-title {
+    bottom: 28px;
+    left: 32px;
+    color: #EC9E96 !important;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Rings (Left Bottom): Bottom-left of image */
+.categories .card-rings .category-title {
+    bottom: 28px;
+    left: 32px;
+    color: #FFFFFF !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Center (Earrings): Bottom-left of image, prominent */
+.categories .card-earrings .category-title {
+    bottom: 36px;
+    left: 36px;
+    color: #FFFFFF !important;
+    font-size: 32px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7);
+}
+
+/* Bracelets & Cuffs (Right Top): Bottom-right of image */
+.categories .card-bracelets .category-title {
+    bottom: 28px;
+    right: 32px;
+    left: auto;
+    color: #FFFFFF !important;
+    font-weight: 500;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Brooches (Right Bottom): Bottom-right of image */
+.categories .card-brooches .category-title {
+    bottom: 28px;
+    right: 32px;
+    left: auto;
+    color: #FFFFFF !important;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* =========================================================
+   TABLET RESPONSIVE FOR CATEGORIES (<= 1024px)
+   All 5 category images have the EXACT SAME visual ratio and dimensions
+   ========================================================= */
+@media (max-width: 1024px) {
+    .categories {
+        padding: 0 0 60px 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .categories .category-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .categories .category-col-left,
+    .categories .category-col-center,
+    .categories .category-col-right {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: none !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* All 5 category cards have identical dimensions and ratio on tablet */
+    .categories .category-card,
+    .categories .category-col-left .category-card,
+    .categories .category-col-center .category-card,
+    .categories .category-col-right .category-card,
+    .categories .card-center-big {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        flex: none !important;
+        aspect-ratio: 16 / 9 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .categories .category-image-wrap {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        position: relative !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .categories .category-card img,
+    .categories .category-image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .categories .category-title {
+        font-size: 26px !important;
+        bottom: 24px !important;
+        left: 28px !important;
+        right: auto !important;
+    }
+
+    .categories .card-bracelets .category-title,
+    .categories .card-brooches .category-title {
+        right: 28px !important;
+        left: auto !important;
+    }
+}
+
+/* =========================================================
+   LOWER COLLECTION SECTION (Figma Rectangle 14: 1531x609)
+   ========================================================= */
+.lower-section {
+    position: relative;
+    width: 100%;
+    padding: 60px 50px 100px;
+    z-index: 10;
+}
+
+.lower-card {
+    max-width: 1300px;
+    margin: 0 auto;
+    background: var(--cream);
+    border-radius: 101px;
+    padding: 60px 80px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.lower-brand-title {
+    font-family: var(--font-almarai);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--pink);
+    letter-spacing: 1.5px;
+    margin-bottom: 40px;
+}
+
+.lower-columns {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 2fr;
+    gap: 40px;
+    align-items: start;
+}
+
+.lower-col h4 {
+    font-family: var(--font-inter);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    letter-spacing: 1.2px;
+    margin-bottom: 18px;
+    text-transform: uppercase;
+}
+
+.col-about p {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-dark);
+    margin-bottom: 12px;
+    opacity: 0.9;
+}
+
+.col-links ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.col-links a {
+    font-size: 14px;
+    color: var(--text-dark);
+    opacity: 0.85;
+    transition: opacity 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+    display: inline-block;
+}
+
+.col-links a:hover {
+    opacity: 1;
+    color: var(--pink);
+    padding-left: 4px;
+}
+
+.col-newsletter p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-dark);
+    margin-bottom: 16px;
+    opacity: 0.9;
+}
+
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 260px;
+}
+
+.newsletter-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #CCCCCC;
+    background: #FFFFFF;
+    font-family: var(--font-inter);
+    font-size: 14px;
+    color: var(--text-dark);
+    outline: none;
+    border-radius: 2px;
+    transition: border-color 0.2s ease;
+}
+
+.newsletter-input:focus {
+    border-color: var(--dark-teal);
+}
+
+.btn-subscribe {
+    width: 100%;
+    padding: 11px 18px;
+    background: var(--dark-teal);
+    color: #FFFFFF;
+    font-family: var(--font-inter);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    transition: background-color 0.25s ease, transform 0.2s ease;
+}
+
+.btn-subscribe:hover {
+    background: #145055;
+    transform: translateY(-1px);
+}
+
+.newsletter-msg {
+    margin-top: 10px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #145055;
+}
+
+/* =========================================================
+   FOOTER (Figma: top: 4118px, font-family: 'Almarai', 24px)
+   ========================================================= */
+.footer {
+    position: relative;
+    width: 100%;
+    height: 100px;
+    padding: 0 77px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-almarai);
+    font-size: 24px;
+    line-height: 1;
+    color: var(--pink);
+    z-index: 10;
+}
+
+.footer-copy {
+    display: flex;
+    align-items: center;
+}
+
+.footer-credit {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.footer-credit strong {
+    font-weight: 700;
+    color: var(--cream);
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN (Tablets & Laptops)
+   ========================================================= */
+@media (max-width: 1399px) {
+    .header-icons {
+        right: 30px;
+        gap: 16px;
+    }
+
+    .navigation {
+        left: 280px;
+        gap: 16px;
+    }
+
+    .nav-link {
+        font-size: 20px;
+    }
+
+    .lower-columns {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+    }
+
+    .col-newsletter {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 1199px) {
+    .navigation {
+        left: 240px;
+        gap: 14px;
+    }
+
+    .nav-link {
+        font-size: 18px;
+    }
+
+    .categories-row {
+        flex-wrap: wrap;
+        gap: 30px;
+    }
+}
+
+@media (max-width: 991px) {
+    .header {
+        height: 200px;
+        background: var(--header-teal);
+    }
+
+    .header-logo {
+        width: 160px;
+        height: 160px;
+        top: 10px;
+    }
+
+    .navigation {
+        left: 180px;
+        top: 130px;
+        gap: 12px;
+    }
+
+    .nav-link {
+        font-size: 16px;
+    }
+
+    .nav-dot {
+        width: 8px;
+        height: 8px;
+    }
+
+    .header-icons {
+        top: 125px;
+        right: 20px;
+    }
+
+    .hero-side-left {
+        left: -380px;
+    }
+
+    .hero-side-right {
+        right: -380px;
+        left: auto;
+    }
+
+    .hero-frame {
+        display: none;
+    }
+
+    .slides-viewport {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        top: 100px;
+        width: 280px;
+        height: 520px;
+        overflow: hidden;
+        z-index: 15;
+    }
+
+    .slides {
+        display: flex;
+        gap: 20px;
+        width: max-content;
+    }
+
+    .slide {
+        flex: 0 0 280px;
+        width: 280px;
+    }
+
+    .slide .image-upload-box {
+        width: 280px;
+        height: 380px;
+    }
+
+    .slider-arrow-left {
+        left: calc(50% - 170px);
+        top: 380px;
+        transform: translateY(-50%);
+    }
+
+    .slider-arrow-right {
+        right: calc(50% - 170px);
+        left: auto;
+        top: 380px;
+        transform: translateY(-50%);
+    }
+
+    .slider-dots {
+        top: 650px;
+    }
+
+    .hero {
+        height: 720px;
+    }
+
+    .testimonial-card {
+        width: 95%;
+        padding: 30px 40px;
+        border-radius: 0 60px 60px 0;
+    }
+
+    .testimonial-card p {
+        font-size: 24px;
+        line-height: 34px;
+    }
+
+    .lower-card {
+        border-radius: 60px;
+        padding: 40px;
+    }
+
+    .footer {
+        padding: 0 30px 30px;
+        font-size: 18px;
+    }
+}
+
+/* =========================================================
+   RESPONSIVE DESIGN (Mobile <= 767px)
+   ========================================================= */
+@media (max-width: 768px) {
+    .header {
+        height: 120px;
+        background: var(--header-teal);
+        position: relative;
+    }
+
+    .header-logo {
+        width: 90px;
+        height: 90px;
+        top: 15px;
+        left: 10px;
+    }
+
+    .navigation {
+        left: 110px;
+        top: 70px;
+        gap: 8px;
+        overflow-x: auto;
+        max-width: calc(100% - 120px);
+        padding-bottom: 6px;
+    }
+
+    .nav-link {
+        font-size: 13px;
+    }
+
+    .nav-dot {
+        width: 5px;
+        height: 5px;
+    }
+
+    .header-icons {
+        top: 20px;
+        right: 15px;
+        gap: 12px;
+    }
+
+    .header-icon-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 16px;
+    }
+
+    .hero {
+        height: 720px;
+    }
+
+    .hero-side {
+        display: none;
+    }
+
+    .hero-frame {
+        display: none;
+    }
+
+    .slides-viewport {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 270px;
+        height: 520px;
+        top: 80px;
+        padding: 0;
+        overflow: hidden;
+        z-index: 15;
+    }
+
+    .slides {
+        display: flex;
+        gap: 20px;
+        width: max-content;
+    }
+
+    .slide {
+        flex: 0 0 270px;
+        width: 270px;
+        transform: none !important;
+        opacity: 1 !important;
+    }
+
+    .slide:not(.center-active) {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+
+    .slide.center-active {
+        transform: none !important;
+        opacity: 1 !important;
+    }
+
+    .slide-header {
+        height: 85px;
+        margin-bottom: 12px;
+    }
+
+    .slide-subtitle {
+        font-size: 16px;
+    }
+
+    .slide-title {
+        font-size: 42px;
+    }
+
+    .title-fearless {
+        font-size: 38px;
+    }
+
+    .title-magnificent {
+        font-size: 50px;
+    }
+
+    .title-surreal {
+        font-size: 42px;
+    }
+
+    .title-vibrant {
+        font-size: 44px;
+    }
+
+    .title-spectacular {
+        font-size: 50px;
+    }
+
+    .slide .image-upload-box {
+        width: 270px;
+        height: 360px;
+        border-radius: 135px 135px 0 0;
+    }
+
+    .slide-bg-shape {
+        display: none !important;
+    }
+
+
+
+    .play-icon {
+        border-top: 15px solid transparent;
+        border-bottom: 15px solid transparent;
+        border-left: 24px solid #FFFFFF;
+    }
+
+    .slider-dots {
+        top: 650px;
+        gap: 10px;
+    }
+
+    .slider-dot {
+        width: 12px;
+        height: 12px;
+    }
+
+    .slider-dot.active {
+        width: 18px;
+        height: 18px;
+    }
+
+    .testimonial {
+        margin-top: 40px;
+        padding-bottom: 60px;
+    }
+
+    .testimonial-card {
+        width: 100%;
+        border-radius: 0 40px 40px 0;
+        padding: 30px 20px;
+    }
+
+    .testimonial-card p {
+        font-size: 18px;
+        line-height: 26px;
+    }
+
+    .testimonial-author {
+        font-size: 16px;
+    }
+
+    /* =========================================================
+       MOBILE CATEGORIES (<= 768px)
+       All 5 category images have the EXACT SAME 4:5 visual ratio and dimensions
+       ========================================================= */
+    .categories {
+        padding: 0 0 50px 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    .categories .category-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .categories .category-col-left,
+    .categories .category-col-center,
+    .categories .category-col-right {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: none !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* All 5 category cards have identical dimensions and 4:5 ratio on mobile */
+    .categories .category-card,
+    .categories .category-col-left .category-card,
+    .categories .category-col-center .category-card,
+    .categories .category-col-right .category-card,
+    .categories .card-center-big {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        flex: none !important;
+        aspect-ratio: 4 / 5 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        background: transparent !important;
+    }
+
+    .categories .category-image-wrap {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+        position: relative !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .categories .category-card img,
+    .categories .category-image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .categories .category-title {
+        font-size: 22px !important;
+        bottom: 20px !important;
+        left: 22px !important;
+        right: auto !important;
+    }
+
+    .categories .card-bracelets .category-title,
+    .categories .card-brooches .category-title {
+        right: 22px !important;
+        left: auto !important;
+    }
+
+    .lower-section {
+        padding: 20px 15px 60px;
+    }
+
+    .lower-card {
+        border-radius: 40px;
+        padding: 30px 20px;
+    }
+
+    .lower-columns {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        height: auto;
+        padding: 0 15px 30px;
+        font-size: 16px;
+    }
+}
+/* =====================================================
+   FIRQUI JEWELS - OPENING ENVELOPE ANIMATION
+===================================================== */
+
+.intro-screen {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100vh;
+
+    background: #073f43;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    z-index: 999999;
+
+    perspective: 1400px;
+
+    animation: introScreenExit 0.65s ease forwards;
+    animation-delay: 1.65s;
+}
+
+
+/* =====================================================
+   ENVELOPE
+===================================================== */
+
+.intro-envelope {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: visible;
+
+    transform-style: preserve-3d;
+}
+
+
+/* =====================================================
+   ENVELOPE BACK
+===================================================== */
+
+.envelope-back {
+    position: absolute;
+    inset: 0;
+
+    background: #073f43;
+}
+
+
+/* =====================================================
+   LEFT FOLD
+===================================================== */
+
+.envelope-left {
+    position: absolute;
+
+    left: 0;
+    bottom: 0;
+
+    width: 52%;
+    height: 88%;
+
+    background: #0b484c;
+
+    clip-path: polygon(
+        0 100%,
+        0 0,
+        100% 100%
+    );
+
+    z-index: 2;
+}
+
+
+/* =====================================================
+   RIGHT FOLD
+===================================================== */
+
+.envelope-right {
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+
+    width: 52%;
+    height: 88%;
+
+    background: #0b484c;
+
+    clip-path: polygon(
+        100% 100%,
+        100% 0,
+        0 100%
+    );
+
+    z-index: 2;
+}
+
+
+/* =====================================================
+   ENVELOPE FLAP
+===================================================== */
+
+.envelope-flap {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 55%;
+
+    background: #0a4549;
+
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 10%,
+        50% 100%,
+        0 10%
+    );
+
+    transform-origin: top center;
+
+    z-index: 6;
+
+    transform: rotateX(0deg);
+
+    animation: envelopeFlapOpen 0.85s cubic-bezier(.65,0,.35,1) forwards;
+    animation-delay: 1s;
+}
+
+
+/* =====================================================
+   LOGO CIRCLE
+===================================================== */
+
+.intro-logo {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 138px;
+    height: 138px;
+
+    transform: translate(-50%, -50%) scale(0.7);
+
+    border-radius: 50%;
+
+    background: #294e51;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 5;
+
+    opacity: 0;
+
+    animation:
+        logoAppear 0.7s ease forwards,
+        logoExit 0.45s ease forwards;
+
+    animation-delay:
+        0.25s,
+        1.35s;
+}
+
+
+/* =====================================================
+   LOGO IMAGE
+===================================================== */
+
+.intro-logo img {
+    width: 108px;
+    height: auto;
+
+    display: block;
+
+    object-fit: contain;
+}
+
+
+/* =====================================================
+   LOGO APPEAR
+===================================================== */
+
+@keyframes logoAppear {
+
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.65);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+}
+
+
+/* =====================================================
+   ENVELOPE FLAP OPEN
+===================================================== */
+
+@keyframes envelopeFlapOpen {
+
+    0% {
+        transform: rotateX(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: rotateX(125deg);
+        opacity: 0;
+    }
+
+}
+
+
+/* =====================================================
+   LOGO EXIT
+===================================================== */
+
+@keyframes logoExit {
+
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.92);
+    }
+
+}
+
+
+/* =====================================================
+   COMPLETE INTRO EXIT
+===================================================== */
+
+@keyframes introScreenExit {
+
+    0% {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    100% {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+}
+/* =====================================================
+   OPENING ENVELOPE INTRO
+===================================================== */
+
+.intro-screen {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+
+    background: #073f43;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 99999;
+
+    overflow: hidden;
+
+    animation: introFadeOut 0.8s ease forwards;
+    animation-delay: 2.6s;
+}
+
+
+/* Envelope */
+
+.envelope {
+    position: relative;
+
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+}
+
+
+/* Envelope dark back */
+
+.envelope-back {
+    position: absolute;
+
+    width: 100%;
+    height: 100%;
+
+    background: #073f43;
+}
+
+
+/* Envelope flap */
+
+.envelope-flap {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background: #0b4a4d;
+
+    clip-path: polygon(
+        0 0,
+        100% 0,
+        100% 12%,
+        50% 50%,
+        0 12%
+    );
+
+    transform-origin: top center;
+
+    animation: envelopeOpen 1.2s ease forwards;
+    animation-delay: 1.7s;
+}
+
+
+/* Logo */
+
+.intro-logo {
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    transform: translate(-50%, -50%);
+
+    width: 180px;
+    height: 180px;
+
+    border-radius: 50%;
+
+    background: #294d50;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 10;
+
+    animation: logoAppear 0.8s ease forwards;
+}
+
+.intro-logo img {
+    width: 145px;
+    height: auto;
+
+    display: block;
+}
+
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes logoAppear {
+
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.7);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+}
+
+
+@keyframes envelopeOpen {
+
+    0% {
+        transform: rotateX(0deg);
+    }
+
+    100% {
+        transform: rotateX(75deg);
+        opacity: 0;
+    }
+
+}
+
+
+@keyframes introFadeOut {
+
+    0% {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    100% {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+
+}
+/* =====================================================
+   LOGIN / REGISTER MODAL
+===================================================== */
+
+.auth-modal-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100vh;
+
+    background: rgba(0, 0, 0, 0.58);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 25px;
+
+    z-index: 999999;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.3s ease,
+        visibility 0.3s ease;
+
+    backdrop-filter: blur(3px);
+}
+
+
+/* OPEN */
+
+.auth-modal-overlay.active {
+    opacity: 1;
+
+    visibility: visible;
+}
+
+
+/* =====================================================
+   MODAL BOX
+===================================================== */
+
+.auth-modal-box {
+    position: relative;
+
+    width: 510px;
+
+    max-width: 100%;
+
+    height: 720px;
+
+    max-height: 92vh;
+
+    background: var(--cream);
+
+    border-radius: 35px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.4);
+
+    transform:
+        translateY(25px)
+        scale(0.96);
+
+    transition:
+        transform 0.35s ease;
+}
+
+
+.auth-modal-overlay.active
+.auth-modal-box {
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+
+/* =====================================================
+   IFRAME
+===================================================== */
+
+.auth-modal-box iframe {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+
+    display: block;
+
+    background: var(--cream);
+}
+
+
+/* =====================================================
+   CLOSE BUTTON
+===================================================== */
+
+.auth-modal-close {
+    position: absolute;
+
+    top: 14px;
+    right: 14px;
+
+    width: 42px;
+    height: 42px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: rgba(250, 245, 238, 0.95);
+
+    color: var(--dark-teal);
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 21px;
+
+    cursor: pointer;
+
+    z-index: 10;
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.auth-modal-close:hover {
+    background: var(--pink);
+
+    transform: rotate(90deg);
+}
+
+
+/* =====================================================
+   PREVENT PAGE SCROLL WHEN MODAL OPEN
+===================================================== */
+
+body.auth-modal-open {
+    overflow: hidden;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .auth-modal-overlay {
+        padding: 10px;
+    }
+
+    .auth-modal-box {
+        width: 100%;
+
+        height: 90vh;
+
+        border-radius: 25px;
+    }
+
+}
+/* =====================================================
+   HERO SLIDER - SAME FONT FOR ALL 5 TITLES
+===================================================== */
+
+.slide-title {
+    font-family: 'Hurricane', cursive !important;
+    font-weight: 400 !important;
+}
+/* =========================================================
+   HERO SLIDER - PERFECT TITLE ALIGNMENT
+   All 5 slides use exactly the same title layout
+========================================================= */
+
+/* Keep every slide in the same vertical structure */
+.slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Same title area for every slide */
+.slide-header {
+    width: 100%;
+    height: 112px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 0;
+}
+
+/* "Unleash the" - identical position on every slide */
+.slide-subtitle {
+    height: 30px;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 30px !important;
+}
+
+/* =========================================================
+   ALL 5 MAIN TITLES
+========================================================= */
+
+.slide-title,
+.title-fearless,
+.title-magnificent,
+.title-surreal,
+.title-vibrant,
+.title-spectacular {
+    width: 100%;
+    height: 70px;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+
+    font-family: 'Hurricane', cursive !important;
+    font-size: 58px !important;
+    font-weight: 400 !important;
+
+    line-height: 1 !important;
+    text-align: center;
+}
+
+/* =========================================================
+   REMOVE OLD INDIVIDUAL TITLE DIFFERENCES
+========================================================= */
+
+.title-fearless,
+.title-magnificent,
+.title-surreal,
+.title-vibrant,
+.title-spectacular {
+    position: static !important;
+    top: auto !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+
+    transform: none !important;
+
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* =========================================================
+   IMAGE BOXES - SAME STARTING POSITION
+========================================================= */
+
+.slide .image-upload-box {
+    margin-top: 0 !important;
+}
+/* =====================================================
+   MOBILE HERO - LARGER TEXT + NO IMAGE OVERLAP
+===================================================== */
+
+@media (max-width: 768px) {
+
+    /* ---------------------------------------------
+       HERO SLIDE
+    --------------------------------------------- */
+
+    .slide {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100% !important;
+    }
+
+
+    /* ---------------------------------------------
+       TITLE AREA
+    --------------------------------------------- */
+
+    .slide-header {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 80px !important;
+
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+
+        position: relative !important;
+        left: 0 !important;
+        right: auto !important;
+        top: 0 !important;
+
+        margin: 0 auto 10px auto !important;
+        padding: 0 10px !important;
+        text-align: center !important;
+        box-sizing: border-box !important;
+    }
+
+
+    /* ---------------------------------------------
+       "UNLEASH THE"
+    --------------------------------------------- */
+
+    .slide-subtitle {
+        width: 100% !important;
+        height: auto !important;
+
+        margin: 0 0 2px 0 !important;
+        padding: 0 !important;
+
+        display: block !important;
+        position: static !important;
+        left: auto !important;
+        top: auto !important;
+
+        font-size: 16px !important;
+        line-height: 1.2 !important;
+        font-family: 'Imprima', sans-serif !important;
+        letter-spacing: 0.5px !important;
+
+        text-align: center !important;
+    }
+
+    .slide:has(.title-spectacular) .slide-subtitle,
+    .slide:has(.title-magnificent) .slide-subtitle {
+        position: static !important;
+        left: auto !important;
+    }
+
+
+    /* ---------------------------------------------
+       MAIN TITLE (Fearless, Magnificent, etc.)
+    --------------------------------------------- */
+
+    .slide-title,
+    .title-fearless,
+    .title-magnificent,
+    .title-surreal,
+    .title-vibrant,
+    .title-spectacular {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 48px !important;
+
+        margin: 0 !important;
+        padding: 0 !important;
+
+        display: block !important;
+        position: static !important;
+        left: auto !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: auto !important;
+
+        transform: none !important;
+        text-align: center !important;
+        line-height: 1.1 !important;
+        white-space: nowrap !important;
+        overflow: visible !important;
+
+        font-size: 42px !important;
+    }
+
+    .title-fearless {
+        font-family: 'Playfair Display', serif !important;
+        font-style: italic !important;
+        font-weight: 600 !important;
+        font-size: 40px !important;
+    }
+
+    .title-magnificent {
+        font-family: var(--font-hurricane) !important;
+        font-size: 42px !important;
+    }
+
+    .title-surreal {
+        font-family: 'Alex Brush', cursive !important;
+        font-size: 42px !important;
+    }
+
+    .title-vibrant {
+        font-family: var(--font-hurricane) !important;
+        font-size: 42px !important;
+    }
+
+    .title-spectacular {
+        font-family: var(--font-hurricane) !important;
+        font-size: 42px !important;
+    }
+
+
+    /* ---------------------------------------------
+       IMAGE BOX
+    --------------------------------------------- */
+
+    .slide .image-upload-box {
+        margin-top: 10px !important;
+    }
+
+
+    /* ---------------------------------------------
+       SLIDER ARROWS - PERFECT SAME HORIZONTAL LINE
+    --------------------------------------------- */
+
+    .slider-arrow-left {
+        left: 16px !important;
+        right: auto !important;
+        top: 380px !important;
+        width: 42px !important;
+        height: 42px !important;
+        font-size: 16px !important;
+        transform: translateY(-50%) !important;
+        border: 2px solid var(--light-pink) !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        color: var(--light-pink) !important;
+        background: rgba(10, 55, 59, 0.85) !important;
+        backdrop-filter: blur(6px) !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+        z-index: 40 !important;
+        cursor: pointer !important;
+    }
+
+    .slider-arrow-right {
+        right: 16px !important;
+        left: auto !important;
+        top: 380px !important;
+        width: 42px !important;
+        height: 42px !important;
+        transform: translateY(-50%) !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+        z-index: 40 !important;
+        margin: 0 !important;
+    }
+
+    .slider-arrow-right::after {
+        content: '' !important;
+        display: block !important;
+        width: 0 !important;
+        height: 0 !important;
+        border-top: 13px solid transparent !important;
+        border-bottom: 13px solid transparent !important;
+        border-left: 22px solid var(--light-pink) !important;
+        border-right: none !important;
+        pointer-events: none !important;
+        transition: border-left-color 0.2s ease, transform 0.2s ease !important;
+    }
+
+    .slider-arrow-right:active::after {
+        border-left-color: var(--pink) !important;
+        transform: scale(0.92) !important;
+    }
+
+    .slider-arrow-right i {
+        display: none !important;
+    }
+}
+
+
+/* =====================================================
+   VERY SMALL MOBILE PHONES
+===================================================== */
+
+@media (max-width: 400px) {
+
+    .slides-viewport {
+        width: 250px !important;
+    }
+
+    .slide {
+        flex: 0 0 250px !important;
+        width: 250px !important;
+    }
+
+    .slide-subtitle {
+        font-size: 14px !important;
+    }
+
+    .slide-title,
+    .title-fearless,
+    .title-magnificent,
+    .title-surreal,
+    .title-vibrant,
+    .title-spectacular {
+        font-size: 36px !important;
+    }
+
+    .title-fearless {
+        font-size: 34px !important;
+    }
+
+    .slide .image-upload-box {
+        width: 250px !important;
+        height: 335px !important;
+        border-radius: 125px 125px 0 0 !important;
+        margin-top: 10px !important;
+    }
+
+    .slider-arrow-left {
+        left: 12px !important;
+        right: auto !important;
+        top: 360px !important;
+        width: 38px !important;
+        height: 38px !important;
+        font-size: 15px !important;
+    }
+
+    .slider-arrow-right {
+        right: 12px !important;
+        left: auto !important;
+        top: 360px !important;
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .slider-arrow-right::after {
+        border-top: 11px solid transparent !important;
+        border-bottom: 11px solid transparent !important;
+        border-left: 18px solid var(--light-pink) !important;
+    }
+}
+/* =====================================================
+   DESKTOP - SHOW TITLE ONLY ON CENTER SLIDE
+===================================================== */
+
+@media (min-width: 769px) {
+
+    /* Hide ALL non-center slide titles with smooth drift */
+    .slide:not(.center-active) .slide-header {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        display: flex !important;
+        pointer-events: none !important;
+        transform: translateY(12px) scale(0.96) !important;
+
+        position: relative;
+        z-index: 50;
+
+        transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s !important;
+    }
+
+
+    /* SHOW CENTER SLIDE TITLE with elegant upward drift */
+    .slide.center-active .slide-header {
+        opacity: 1 !important;
+        visibility: visible !important;
+        display: flex !important;
+        pointer-events: auto !important;
+        transform: translateY(0) scale(1) !important;
+
+        position: relative;
+        z-index: 100;
+
+        transition: opacity 0.55s cubic-bezier(0.25, 1, 0.35, 1) 0.08s, transform 0.55s cubic-bezier(0.25, 1, 0.35, 1) 0.08s, visibility 0.55s !important;
+    }
+
+
+    /* Keep title above image */
+    .slide.center-active .slide-subtitle,
+    .slide.center-active .slide-title {
+        position: relative;
+        z-index: 101;
+    }
+}
+/* ================================
+   FOOTER SOCIAL MEDIA ICONS
+================================ */
+
+.footer-social-icons {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    margin-top: 22px;
+}
+
+.footer-social-icons .social-icon {
+    width: 38px;
+    height: 38px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #161616;
+    text-decoration: none;
+
+    font-size: 20px;
+
+    border: 1px solid transparent;
+    border-radius: 50%;
+
+    transition:
+        transform 0.3s ease,
+        color 0.3s ease,
+        border-color 0.3s ease;
+}
+
+.footer-social-icons .social-icon:hover {
+    color: #0A373B;
+    background: #EC9E96;
+
+    transform: translateY(-3px);
+}
+/* =========================================================
+   FORCE HERO TITLE SIZE (DESKTOP ONLY)
+========================================================= */
+
+@media (min-width: 1025px) {
+    .hero .slide .slide-header .slide-title {
+        font-size: 79px !important;
+        line-height: 0.8 !important;
+        transform: none !important;
+    }
+
+    .hero .slide .slide-header .slide-subtitle {
+        font-size: 25px !important;
+    }
+}
+
+

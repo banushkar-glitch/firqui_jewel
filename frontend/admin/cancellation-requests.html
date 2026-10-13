@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firqui Jewels | Cancellation Requests</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         CANCELLATION REQUESTS CSS (SAME DESIGN SYSTEM AS ORDERS)
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="cancellation-requests.css"
+    >
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="dashboard.html"
+            class="header-logo"
+        >
+
+            <img
+                src="../assets/Logo Pink 1.png"
+                alt="Firqui Jewels"
+            >
+
+        </a>
+
+
+        <!-- NAVIGATION -->
+
+        <nav
+            class="navigation"
+            aria-label="Admin Navigation"
+        >
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="products.html"
+                class="nav-link"
+            >
+                Products
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../categories/categories.html"
+                class="nav-link"
+            >
+                Categories
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../collections/collections.html"
+                class="nav-link"
+            >
+                Collections
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link active"
+            >
+                Cancellation Requests
+            </a>
+
+        </nav>
+
+
+        <!-- HEADER ICONS -->
+
+        <div class="header-icons">
+
+
+            <button
+                class="header-icon-btn"
+                id="adminButton"
+                type="button"
+                aria-label="Admin"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="searchButton"
+                type="button"
+                aria-label="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="notificationButton"
+                type="button"
+                aria-label="Notifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="logoutButton"
+                type="button"
+                aria-label="Logout"
+            >
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+
+        <section
+            class="orders-section"
+            id="orders"
+        >
+
+
+            <!-- =================================================
+                 PAGE HEADING
+            ================================================== -->
+
+            <div class="orders-heading">
+
+                <div>
+
+                    <span class="page-label">
+                        ORDER MANAGEMENT
+                    </span>
+
+                    <h1>
+                        Cancellation Requests
+                    </h1>
+
+                    <p>
+                        Review, verify, and manage FIRQUI JEWELS customer cancellation requests.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 ORDERS CONTAINER
+            ================================================== -->
+
+            <div class="orders-container">
+
+
+                <!-- =================================================
+                     ORDER SUMMARY (4 CARDS)
+                ================================================== -->
+
+                <div class="order-summary">
+
+
+                    <!-- TOTAL REQUESTS -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-bag-shopping"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                TOTAL REQUESTS
+                            </span>
+
+                            <strong id="totalRequests">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- PENDING -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-clock"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                PENDING REVIEW
+                            </span>
+
+                            <strong id="pendingRequests">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- APPROVED -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-check"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                APPROVED
+                            </span>
+
+                            <strong id="approvedRequests">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- REJECTED -->
+
+                    <div class="summary-card">
+
+                        <div class="summary-icon">
+
+                            <i class="fa-solid fa-xmark"></i>
+
+                        </div>
+
+                        <div>
+
+                            <span>
+                                REJECTED
+                            </span>
+
+                            <strong id="rejectedRequests">
+                                0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     ORDERS CARD
+                ================================================== -->
+
+                <div class="orders-card">
+
+
+                    <!-- CARD HEADER -->
+
+                    <div class="orders-card-header">
+
+                        <div>
+
+                            <span class="section-label">
+                                CUSTOMER REQUESTS
+                            </span>
+
+                            <h2>
+                                All Cancellation Requests
+                            </h2>
+
+                        </div>
+
+
+                        <div class="orders-count">
+
+                            <span id="visibleRequestCount">
+                                0
+                            </span>
+
+                            Requests
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         FILTERS
+                    ================================================== -->
+
+                    <div class="orders-filters">
+
+
+                        <!-- SEARCH -->
+
+                        <div class="order-search">
+
+                            <i class="fa-solid fa-magnifying-glass"></i>
+
+                            <input
+                                type="text"
+                                id="requestSearch"
+                                placeholder="Search order #, customer name, reason, or details..."
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+
+
+                        <!-- STATUS FILTER -->
+
+                        <div class="filter-select">
+
+                            <select id="statusFilter">
+
+                                <option value="all">
+                                    All Status
+                                </option>
+
+                                <option value="PENDING">
+                                    Pending Review
+                                </option>
+
+                                <option value="APPROVED">
+                                    Approved
+                                </option>
+
+                                <option value="REJECTED">
+                                    Rejected
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         TABLE WRAPPER
+                    ================================================== -->
+
+                    <div class="orders-table-wrapper">
+
+                        <table class="orders-table">
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>REQ ID</th>
+
+                                    <th>ORDER</th>
+
+                                    <th>CUSTOMER</th>
+
+                                    <th>PRODUCTS</th>
+
+                                    <th>AMOUNT</th>
+
+                                    <th>REASON & DETAILS</th>
+
+                                    <th>DATE</th>
+
+                                    <th>STATUS</th>
+
+                                    <th>ACTIONS</th>
+
+                                </tr>
+
+                            </thead>
+
+                            <tbody id="cancellationTableBody">
+                                <!-- Loaded dynamically via cancellation-requests.js -->
+                            </tbody>
+
+                        </table>
+
+
+                        <!-- EMPTY STATE -->
+
+                        <div
+                            class="empty-orders"
+                            id="emptyRequests"
+                        >
+
+                            <div class="empty-icon">
+
+                                <i class="fa-solid fa-box-open"></i>
+
+                            </div>
+
+                            <h3>
+                                No Cancellation Requests Found
+                            </h3>
+
+                            <p>
+                                No requests match your current search or filter criteria.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+      
+
+
+    <!-- =====================================================
+         FOOTER (EXACT SAME AS ORDERS.HTML)
+    ====================================================== -->
+
+    <footer
+        class="footer"
+        id="footer"
+    >
+
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+
+
+        <div class="footer-credit">
+
+            Powered by
+
+            <strong>
+                GENEXA TECH
+            </strong>
+
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     SCRIPTS
+====================================================== -->
+
+<script src="cancellation-requests.js"></script>
+<script src="admin-search.js"></script>
+
+</body>
+
+</html>

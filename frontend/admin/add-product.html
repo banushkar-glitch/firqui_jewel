@@ -1,0 +1,1526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firqui Jewels | Add Product</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         SAME ADMIN BASE DESIGN
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+
+    <!-- =====================================================
+         ADD PRODUCT CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="add-product.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="dashboard.html"
+            class="header-logo"
+            aria-label="FIRQUI JEWELS Dashboard"
+        >
+
+            <img
+                src="../assets/Logo Pink 1.png"
+                alt="Firqui Jewels"
+            >
+
+        </a>
+
+
+
+        <!-- NAVIGATION -->
+
+        <nav
+            class="navigation"
+            aria-label="Admin Navigation"
+        >
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="products.html"
+                class="nav-link active"
+            >
+                Products
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="#"
+                class="nav-link"
+            >
+                Categories
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="#"
+                class="nav-link"
+            >
+                Collections
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="#"
+                class="nav-link"
+            >
+                Orders
+            </a>
+
+        </nav>
+
+
+
+        <!-- HEADER ICONS -->
+
+        <div class="header-icons">
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="adminButton"
+                aria-label="Admin"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="searchButton"
+                aria-label="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="notificationButton"
+                aria-label="Notifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="logoutButton"
+                aria-label="Logout"
+            >
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            </button>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+
+        <section class="add-product-section">
+
+
+            <!-- =================================================
+                 CENTERED PAGE HEADING
+            ================================================== -->
+
+            <div class="add-product-heading">
+
+           
+
+                <h1>
+                    Add Product
+                </h1>
+
+                <p>
+                    Create a new FIRQUI JEWELS product
+                    for your online store.
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 PRODUCT FORM
+            ================================================== -->
+
+            <form
+                id="addProductForm"
+                class="add-product-form"
+            >
+
+
+                <!-- =================================================
+                     LEFT COLUMN
+                ================================================== -->
+
+                <div class="form-left-column">
+
+
+                    <!-- =================================================
+                         PRODUCT DETAILS
+                    ================================================== -->
+
+                    <div class="form-card">
+
+
+                        <div class="form-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    BASIC INFORMATION
+                                </span>
+
+                                <h2>
+                                    Product Details
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- JEWELRY TITLE -->
+
+                        <div class="form-group">
+
+                            <label for="productName">
+
+                                JEWELRY TITLE
+
+                                <span>*</span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="productName"
+                                name="productName"
+                                placeholder="e.g., 18K Rose Gold Diamond Halo Ring"
+                                required
+                            >
+
+                        </div>
+
+
+
+                        <!-- DESCRIPTION -->
+
+                        <div class="form-group">
+
+                            <label>
+                                DESCRIPTION
+                            </label>
+
+
+                            <div class="editor-toolbar">
+
+                                <button
+                                    type="button"
+                                    data-command="bold"
+                                    title="Bold"
+                                >
+                                    <strong>B</strong>
+                                </button>
+
+
+                                <span>/</span>
+
+
+                                <button
+                                    type="button"
+                                    data-command="italic"
+                                    title="Italic"
+                                >
+                                    <em>I</em>
+                                </button>
+
+
+                                <span>/</span>
+
+
+                                <button
+                                    type="button"
+                                    data-command="underline"
+                                    title="Underline"
+                                >
+                                    <u>U</u>
+                                </button>
+
+                            </div>
+
+
+                            <div
+                                class="description-editor"
+                                id="descriptionEditor"
+                                contenteditable="true"
+                                data-placeholder="Detail the cut, clarity, inspiration, and craftsmanship..."
+                            ></div>
+
+
+                            <input
+                                type="hidden"
+                                id="description"
+                                name="description"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         SPECIFICATIONS
+                    ================================================== -->
+
+                    <div class="form-card">
+
+
+                        <div class="form-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    PRODUCT INFORMATION
+                                </span>
+
+                                <h2>
+                                    Specifications
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <div class="two-column-fields">
+
+
+                            <!-- MEASUREMENT -->
+
+                            <div class="form-group">
+
+                                <label for="measurement">
+                                    MEASUREMENT
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="measurement"
+                                    name="measurement"
+                                    placeholder="Enter measurement"
+                                >
+
+                            </div>
+
+
+
+                            <!-- GEMSTONE -->
+
+                            <div class="form-group">
+
+                                <label for="gemstone">
+                                    GEMSTONE
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="gemstone"
+                                    name="gemstone"
+                                    placeholder="e.g., Moissanite, Emerald, Diamond"
+                                >
+
+                            </div>
+
+
+
+                            <!-- MATERIAL -->
+
+                            <div class="form-group">
+
+                                <label for="material">
+                                    MATERIAL
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="material"
+                                    name="material"
+                                    placeholder="e.g., 18K Gold, Sterling Silver"
+                                >
+
+                            </div>
+
+
+
+                            <!-- COLOR -->
+
+                            <div class="form-group">
+
+                                <label for="productColor">
+                                    COLOR
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="productColor"
+                                    name="productColor"
+                                    placeholder="e.g., Rose Gold"
+                                >
+
+                            </div>
+
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PRODUCT DETAILS
+                    ================================================== -->
+
+                    <div class="form-card">
+
+                        <div class="form-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    PAGE CONTENT
+                                </span>
+
+                                <h2>
+                                    Product Details
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- PRODUCT DETAILS DESCRIPTION -->
+
+                        <div class="form-group">
+
+                            <label for="productDetailsDescription">
+                                Product Details Description
+                            </label>
+
+                            <textarea
+                                id="productDetailsDescription"
+                                name="productDetailsDescription"
+                                class="product-details-textarea"
+                                rows="4"
+                                placeholder="Carefully crafted with attention to detail, this piece is designed to complement both everyday and occasion styling."
+                            ></textarea>
+
+                        </div>
+
+
+                        <!-- PRODUCT HIGHLIGHTS -->
+
+                        <div class="form-group">
+
+                            <label>
+                                Product Highlights
+                            </label>
+
+                            <div
+                                id="highlightsList"
+                                class="highlights-list"
+                            >
+                                <!-- Dynamic bullet items -->
+                            </div>
+
+                            <button
+                                type="button"
+                                id="addHighlightBtn"
+                                class="add-highlight-btn"
+                            >
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Add Highlight</span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         MEDIA GALLERY
+                    ================================================== -->
+
+                    <div class="form-card media-card">
+
+
+                        <div class="form-card-heading media-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    PRODUCT IMAGES
+                                </span>
+
+                                <h2>
+                                    Media Gallery
+                                </h2>
+
+                            </div>
+
+
+                            <span class="high-res-text">
+                                High-res images only
+                            </span>
+
+                        </div>
+
+
+
+                        <!-- MAIN IMAGE / VIDEO -->
+
+                        <div class="upload-area">
+
+                            <input
+                                type="file"
+                                id="mainImage"
+                                name="mainImage"
+                                accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                                hidden
+                            >
+
+
+                            <label
+                                for="mainImage"
+                                class="upload-box"
+                                id="mainUploadBox"
+                            >
+
+                                <div class="upload-icon">
+
+                                    <i class="fa-solid fa-photo-film"></i>
+
+                                </div>
+
+                                <strong>
+                                    Click to upload product media
+                                </strong>
+
+                                <span>
+                                    Upload main product image or video
+                                    (JPG, PNG, WEBP, GIF, MP4, WEBM)
+                                </span>
+
+                            </label>
+
+
+                            <div
+                                class="image-preview"
+                                id="mainImagePreview"
+                            ></div>
+
+                        </div>
+
+
+
+                       <!-- =================================================
+     REFERENCE MEDIA (IMAGES / VIDEOS)
+================================================== -->
+
+<div class="reference-images">
+
+    <div class="reference-title">
+
+        <h3>
+            Reference Media
+        </h3>
+
+        <span>
+            Up to 4 additional images or videos
+        </span>
+
+    </div>
+
+
+    <div class="reference-grid">
+
+        <!-- REFERENCE 1 -->
+
+        <div class="reference-upload">
+
+            <input
+                type="file"
+                id="referenceImage1"
+                name="referenceImage1"
+                accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                hidden
+            >
+
+            <label
+                for="referenceImage1"
+                class="reference-box"
+                id="referenceBox1"
+            >
+
+                <i class="fa-solid fa-photo-film"></i>
+
+                <strong>
+                    Reference Media 1
+                </strong>
+
+                <span>
+                    Image / Video (MP4 / WEBM / JPG / PNG)
+                </span>
+
+            </label>
+
+            <div
+                class="reference-preview"
+                id="referencePreview1"
+            ></div>
+
+        </div>
+
+
+        <!-- REFERENCE 2 -->
+
+        <div class="reference-upload">
+
+            <input
+                type="file"
+                id="referenceImage2"
+                name="referenceImage2"
+                accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                hidden
+            >
+
+            <label
+                for="referenceImage2"
+                class="reference-box"
+                id="referenceBox2"
+            >
+
+                <i class="fa-solid fa-photo-film"></i>
+
+                <strong>
+                    Reference Media 2
+                </strong>
+
+                <span>
+                    Image / Video (MP4 / WEBM / JPG / PNG)
+                </span>
+
+            </label>
+
+            <div
+                class="reference-preview"
+                id="referencePreview2"
+            ></div>
+
+        </div>
+
+
+        <!-- REFERENCE 3 -->
+
+        <div class="reference-upload">
+
+            <input
+                type="file"
+                id="referenceImage3"
+                name="referenceImage3"
+                accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                hidden
+            >
+
+            <label
+                for="referenceImage3"
+                class="reference-box"
+                id="referenceBox3"
+            >
+
+                <i class="fa-solid fa-photo-film"></i>
+
+                <strong>
+                    Reference Media 3
+                </strong>
+
+                <span>
+                    Image / Video (MP4 / WEBM / JPG / PNG)
+                </span>
+
+            </label>
+
+            <div
+                class="reference-preview"
+                id="referencePreview3"
+            ></div>
+
+        </div>
+
+
+        <!-- REFERENCE 4 -->
+
+        <div class="reference-upload">
+
+            <input
+                type="file"
+                id="referenceImage4"
+                name="referenceImage4"
+                accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm"
+                hidden
+            >
+
+            <label
+                for="referenceImage4"
+                class="reference-box"
+                id="referenceBox4"
+            >
+
+                <i class="fa-solid fa-photo-film"></i>
+
+                <strong>
+                    Reference Media 4
+                </strong>
+
+                <span>
+                    Image / Video (MP4 / WEBM / JPG / PNG)
+                </span>
+
+            </label>
+
+            <div
+                class="reference-preview"
+                id="referencePreview4"
+            ></div>
+
+        </div>
+
+    </div>
+
+</div>
+</div>
+</div>
+                <!-- =================================================
+                     RIGHT COLUMN
+                ================================================== -->
+
+                <div class="form-right-column">
+
+
+                    <!-- =================================================
+                         AVAILABILITY
+                    ================================================== -->
+
+                    <div class="form-card">
+
+
+                        <div class="form-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    INVENTORY
+                                </span>
+
+                                <h2>
+                                    Availability
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- IN STOCK -->
+
+                        <label
+                            class="availability-option selected"
+                            data-option="in-stock"
+                        >
+
+                            <input
+                                type="radio"
+                                name="availability"
+                                value="In Stock"
+                                checked
+                            >
+
+                            <span class="custom-radio"></span>
+
+                            <div>
+
+                                <strong>
+                                    In Stock
+                                </strong>
+
+                                <small>
+                                    Available for immediate dispatch
+                                </small>
+
+                            </div>
+
+                        </label>
+
+
+
+                        <!-- ARRIVING SOON -->
+
+                        <label
+                            class="availability-option"
+                            data-option="arriving-soon"
+                        >
+
+                            <input
+                                type="radio"
+                                name="availability"
+                                value="Arriving Soon"
+                            >
+
+                            <span class="custom-radio"></span>
+
+                            <div>
+
+                                <strong>
+                                    Arriving Soon (Pre-order)
+                                </strong>
+
+                                <small>
+                                    Accept orders before stock arrives
+                                </small>
+
+                            </div>
+
+                        </label>
+
+
+
+                        <!-- OUT OF STOCK -->
+
+                        <label
+                            class="availability-option"
+                            data-option="out-of-stock"
+                        >
+
+                            <input
+                                type="radio"
+                                name="availability"
+                                value="Out of Stock"
+                            >
+
+                            <span class="custom-radio"></span>
+
+                            <div>
+
+                                <strong>
+                                    Out of Stock
+                                </strong>
+
+                                <small>
+                                    Hide add-to-cart button
+                                </small>
+
+                            </div>
+
+                        </label>
+
+
+
+                        <!-- RESTOCK DATE -->
+
+                        <div
+                            class="restock-wrapper"
+                            id="restockWrapper"
+                        >
+
+                            <div class="form-divider"></div>
+
+                            <div class="form-group">
+
+                                <label for="restockDate">
+
+                                    RESTOCK DATE
+
+                                    <span>
+                                        (IF ARRIVING SOON)
+                                    </span>
+
+                                </label>
+
+                                <input
+                                    type="date"
+                                    id="restockDate"
+                                    name="restockDate"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- STOCK QUANTITY -->
+
+                        <div class="form-group">
+
+                            <label for="stockQuantity">
+                                STOCK QUANTITY
+                            </label>
+
+                            <input
+                                type="number"
+                                id="stockQuantity"
+                                name="stockQuantity"
+                                min="0"
+                                placeholder="e.g., 25"
+                            >
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PRICING
+                    ================================================== -->
+
+                    <div class="form-card">
+
+
+                        <div class="form-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    PRODUCT VALUE
+                                </span>
+
+                                <h2>
+                                    Pricing
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- PRICE -->
+
+                        <div class="form-group">
+
+                            <label for="price">
+
+                                PRICE (₹)
+
+                                <span>*</span>
+
+                            </label>
+
+                            <div class="price-input">
+
+                                <span>
+                                    ₹
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="price"
+                                    name="price"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    required
+                                >
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- COMPARE AT -->
+
+                        <div class="form-group">
+
+                            <label for="comparePrice">
+                                COMPARE-AT PRICE
+                            </label>
+
+                            <div class="price-input">
+
+                                <span>
+                                    ₹
+                                </span>
+
+                                <input
+                                    type="number"
+                                    id="comparePrice"
+                                    name="comparePrice"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                >
+
+                            </div>
+
+                            <small class="field-help">
+                                To show a markdown/discount
+                            </small>
+
+                        </div>
+
+
+
+                        <!-- DISCOUNT -->
+
+                        <div
+                            class="discount-preview"
+                            id="discountPreview"
+                        >
+
+                            <span>
+                                Discount
+                            </span>
+
+                            <strong id="discountValue">
+                                0%
+                            </strong>
+
+                        </div>
+
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ORGANIZATION
+                    ================================================== -->
+
+                    <div class="form-card">
+
+
+                        <div class="form-card-heading">
+
+                            <div>
+
+                                <span class="section-label">
+                                    STORE ORGANIZATION
+                                </span>
+
+                                <h2>
+                                    Organization
+                                </h2>
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- CATEGORY -->
+
+                        <div class="form-group">
+
+                            <label for="category">
+
+                                PRODUCT CATEGORY
+
+                                <span>*</span>
+
+                            </label>
+
+                            <select
+                                id="category"
+                                name="category"
+                                required
+                            >
+
+                                <option value="">
+                                    Select category
+                                </option>
+
+                                <option value="Rings">
+                                    Rings
+                                </option>
+
+                                <option value="Necklaces">
+                                    Necklaces
+                                </option>
+
+                                <option value="Bracelets & Cuffs">
+                                    Bracelets & Cuffs
+                                </option>
+
+                                <option value="Earrings">
+                                    Earrings
+                                </option>
+
+                                <option value="Bangles">
+                                    Bangles
+                                </option>
+
+                                <option value="Brooches">
+                                    Brooches
+                                </option>
+
+                                <option value="Pearls Gone Rogue">
+                                    Pearls Gone Rogue
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+
+                        <!-- COLLECTION -->
+
+                        <div class="form-group">
+
+                            <label for="collection">
+                                COLLECTION
+                            </label>
+
+                            <input
+                                type="text"
+                                id="collection"
+                                name="collection"
+                                placeholder="Enter collection (e.g. Signature, or leave blank)"
+                            >
+
+                        </div>
+
+
+
+                        <!-- SKU -->
+
+                        <div class="form-group">
+
+                            <label for="sku">
+                                SKU (STOCK KEEPING UNIT)
+                            </label>
+
+                            <input
+                                type="text"
+                                id="sku"
+                                name="sku"
+                                placeholder="E.G. FQ-RNG-001"
+                            >
+
+                        </div>
+
+
+
+                        <!-- TAGS -->
+
+                        <div class="form-group">
+
+                            <label for="tags">
+                                PRODUCT TAGS
+                            </label>
+
+                            <input
+                                type="text"
+                                id="tags"
+                                name="tags"
+                                placeholder="e.g. ring, gold, diamond"
+                            >
+
+                            <small class="field-help">
+                                Separate multiple tags with commas.
+                            </small>
+
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </form>
+
+
+
+            <!-- =================================================
+                 ACTION BUTTONS
+            ================================================== -->
+
+            <div class="form-actions">
+
+
+                <a
+                    href="products.html"
+                    class="cancel-btn"
+                >
+                    Cancel
+                </a>
+
+
+                <button
+                    type="submit"
+                    form="addProductForm"
+                    class="save-product-btn"
+                >
+
+                    <i class="fa-solid fa-check"></i>
+
+                    Save Product
+
+                </button>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================================
+             LOWER FOOTER
+        ====================================================== -->
+
+        <section class="lower-section">
+
+
+            <div class="lower-card">
+
+
+                <div class="lower-brand-title">
+                    2026 - FIRQUI JEWELS
+                </div>
+
+
+                <div class="lower-columns">
+
+
+                    <!-- ABOUT -->
+
+                    <div class="lower-col col-about">
+
+                        <h4>
+                            ABOUT
+                        </h4>
+
+                        <p>
+                            Firqui Jewels creates elegant jewellery
+                            designed to celebrate your unique style.
+                        </p>
+
+                        <p>
+                            Discover pieces made to become part
+                            of your most spectacular moments.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- SUPPORT -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SUPPORT
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../contact.html">
+                                    Contact Us
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Shipping
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Returns
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    FAQ
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- SHOP -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SHOP
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../earrings.html">
+                                    Earrings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../necklaces.html">
+                                    Necklaces
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../bracelets.html">
+                                    Bracelets
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../rings.html">
+                                    Rings
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- EXPLORE -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            EXPLORE
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../index.html">
+                                    Home
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../index.html#collections">
+                                    Collections
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../about.html">
+                                    About
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- NEWSLETTER -->
+
+                    <div class="lower-col col-newsletter">
+
+                        <h4>
+                            NEWSLETTER
+                        </h4>
+
+                        <p>
+                            Subscribe to receive updates about
+                            new collections and special pieces.
+                        </p>
+
+
+                        <form id="newsletterForm">
+
+                            <input
+                                type="email"
+                                id="newsletterEmail"
+                                placeholder="Your email address"
+                                required
+                            >
+
+                            <button type="submit">
+                                Subscribe
+                            </button>
+
+                        </form>
+
+
+                        <div id="newsletterMsg"></div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         BOTTOM FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+
+        <div class="footer-credit">
+            Powered by
+            <strong>
+                GENEXA TECH
+            </strong>
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<script src="add-product.js"></script>
+<script src="admin-search.js"></script>
+
+</body>
+
+</html>

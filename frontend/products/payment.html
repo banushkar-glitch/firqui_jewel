@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FIRQUI JEWELS | Complete Your Payment</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Imprima&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Payment Page Styles -->
+    <link rel="stylesheet" href="payment.css">
+</head>
+
+<body>
+
+    <!-- =====================================================
+         HEADER (Identical to Checkout, Cart & Brand Pages)
+    ====================================================== -->
+    <header class="header">
+        <a href="bracelets_cuffs.html" class="header-logo" aria-label="FIRQUI JEWELS Home">
+            <img src="../assets/Logo Pink 1.png" alt="FIRQUI JEWELS Logo" onerror="this.src='../assets/Logo Pink 1.png'">
+        </a>
+
+        <nav class="navigation" aria-label="Primary Navigation">
+            <a href="bracelets_cuffs.html" class="nav-link">Home</a>
+            <span class="nav-dot"></span>
+            <a href="bracelets_cuffs.html" class="nav-link">Collections</a>
+            <span class="nav-dot"></span>
+            <a href="bracelets_cuffs.html" class="nav-link">Categories</a>
+            <span class="nav-dot"></span>
+            <a href="../about.html" class="nav-link">About</a>
+            <span class="nav-dot"></span>
+            <a href="../contact.html" class="nav-link">Contact</a>
+        </nav>
+
+        <div class="header-icons">
+            <a href="../authentication/profile.html" class="header-icon-btn" aria-label="Profile">
+                <i class="fa-regular fa-user"></i>
+            </a>
+            <button type="button" class="header-icon-btn" id="search-toggle-btn" aria-label="Search Collection">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <a href="wishlist.html" class="header-icon-btn" aria-label="Wishlist">
+                <i class="fa-regular fa-heart"></i>
+            </a>
+            <a href="cart.html" class="header-icon-btn" aria-label="Shopping Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- =====================================================
+         PAYMENT PAGE MAIN CONTENT
+    ====================================================== -->
+    <main class="payment-page">
+
+        <!-- SECTION A: PAGE HEADING -->
+        <div class="payment-header-section">
+            <span class="payment-badge-pill">FIRQUI JEWELS • SECURE UPI</span>
+            <h1 class="payment-title">Complete Your Payment</h1>
+            <p class="payment-instructions">
+                Scan the QR code using your UPI application or pay using the UPI ID below.
+            </p>
+        </div>
+
+        <!-- MAIN LAYOUT GRID -->
+        <div class="payment-grid-container">
+
+            <!-- LEFT COLUMN: UPI PAYMENT (QR CODE, UPI ID & SUBMISSION FORM) -->
+            <div class="payment-left-column">
+
+                <!-- SECTION C & D: QR CODE & UPI ID CARD -->
+                <section class="payment-card qr-card" aria-labelledby="qr-section-heading">
+                    <div class="card-header">
+                        <div>
+                            <span class="step-indicator">STEP 1</span>
+                            <h2 id="qr-section-heading">Scan & Pay via UPI</h2>
+                        </div>
+                        <div class="upi-logos-badge">
+                            <span>GPay • PhonePe • Paytm • BHIM</span>
+                        </div>
+                    </div>
+
+                    <!-- PROMINENT AMOUNT DISPLAY -->
+                    <div class="amount-banner">
+                        <span class="amount-label">Exact Payable Amount</span>
+                        <span class="amount-value" id="display-order-amount">Loading...</span>
+                    </div>
+
+                    <!-- QR CODE CONTAINER -->
+                    <div class="qr-code-wrapper">
+                        <div class="qr-image-frame" id="qr-image-container">
+                            <img
+                                id="upi-qr-image"
+                                src="../assets/QR Code.jpeg"
+                                alt="FIRQUI JEWELS UPI QR Code"
+                                class="qr-image"
+                            >
+                        </div>
+                        <p class="qr-helper-text">
+                            <i class="fa-solid fa-camera"></i> Open any UPI App (Google Pay, PhonePe, Paytm, BHIM) and scan this QR code.
+                        </p>
+                    </div>
+
+                    <!-- SECTION D: UPI ID CONTAINER WITH COPY BUTTON -->
+                    <div class="upi-id-box">
+                        <div class="upi-id-label">OR Pay to UPI ID:</div>
+                        <div class="upi-id-row">
+                            <code class="upi-id-text" id="upi-id-display">nehaa067@icici</code>
+                            <button type="button" class="copy-upi-btn" id="copy-upi-btn" aria-label="Copy UPI ID">
+                                <i class="fa-regular fa-copy"></i>
+                                <span id="copy-btn-text">Copy UPI ID</span>
+                            </button>
+                        </div>
+                        <div class="copy-toast" id="copy-toast" style="display: none;">
+                            <i class="fa-solid fa-check"></i> UPI ID copied to clipboard!
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SECTION E, F & G: SUBMIT TRANSACTION DETAILS FORM -->
+                <section class="payment-card submission-card" aria-labelledby="submission-section-heading">
+                    <div class="card-header">
+                        <div>
+                            <span class="step-indicator">STEP 2</span>
+                            <h2 id="submission-section-heading">Submit Payment Verification</h2>
+                        </div>
+                    </div>
+
+                    <p class="submission-instructions">
+                        Once paid from your UPI app, enter your 12-digit UPI UTR / Transaction ID and attach the payment screenshot below for manual admin verification.
+                    </p>
+
+                    <form id="upi-payment-form" novalidate>
+
+                        <!-- SECTION E: TRANSACTION ID / UTR FIELD -->
+                        <div class="form-group">
+                            <label for="transaction-id" class="input-label">
+                                UPI Transaction ID / UTR Number <span class="required-star">*</span>
+                            </label>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-receipt input-icon"></i>
+                                <input
+                                    type="text"
+                                    id="transaction-id"
+                                    name="transactionId"
+                                    class="text-input"
+                                    placeholder="e.g., 428938192837 (12-digit UTR)"
+                                    maxlength="60"
+                                    autocomplete="off"
+                                    required
+                                >
+                            </div>
+                            <span class="field-error" id="transaction-id-error"></span>
+                            <small class="field-hint">
+                                You can find this reference in your UPI payment receipt (Google Pay, PhonePe, Paytm, BHIM).
+                            </small>
+                        </div>
+
+                        <!-- SECTION F: PAYMENT SCREENSHOT UPLOAD -->
+                        <div class="form-group screenshot-group">
+                            <label class="input-label">
+                                Payment Screenshot <span class="required-star">*</span>
+                            </label>
+
+                            <!-- FILE UPLOAD DROP / BUTTON ZONE -->
+                            <div class="upload-dropzone" id="upload-dropzone">
+                                <input
+                                    type="file"
+                                    id="screenshot-input"
+                                    name="screenshot"
+                                    accept="image/png, image/jpeg, image/jpg"
+                                    class="hidden-file-input"
+                                >
+                                <div class="dropzone-content" id="dropzone-prompt">
+                                    <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
+                                    <div class="dropzone-text">
+                                        <button type="button" class="choose-file-btn" id="choose-file-btn">
+                                            Choose Screenshot
+                                        </button>
+                                        <span class="dropzone-hint">or drag & drop your image here</span>
+                                    </div>
+                                    <small class="upload-restrictions">Supported: PNG, JPG, JPEG (Max 10 MB)</small>
+                                </div>
+                            </div>
+
+                            <!-- PREVIEW CONTAINER (Hidden until file selected) -->
+                            <div class="screenshot-preview-container" id="screenshot-preview-container" style="display: none;">
+                                <div class="preview-thumbnail-wrap">
+                                    <img id="screenshot-preview-img" src="" alt="Screenshot Preview" class="preview-img">
+                                </div>
+                                <div class="preview-meta">
+                                    <span class="preview-filename" id="preview-filename">image.png</span>
+                                    <span class="preview-filesize" id="preview-filesize">0 KB</span>
+                                    <div class="preview-actions">
+                                        <button type="button" class="preview-action-btn replace-btn" id="replace-file-btn">
+                                            <i class="fa-solid fa-arrows-rotate"></i> Replace
+                                        </button>
+                                        <button type="button" class="preview-action-btn remove-btn" id="remove-file-btn">
+                                            <i class="fa-solid fa-trash-can"></i> Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <span class="field-error" id="screenshot-error"></span>
+                        </div>
+
+                        <!-- SUBMIT STATUS / ALERT MESSAGE -->
+                        <div class="payment-alert" id="payment-alert" style="display: none;" role="alert"></div>
+
+                        <!-- SECTION G: SUBMIT BUTTON -->
+                        <button type="submit" class="submit-payment-btn" id="submit-payment-btn">
+                            <span class="btn-text">
+                                <i class="fa-solid fa-shield-halved"></i> Submit Payment Details
+                            </span>
+                            <span class="btn-loader" style="display: none;">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Submitting Details...
+                            </span>
+                        </button>
+
+                    </form>
+
+                </section>
+
+            </div>
+
+            <!-- RIGHT COLUMN: ORDER INFORMATION CARD -->
+            <div class="payment-right-column">
+
+                <!-- SECTION B: ORDER INFORMATION -->
+                <aside class="payment-card order-info-card" aria-labelledby="order-info-heading">
+                    <h2 id="order-info-heading" class="summary-heading">Order Summary</h2>
+
+                    <div class="order-meta-box">
+                        <div class="meta-row">
+                            <span class="meta-label">Order Number:</span>
+                            <strong class="meta-value" id="display-order-number">Loading...</strong>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Payment Status:</span>
+                            <span class="payment-status-badge status-pending" id="display-payment-status">
+                                PENDING_PAYMENT
+                            </span>
+                        </div>
+                        <div class="meta-row">
+                            <span class="meta-label">Order Date:</span>
+                            <span class="meta-value" id="display-order-date">Today</span>
+                        </div>
+                    </div>
+
+                    <hr class="summary-divider">
+
+                    <!-- ORDER ITEMS SUMMARY LIST -->
+                    <div class="order-items-wrapper">
+                        <h3 class="items-heading">Items in this Order</h3>
+                        <div class="order-items-list" id="display-order-items">
+                            <div class="items-loading">Loading order items...</div>
+                        </div>
+                    </div>
+
+                    <hr class="summary-divider">
+
+                    <!-- TOTAL AMOUNTS BREAKDOWN -->
+                    <div class="price-breakdown">
+                        <div class="price-row">
+                            <span>Subtotal</span>
+                            <span id="display-subtotal">₹0</span>
+                        </div>
+                        <div class="price-row">
+                            <span>Shipping</span>
+                            <span class="free-shipping">Free</span>
+                        </div>
+                        <hr class="summary-subdivider">
+                        <div class="price-total-row">
+                            <span>Total Payable</span>
+                            <strong class="total-price" id="display-total-amount">₹0</strong>
+                        </div>
+                    </div>
+
+                    <!-- SECURITY NOTICE -->
+                    <div class="security-notice">
+                        <i class="fa-solid fa-lock"></i>
+                        <p>
+                            FIRQUI JEWELS manual UPI verification ensures your transaction is verified directly against bank receipts.
+                        </p>
+                    </div>
+                </aside>
+
+            </div>
+
+        </div>
+
+        <!-- SUCCESS CONFIRMATION MODAL -->
+        <div class="confirmation-modal-backdrop" id="confirmation-modal" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+            <div class="confirmation-modal-box">
+                <div class="modal-success-icon">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <h2 id="modal-title" class="modal-title">Payment Details Submitted</h2>
+                <p class="modal-message">
+                    Your payment details have been submitted successfully. Your order is awaiting payment verification.
+                </p>
+                <div class="modal-order-details">
+                    <div class="modal-detail-row">
+                        <span>Order Number:</span>
+                        <strong id="modal-order-number">--</strong>
+                    </div>
+                    <div class="modal-detail-row">
+                        <span>Transaction Reference:</span>
+                        <strong id="modal-txn-id">--</strong>
+                    </div>
+                    <div class="modal-detail-row">
+                        <span>Payment Status:</span>
+                        <span class="payment-status-badge status-verification">PENDING_VERIFICATION</span>
+                    </div>
+                </div>
+                <p class="modal-notice">
+                    Our team will verify the payment against bank records. Once verified, your order status will be updated to <strong>PAID</strong>.
+                </p>
+                <div class="modal-buttons">
+                    <a href="../authentication/profile.html" class="modal-btn modal-btn-primary">
+                        View Order in Profile
+                    </a>
+                    <a href="bracelets_cuffs.html" class="modal-btn modal-btn-secondary">
+                        Continue Shopping
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =====================================================
+         FOOTER (Identical to Checkout / Website)
+    ====================================================== -->
+    <footer class="footer" id="contact">
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+        <div class="footer-credit">
+            Powered by <strong>GENEXA TECH</strong>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="payment.js"></script>
+    <script src="../js/search.js"></script>
+
+</body>
+
+</html>

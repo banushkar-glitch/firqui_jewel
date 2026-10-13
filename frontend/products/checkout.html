@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>FIRQUI JEWELS | Checkout</title>
+
+
+    <!-- Google Fonts -->
+
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
+
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Imprima&family=Inter:wght@300;400;500;600&display=swap"
+          rel="stylesheet">
+
+
+    <!-- Font Awesome -->
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+
+    <!-- Checkout CSS -->
+
+    <link rel="stylesheet"
+          href="checkout.css">
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         HEADER
+         SAME AS CART / BRACELETS
+    ========================== -->
+
+    <header class="header">
+
+
+        <!-- Logo -->
+
+        <a href="bracelets_cuffs.html"
+           class="header-logo"
+           aria-label="FIRQUI JEWELS Home">
+
+            <img src="../assets/Logo Pink 1.png"
+                 alt="FIRQUI JEWELS Logo"
+                 onerror="this.src='assets/Logo Pink 1.png'">
+
+        </a>
+
+
+        <!-- Navigation -->
+
+        <nav class="navigation"
+             aria-label="Primary Navigation">
+
+
+            <a href="bracelets_cuffs.html"
+               class="nav-link">
+                Home
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a href="bracelets_cuffs.html"
+               class="nav-link">
+                Collections
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a href="bracelets_cuffs.html"
+               class="nav-link">
+                Categories
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a href="#about"
+               class="nav-link">
+                About
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a href="#contact"
+               class="nav-link">
+                Contact
+            </a>
+
+
+        </nav>
+
+
+        <!-- Header Icons -->
+
+        <div class="header-icons">
+
+
+            <a href="../authentication/profile.html"
+               class="header-icon-btn"
+               aria-label="Profile">
+
+                <i class="fa-regular fa-user"></i>
+
+            </a>
+
+
+            <button type="button"
+                    class="header-icon-btn"
+                    aria-label="Search Collection">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <a href="wishlist.html"
+               class="header-icon-btn"
+               aria-label="Wishlist">
+
+                <i class="fa-regular fa-heart"></i>
+
+            </a>
+
+
+            <a href="cart.html"
+               class="header-icon-btn"
+               aria-label="Shopping Cart">
+
+                <i class="fa-solid fa-cart-shopping"></i>
+
+            </a>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- =========================
+         CHECKOUT PAGE
+    ========================== -->
+
+    <main class="checkout-page">
+
+
+        <h1>Checkout</h1>
+
+
+        <p class="checkout-subtitle">
+            Enter your delivery details and select your payment method.
+        </p>
+
+
+        <div class="checkout-container">
+
+
+            <!-- =========================
+                 CUSTOMER INFORMATION
+            ========================== -->
+
+            <section class="customer-section">
+
+
+                <h2>Delivery Information</h2>
+
+
+                <form id="checkout-form">
+
+
+                    <!-- NAME -->
+
+                    <div class="form-group">
+
+                        <label for="customer-name">
+                            Name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="customer-name"
+                            name="name"
+                            placeholder="Enter your full name"
+                            autocomplete="name"
+                            required>
+
+                    </div>
+
+
+                    <!-- PHONE -->
+
+                    <div class="form-group">
+
+                        <label for="customer-phone">
+                            Phone Number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="customer-phone"
+                            name="phone"
+                            placeholder="Enter your phone number"
+                            autocomplete="tel"
+                            inputmode="numeric"
+                            required>
+
+                    </div>
+
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group">
+
+                        <label for="customer-email">
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            id="customer-email"
+                            name="email"
+                            placeholder="Enter your email address"
+                            autocomplete="email"
+                            required>
+
+                    </div>
+
+
+                    <!-- PINCODE -->
+
+                    <div class="form-group">
+
+                        <label for="customer-pincode">
+                            Pincode
+                        </label>
+
+                        <input
+                            type="text"
+                            id="customer-pincode"
+                            name="pincode"
+                            placeholder="Enter your pincode"
+                            inputmode="numeric"
+                            maxlength="6"
+                            autocomplete="postal-code"
+                            required>
+
+                    </div>
+
+
+                    <!-- ADDRESS 1 -->
+
+                    <div class="form-group">
+
+                        <label for="address-1">
+                            Address 1
+                        </label>
+
+                        <input
+                            type="text"
+                            id="address-1"
+                            name="address1"
+                            placeholder="House / Flat / Building / Street"
+                            autocomplete="address-line1"
+                            required>
+
+                    </div>
+
+
+                    <!-- ADDRESS 2 -->
+
+                    <div class="form-group">
+
+                        <label for="address-2">
+                            Address 2
+                        </label>
+
+                        <input
+                            type="text"
+                            id="address-2"
+                            name="address2"
+                            placeholder="Area / Landmark / Locality"
+                            autocomplete="address-line2">
+
+                    </div>
+
+
+                    <!-- =========================
+                         PAYMENT
+                    ========================== -->
+
+                    <div class="payment-section">
+
+
+                        <h2>Payment Method</h2>
+
+
+                        <div class="payment-options">
+
+
+                            <!-- PAY NOW -->
+
+                            <label class="payment-option">
+
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="pay-now"
+                                    checked
+                                    required>
+
+                                <span class="payment-content">
+
+                                    <span class="payment-icon">
+                                        <i class="fa-solid fa-credit-card"></i>
+                                    </span>
+
+                                    <span>
+                                        <strong>
+                                            Pay Now
+                                        </strong>
+
+                                        <small>
+                                            Pay securely via UPI (QR Code / UPI ID)
+                                        </small>
+                                    </span>
+
+                                </span>
+
+                            </label>
+
+
+                          
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PLACE ORDER -->
+
+                    <button
+                        type="submit"
+                        class="place-order-button">
+
+                        Place Order
+
+                    </button>
+
+
+                </form>
+
+
+            </section>
+
+
+
+            <!-- =========================
+                 ORDER SUMMARY
+            ========================== -->
+
+            <aside class="order-summary">
+
+
+                <h2>
+                    Order Summary
+                </h2>
+
+
+                <div id="checkout-items">
+
+                    <!-- Cart products will appear here -->
+
+                </div>
+
+
+                <div class="summary-line">
+
+                    <span>
+                        Subtotal
+                    </span>
+
+                    <span id="checkout-subtotal">
+                        ₹0
+                    </span>
+
+                </div>
+
+
+                <div class="summary-line">
+
+                    <span>
+                        Shipping
+                    </span>
+
+                    <span>
+                        Free
+                    </span>
+
+                </div>
+
+
+                <hr>
+
+
+                <div class="summary-total">
+
+                    <span>
+                        Total
+                    </span>
+
+                    <span id="checkout-total">
+                        ₹0
+                    </span>
+
+                </div>
+
+
+            </aside>
+
+
+        </div>
+
+
+    </main>
+
+
+
+    <!-- =========================
+         FOOTER
+         SAME AS CART / WISHLIST
+    ========================== -->
+
+    <footer class="footer"
+            id="contact">
+
+
+        <div class="footer-copy">
+
+            2026 - FIRQUI JEWELS
+
+        </div>
+
+
+        <div class="footer-credit">
+
+            Powered by
+
+            <strong>
+                GENEXA TECH
+            </strong>
+
+        </div>
+
+
+    </footer>
+
+
+
+    <!-- Checkout JavaScript -->
+
+    <script src="checkout.js"></script>
+    <script src="../js/search.js"></script>
+
+</body>
+
+</html>

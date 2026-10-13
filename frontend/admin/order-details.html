@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>FIRQUI JEWELS | Order Details</title>
+
+    <!-- GOOGLE FONTS -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Caveat:wght@400;500;600;700&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- ICONS -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    >
+
+    <!-- ORDER DETAILS CSS -->
+    <link
+        rel="stylesheet"
+        href="order-details.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+    <!-- LOGO -->
+
+    <a
+        href="../dashboard.html"
+        class="header-logo-link"
+    >
+
+        <img
+            src="../assets/Logo Pink 1.png"
+            alt="Firqui Jewels"
+            class="header-logo"
+        >
+
+    </a>
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="navigation">
+
+        <a
+            href="../dashboard.html"
+            class="nav-link"
+        >
+            Dashboard
+        </a>
+
+        <a
+            href="../products/products.html"
+            class="nav-link"
+        >
+            Products
+        </a>
+
+        <a
+            href="../categories/categories.html"
+            class="nav-link"
+        >
+            Categories
+        </a>
+
+        <a
+            href="../collections/collections.html"
+            class="nav-link"
+        >
+            Collections
+        </a>
+
+        <a
+            href="orders.html"
+            class="nav-link"
+        >
+            Orders
+        </a>
+
+        <a
+            href="cancellation-requests.html"
+            class="nav-link"
+        >
+            Cancellation Requests
+        </a>
+
+    </nav>
+
+
+    <!-- HEADER ICONS -->
+
+    <div class="header-icons">
+
+        <button
+            class="header-icon"
+            id="adminProfileBtn"
+            title="Admin Profile"
+        >
+            <i class="fa-regular fa-user"></i>
+        </button>
+
+        <button
+            class="header-icon"
+            id="searchBtn"
+            title="Search"
+        >
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+
+        <button
+            class="header-icon notification-icon"
+            id="notificationBtn"
+            title="Notifications"
+        >
+
+            <i class="fa-regular fa-bell"></i>
+
+            <span class="notification-dot"></span>
+
+        </button>
+
+        <button
+            class="header-icon"
+            id="logoutBtn"
+            title="Logout"
+        >
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        </button>
+
+    </div>
+
+</header>
+
+
+
+<!-- =========================================================
+     ORDER DETAILS SECTION
+========================================================= -->
+
+<main class="order-details-section">
+
+
+    <!-- PAGE HEADING -->
+
+    <div class="page-heading">
+
+        
+
+        <h1>
+            Order Details
+        </h1>
+
+        <p>
+            View customer, payment, shipping and order information.
+        </p>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         BACK BUTTON
+    ====================================================== -->
+
+    <div class="back-wrapper">
+
+        <a
+            href="orders.html"
+            class="back-button"
+        >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to Orders
+
+        </a>
+
+    </div>
+
+
+
+    <!-- =====================================================
+         ORDER HEADER CARD
+    ====================================================== -->
+
+    <section class="order-header-card">
+
+        <div class="order-main-info">
+
+            <span class="small-label">
+                ORDER ID
+            </span>
+
+            <h2 id="orderId">
+                FJ1001
+            </h2>
+
+            <p id="orderDate">
+                01 Oct 2026
+            </p>
+
+        </div>
+
+
+        <div class="order-status-area">
+
+            <span class="small-label">
+                ORDER STATUS
+            </span>
+
+            <select
+                id="orderStatus"
+                class="status-select"
+            >
+
+                <option value="Pending">
+                    Pending
+                </option>
+
+                <option value="Pending Verification">
+                    Pending Verification
+                </option>
+
+                <option value="Confirmed">
+                    Confirmed
+                </option>
+
+                <option value="Processing">
+                    Processing
+                </option>
+
+                <option value="Shipped">
+                    Shipped
+                </option>
+
+                <option value="Delivered">
+                    Delivered
+                </option>
+
+                <option value="Cancelled">
+                    Cancelled
+                </option>
+
+                <option value="Rejected">
+                    Rejected
+                </option>
+
+            </select>
+
+            <button
+                type="button"
+                class="update-status-btn"
+                id="updateStatusBtn"
+            >
+
+                Update Status
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         MAIN ORDER GRID
+    ====================================================== -->
+
+    <div class="order-grid">
+
+
+        <!-- =================================================
+             LEFT COLUMN
+        ================================================== -->
+
+        <div class="order-left-column">
+
+
+            <!-- =============================================
+                 CUSTOMER INFORMATION
+            ============================================== -->
+
+            <section class="detail-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="card-label">
+                            CUSTOMER
+                        </span>
+
+                        <h3>
+                            Customer Information
+                        </h3>
+
+                    </div>
+
+                    <i class="fa-regular fa-user card-icon"></i>
+
+                </div>
+
+
+                <div class="customer-details">
+
+                    <div class="detail-row">
+
+                        <span>
+                            Name
+                        </span>
+
+                        <strong id="customerName">
+                            Rahul Sharma
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span>
+                            Registered Email
+                        </span>
+
+                        <strong id="customerEmail">
+                            rahul@example.com
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span>
+                            Phone
+                        </span>
+
+                        <strong id="customerPhone">
+                            +91 98765 43210
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 SHIPPING INFORMATION
+            ============================================== -->
+
+            <section class="detail-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="card-label">
+                            SHIPPING
+                        </span>
+
+                        <h3>
+                            Shipping Address
+                        </h3>
+
+                    </div>
+
+                    <i class="fa-solid fa-location-dot card-icon"></i>
+
+                </div>
+
+
+                <div
+                    class="shipping-address"
+                    id="shippingAddress"
+                >
+
+                    Rahul Sharma<br>
+                    Flat No. 204, Green Residency<br>
+                    Sinhgad Road<br>
+                    Pune, Maharashtra - 411041<br>
+                    India
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 ORDER ITEMS
+            ============================================== -->
+
+            <section class="detail-card order-items-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="card-label">
+                            ORDER ITEMS
+                        </span>
+
+                        <h3>
+                            Products
+                        </h3>
+
+                    </div>
+
+                    <span
+                        class="items-count"
+                        id="itemsCount"
+                    >
+                        2 Items
+                    </span>
+
+                </div>
+
+
+                <div
+                    class="products-list"
+                    id="productsList"
+                >
+                    <!-- JS CONTENT -->
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+
+        <!-- =================================================
+             RIGHT COLUMN
+        ================================================== -->
+
+        <div class="order-right-column">
+
+
+            <!-- =============================================
+                 PAYMENT CARD
+            ============================================== -->
+
+            <section class="detail-card payment-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="card-label">
+                            PAYMENT
+                        </span>
+
+                        <h3>
+                            Payment Information
+                        </h3>
+
+                    </div>
+
+                    <i class="fa-regular fa-credit-card card-icon"></i>
+
+                </div>
+
+
+                <div class="payment-details">
+
+                    <div class="detail-row">
+
+                        <span>
+                            Payment Status
+                        </span>
+
+                        <span
+                            class="payment-badge"
+                            id="paymentStatus"
+                        >
+                            Pending
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span>
+                            Payment Method
+                        </span>
+
+                        <strong id="paymentMethod">
+                            UPI
+                        </strong>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span>
+                            Transaction ID / UTR
+                        </span>
+
+                        <strong id="transactionId">
+                            N/A
+                        </strong>
+
+                    </div>
+
+                    <div class="detail-row" id="paymentSubmittedRow" style="display: none;">
+
+                        <span>
+                            Submitted At
+                        </span>
+
+                        <strong id="paymentSubmittedAt">
+                            --
+                        </strong>
+
+                    </div>
+
+                    <div class="detail-row" id="verificationHistoryRow" style="display: none;">
+
+                        <span>
+                            Verified By
+                        </span>
+
+                        <strong id="verifiedByDetails">
+                            --
+                        </strong>
+
+                    </div>
+
+                    <div class="detail-row" id="rejectionReasonRow" style="display: none; color: #D32F2F;">
+
+                        <span>
+                            Rejection Reason
+                        </span>
+
+                        <strong id="rejectionReasonText">
+                            --
+                        </strong>
+
+                    </div>
+
+                    <!-- PAYMENT SCREENSHOT SECTION -->
+                    <div class="screenshot-admin-box" id="adminScreenshotBox" style="display: none; margin-top: 14px; padding-top: 12px; border-top: 1px dashed #E0D7CC;">
+                        <span style="display: block; font-size: 0.82rem; font-weight: 600; color: #0A373B; margin-bottom: 8px;">
+                            Payment Proof Screenshot
+                        </span>
+                        <div id="screenshotThumbnailWrapper" style="margin-bottom: 8px; display: none;">
+                            <img id="adminScreenshotThumb" src="" alt="Proof Preview" style="width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid #E0D7CC; cursor: pointer;" title="Click to enlarge screenshot">
+                        </div>
+                        <button type="button" class="view-screenshot-btn" id="viewScreenshotBtn">
+                            <i class="fa-regular fa-image"></i> View Customer Screenshot
+                        </button>
+                    </div>
+
+                    <!-- ADMIN PAYMENT ACTIONS -->
+                    <div class="payment-action-buttons" id="adminPaymentActions" style="display: none; margin-top: 16px; padding-top: 14px; border-top: 1px solid #E0D7CC;">
+                        <span style="display: block; font-size: 0.8rem; font-weight: 700; color: #0A373B; text-transform: uppercase; margin-bottom: 8px;">
+                            Manual UPI Verification
+                        </span>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <button type="button" class="admin-pay-btn mark-paid-btn" id="adminMarkPaidBtn">
+                                <i class="fa-solid fa-check-double"></i> Confirm Payment & Order
+                            </button>
+                            <button type="button" class="admin-pay-btn reject-pay-btn" id="adminRejectPayBtn">
+                                <i class="fa-solid fa-xmark"></i> Reject Payment
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- SECURE SCREENSHOT PREVIEW MODAL -->
+            <div class="screenshot-modal-backdrop" id="screenshotModal" style="display: none;">
+                <div class="screenshot-modal-box">
+                    <div class="screenshot-modal-header">
+                        <h3>Customer Payment Screenshot</h3>
+                        <button type="button" class="modal-close-icon" id="closeScreenshotModal">&times;</button>
+                    </div>
+                    <div class="screenshot-modal-body">
+                        <div id="screenshotLoading" style="text-align: center; padding: 30px;">
+                            <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: #0A373B;"></i>
+                            <p style="margin-top: 10px; color: #555;">Loading secure screenshot...</p>
+                        </div>
+                        <img id="adminScreenshotImage" src="" alt="Payment Screenshot" style="display: none; width: 100%; max-height: 70vh; object-fit: contain; border-radius: 8px;">
+                    </div>
+                    <div class="screenshot-modal-footer">
+                        <button type="button" class="close-modal-btn" id="closeScreenshotBtn">Close</button>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- =============================================
+                 ORDER SUMMARY
+            ============================================== -->
+
+            <section class="detail-card summary-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="card-label">
+                            BILLING
+                        </span>
+
+                        <h3>
+                            Order Summary
+                        </h3>
+
+                    </div>
+
+                    <i class="fa-solid fa-receipt card-icon"></i>
+
+                </div>
+
+
+                <div class="summary-details">
+
+                    <div class="summary-row">
+
+                        <span>
+                            Subtotal
+                        </span>
+
+                        <strong id="subtotal">
+                            ₹2,998
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row">
+
+                        <span>
+                            Shipping
+                        </span>
+
+                        <strong id="shipping">
+                            ₹0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-row discount-row">
+
+                        <span>
+                            Discount
+                        </span>
+
+                        <strong id="discount">
+                            - ₹0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="summary-divider"></div>
+
+
+                    <div class="summary-total">
+
+                        <span>
+                            Total
+                        </span>
+
+                        <strong id="totalAmount">
+                            ₹2,998
+                        </strong>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- =============================================
+                 ORDER TIMELINE
+            ============================================== -->
+
+            <section class="detail-card timeline-card">
+
+                <div class="card-heading">
+
+                    <div>
+
+                        <span class="card-label">
+                            ORDER PROGRESS
+                        </span>
+
+                        <h3>
+                            Status Timeline
+                        </h3>
+
+                    </div>
+
+                    <i class="fa-solid fa-clock-rotate-left card-icon"></i>
+
+                </div>
+
+
+                <div class="timeline">
+
+                    <div
+                        class="timeline-item completed"
+                        data-status="Pending"
+                    >
+
+                        <span class="timeline-dot"></span>
+
+                        <div>
+
+                            <strong>
+                                Order Placed
+                            </strong>
+
+                            <small>
+                                Order received successfully
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="timeline-item"
+                        data-status="Confirmed"
+                    >
+
+                        <span class="timeline-dot"></span>
+
+                        <div>
+
+                            <strong>
+                                Confirmed
+                            </strong>
+
+                            <small>
+                                Order confirmed by admin
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="timeline-item"
+                        data-status="Processing"
+                    >
+
+                        <span class="timeline-dot"></span>
+
+                        <div>
+
+                            <strong>
+                                Processing
+                            </strong>
+
+                            <small>
+                                Product is being prepared
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="timeline-item"
+                        data-status="Shipped"
+                    >
+
+                        <span class="timeline-dot"></span>
+
+                        <div>
+
+                            <strong>
+                                Shipped
+                            </strong>
+
+                            <small>
+                                Order handed to delivery partner
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="timeline-item"
+                        data-status="Delivered"
+                    >
+
+                        <span class="timeline-dot"></span>
+
+                        <div>
+
+                            <strong>
+                                Delivered
+                            </strong>
+
+                            <small>
+                                Order delivered to customer
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+    </div>
+
+</main>
+
+
+
+<!-- =========================================================
+     LOWER BRAND / FOOTER INFORMATION
+========================================================= -->
+
+<section class="lower-section">
+
+    <div class="lower-card">
+
+        <h3 class="lower-brand-title">
+            2026 - FIRQUI JEWELS
+        </h3>
+
+
+        <div class="lower-columns">
+
+
+            <!-- ABOUT -->
+
+            <div class="footer-column">
+
+                <h4>
+                    FIRQUI JEWELS
+                </h4>
+
+                <p>
+                    Discover timeless jewellery designed
+                    to celebrate your unique style.
+                </p>
+
+            </div>
+
+
+            <!-- QUICK LINKS -->
+
+            <div class="footer-column">
+
+                <h4>
+                    QUICK LINKS
+                </h4>
+
+                <a href="../dashboard.html">
+                    Dashboard
+                </a>
+
+                <a href="../products/products.html">
+                    Products
+                </a>
+
+                <a href="orders.html">
+                    Orders
+                </a>
+
+            </div>
+
+
+            <!-- MANAGEMENT -->
+
+            <div class="footer-column">
+
+                <h4>
+                    MANAGEMENT
+                </h4>
+
+                <a href="../products/add-product.html">
+                    Add Product
+                </a>
+
+                <a href="../products/products.html">
+                    Product List
+                </a>
+
+                <a href="orders.html">
+                    Order List
+                </a>
+
+            </div>
+
+
+            <!-- SUPPORT -->
+
+            <div class="footer-column">
+
+                <h4>
+                    SUPPORT
+                </h4>
+
+                <a href="#">
+                    Help Center
+                </a>
+
+                <a href="#">
+                    Contact
+                </a>
+
+                <a href="#">
+                    Privacy Policy
+                </a>
+
+            </div>
+
+
+            <!-- NEWSLETTER -->
+
+            <div class="footer-column newsletter-column">
+
+                <h4>
+                    STAY CONNECTED
+                </h4>
+
+                <p>
+                    Subscribe for updates and
+                    jewellery inspiration.
+                </p>
+
+                <form id="newsletterForm">
+
+                    <input
+                        type="email"
+                        id="newsletterEmail"
+                        placeholder="Your email address"
+                        required
+                    >
+
+                    <button type="submit">
+                        Subscribe
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =========================================================
+     BOTTOM FOOTER
+========================================================= -->
+
+<footer class="footer">
+
+    <div>
+        2026 - FIRQUI JEWELS
+    </div>
+
+    <div>
+        Powered by GENEXA TECH
+    </div>
+
+</footer>
+
+
+
+<!-- =========================================================
+     JAVASCRIPT
+========================================================= -->
+
+<script src="order-details.js"></script>
+<script src="admin-search.js"></script>
+
+</body>
+
+</html>

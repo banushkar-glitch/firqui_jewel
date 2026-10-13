@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firqui Jewels | Admin Dashboard</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         DASHBOARD CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css"
+    >
+
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+         SAME FIRQUI JEWELS HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="../index.html"
+            class="header-logo"
+            aria-label="FIRQUI JEWELS Home"
+        >
+
+            <img
+                src="../assets/Logo Pink 1.png"
+                alt="Firqui Jewels"
+            >
+
+        </a>
+
+
+
+        <!-- =================================================
+             NAVIGATION
+        ================================================== -->
+
+        <nav
+            class="navigation"
+            aria-label="Admin Navigation"
+        >
+
+
+            <a
+                href="dashboard.html"
+                class="nav-link active"
+            >
+                Dashboard
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="products.html"
+                class="nav-link"
+            >
+                Products
+            </a>
+
+
+            
+
+
+    
+
+
+            
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellation Requests
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
+            </a>
+
+
+        </nav>
+
+
+
+        <!-- =================================================
+             HEADER ICONS
+        ================================================== -->
+
+        <div class="header-icons">
+
+
+            <!-- ADMIN -->
+
+            <button
+                class="header-icon-btn"
+                id="adminButton"
+                type="button"
+                aria-label="Admin Account"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+            </button>
+
+
+            <!-- SEARCH -->
+
+            <button
+                class="header-icon-btn"
+                id="searchButton"
+                type="button"
+                aria-label="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <!-- NOTIFICATION -->
+
+            <button
+                class="header-icon-btn"
+                id="notificationButton"
+                type="button"
+                aria-label="Notifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <!-- LOGOUT -->
+
+            <button
+                class="header-icon-btn"
+                id="logoutButton"
+                type="button"
+                aria-label="Logout"
+            >
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            </button>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN DASHBOARD CONTENT
+    ====================================================== -->
+
+    <main>
+
+
+        <section
+            class="dashboard-section"
+            id="dashboard"
+        >
+
+
+            <!-- =================================================
+                 PAGE TITLE
+            ================================================== -->
+
+            <div class="dashboard-title">
+
+                <h1>
+                    Admin Dashboard
+                </h1>
+
+                <p>
+                    Manage your FIRQUI JEWELS store from one place.
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 DASHBOARD CONTAINER
+            ================================================== -->
+
+            <div class="dashboard-container">
+
+
+                <!-- =================================================
+                     WELCOME / QUICK ACTION
+                ================================================== -->
+
+                <div class="dashboard-welcome">
+
+                    <div class="welcome-text">
+
+                        <span class="welcome-label">
+                            WELCOME ADMIN
+                        </span>
+
+                        <h2>
+                            Store Overview
+                        </h2>
+
+                        <p>
+                            Keep track of your products, categories,
+                            collections and orders.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="add-product.html"
+                        class="add-product-btn"
+                    >
+
+                        <i class="fa-solid fa-plus"></i>
+
+                        Add Product
+
+                    </a>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     STATISTICS
+                ================================================== -->
+
+                <div class="stats-grid">
+
+
+                    <!-- PRODUCTS -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+
+                            <i class="fa-solid fa-gem"></i>
+
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                PRODUCTS
+                            </span>
+
+                            <strong id="productCount">
+                                24
+                            </strong>
+
+                            <small>
+                                Total products
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- CATEGORIES -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+
+                            <i class="fa-solid fa-layer-group"></i>
+
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                CATEGORIES
+                            </span>
+
+                            <strong id="categoryCount">
+                                05
+                            </strong>
+
+                            <small>
+                                Active categories
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- COLLECTIONS -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+
+                            <i class="fa-solid fa-crown"></i>
+
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                COLLECTIONS
+                            </span>
+
+                            <strong id="collectionCount">
+                                04
+                            </strong>
+
+                            <small>
+                                Store collections
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- ORDERS -->
+
+                    <div class="stat-card">
+
+                        <div class="stat-icon">
+
+                            <i class="fa-solid fa-bag-shopping"></i>
+
+                        </div>
+
+                        <div class="stat-content">
+
+                            <span>
+                                ORDERS
+                            </span>
+
+                            <strong id="orderCount">
+                                12
+                            </strong>
+
+                            <small>
+                                Total orders
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     RECENT PRODUCTS
+                ================================================== -->
+
+                <div class="dashboard-card recent-products">
+
+
+                    <div class="card-heading">
+
+                        <div>
+
+                            <span class="section-label">
+                                STORE
+                            </span>
+
+                            <h2>
+                                Recent Products
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="products.html"
+                            class="view-all-btn"
+                        >
+                            View All
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </a>
+
+                    </div>
+
+
+
+                    <!-- PRODUCT TABLE -->
+
+                    <div class="table-wrapper">
+
+                        <table>
+
+                            <thead>
+
+                                <tr>
+
+                                    <th>
+                                        Product
+                                    </th>
+
+                                    <th>
+                                        Category
+                                    </th>
+
+                                    <th>
+                                        Collection
+                                    </th>
+
+                                    <th>
+                                        Price
+                                    </th>
+
+                                    <th>
+                                        Status
+                                    </th>
+
+                                    <th>
+                                        Action
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+
+                                <!-- PRODUCT 1 -->
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="product-info">
+
+                                            <div class="product-image">
+                                                <i class="fa-solid fa-gem"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <strong>
+                                                    Golden Grace
+                                                </strong>
+
+                                                <small>
+                                                    Product #001
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        Bracelets
+                                    </td>
+
+
+                                    <td>
+                                        Signature
+                                    </td>
+
+
+                                    <td>
+                                        ₹1,499
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status active">
+                                            Active
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <button
+                                            class="table-action edit-btn"
+                                            data-product="Golden Grace"
+                                        >
+
+                                            <i class="fa-regular fa-pen-to-square"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+
+
+                                <!-- PRODUCT 2 -->
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="product-info">
+
+                                            <div class="product-image">
+                                                <i class="fa-solid fa-ring"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <strong>
+                                                    Pearl Shine
+                                                </strong>
+
+                                                <small>
+                                                    Product #002
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        Necklaces
+                                    </td>
+
+
+                                    <td>
+                                        Pearl Collection
+                                    </td>
+
+
+                                    <td>
+                                        ₹1,899
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status active">
+                                            Active
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <button
+                                            class="table-action edit-btn"
+                                            data-product="Pearl Shine"
+                                        >
+
+                                            <i class="fa-regular fa-pen-to-square"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+
+
+                                <!-- PRODUCT 3 -->
+
+                                <tr>
+
+                                    <td>
+
+                                        <div class="product-info">
+
+                                            <div class="product-image">
+                                                <i class="fa-solid fa-star"></i>
+                                            </div>
+
+                                            <div>
+
+                                                <strong>
+                                                    Rose Charm
+                                                </strong>
+
+                                                <small>
+                                                    Product #003
+                                                </small>
+
+                                            </div>
+
+                                        </div>
+
+                                    </td>
+
+
+                                    <td>
+                                        Earrings
+                                    </td>
+
+
+                                    <td>
+                                        Rose Collection
+                                    </td>
+
+
+                                    <td>
+                                        ₹999
+                                    </td>
+
+
+                                    <td>
+
+                                        <span class="status active">
+                                            Active
+                                        </span>
+
+                                    </td>
+
+
+                                    <td>
+
+                                        <button
+                                            class="table-action edit-btn"
+                                            data-product="Rose Charm"
+                                        >
+
+                                            <i class="fa-regular fa-pen-to-square"></i>
+
+                                        </button>
+
+                                    </td>
+
+                                </tr>
+
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+
+                </div>
+
+
+
+                <!-- =================================================
+                     QUICK ACTIONS
+                ================================================== -->
+
+                <div class="quick-actions">
+
+
+                    <div class="quick-actions-title">
+
+                        <span class="section-label">
+                            MANAGE STORE
+                        </span>
+
+                        <h2>
+                            Quick Actions
+                        </h2>
+
+                    </div>
+
+
+                    <div class="quick-actions-grid">
+
+
+                        <!-- ADD PRODUCT -->
+
+                        <a
+                            href="products/add-product.html"
+                            class="quick-action-card"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="fa-solid fa-plus"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Add Product
+                                </h3>
+
+                                <p>
+                                    Add a new jewellery product
+                                </p>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                        </a>
+
+
+
+                        <!-- CATEGORIES -->
+
+                        <a
+                            href="categories/categories.html"
+                            class="quick-action-card"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="fa-solid fa-layer-group"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Categories
+                                </h3>
+
+                                <p>
+                                    Manage product categories
+                                </p>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                        </a>
+
+
+
+                        <!-- COLLECTIONS -->
+
+                        <a
+                            href="collections/collections.html"
+                            class="quick-action-card"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="fa-solid fa-crown"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Collections
+                                </h3>
+
+                                <p>
+                                    Manage jewellery collections
+                                </p>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                        </a>
+
+
+
+                        <!-- ORDERS -->
+
+                        <a
+                            href="orders.html"
+                            class="quick-action-card"
+                        >
+
+                            <div class="quick-action-icon">
+
+                                <i class="fa-solid fa-bag-shopping"></i>
+
+                            </div>
+
+                            <div>
+
+                                <h3>
+                                    Orders
+                                </h3>
+
+                                <p>
+                                    View and manage orders
+                                </p>
+
+                            </div>
+
+                            <i class="fa-solid fa-arrow-right action-arrow"></i>
+
+                        </a>
+
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =====================================================
+             LOWER FOOTER
+             SAME STYLE AS CONTACT PAGE
+        ====================================================== -->
+
+        <section
+            class="lower-section"
+            id="collections"
+        >
+
+
+            <div class="lower-card">
+
+
+                <!-- BRAND -->
+
+                <div class="lower-brand-title">
+
+                    2026 - FIRQUI JEWELS
+
+                </div>
+
+
+
+                <!-- COLUMNS -->
+
+                <div class="lower-columns">
+
+
+                    <!-- ABOUT -->
+
+                    <div class="lower-col col-about">
+
+                        <h4>
+                            ABOUT
+                        </h4>
+
+                        <p>
+                            Firqui Jewels creates elegant jewellery
+                            designed to celebrate your unique style.
+                        </p>
+
+                        <p>
+                            Discover pieces made to become part
+                            of your most spectacular moments.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- SUPPORT -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SUPPORT
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../contact.html">
+                                    Contact Us
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Shipping
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Returns
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    FAQ
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- SHOP -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SHOP
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../earrings.html">
+                                    Earrings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../necklaces.html">
+                                    Necklaces
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../bracelets.html">
+                                    Bracelets
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../rings.html">
+                                    Rings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../cuffs.html">
+                                    Cuffs
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- EXPLORE -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            EXPLORE
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../index.html">
+                                    Home
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../index.html#collections">
+                                    Collections
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../index.html#categories">
+                                    Categories
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../about.html">
+                                    About
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- NEWSLETTER -->
+
+                    <div class="lower-col col-newsletter">
+
+                        <h4>
+                            NEWSLETTER
+                        </h4>
+
+                        <p>
+                            Subscribe to receive updates about
+                            new collections and special pieces.
+                        </p>
+
+
+                        <form
+                            class="newsletter-form"
+                            id="newsletterForm"
+                        >
+
+                            <input
+                                type="email"
+                                class="newsletter-input"
+                                id="newsletterEmail"
+                                placeholder="Your email address"
+                                required
+                            >
+
+
+                            <button
+                                type="submit"
+                                class="btn-subscribe"
+                            >
+
+                                Subscribe
+
+                            </button>
+
+                        </form>
+
+
+                        <div
+                            class="newsletter-msg"
+                            id="newsletterMsg"
+                        ></div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         BOTTOM FOOTER
+         SAME AS CONTACT PAGE
+    ====================================================== -->
+
+    <footer
+        class="footer"
+        id="footer"
+    >
+
+        <div class="footer-copy">
+
+            2026 - FIRQUI JEWELS
+
+        </div>
+
+
+        <div class="footer-credit">
+
+            Powered by
+
+            <strong>
+                GENEXA TECH
+            </strong>
+
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     DASHBOARD JAVASCRIPT
+====================================================== -->
+
+<script src="dashboard.js"></script>
+<script src="admin-search.js"></script>
+
+
+</body>
+
+</html>

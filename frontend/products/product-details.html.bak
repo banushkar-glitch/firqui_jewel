@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FIRQUI JEWELS | Product Details</title>
+
+    <!-- =====================================================
+         GOOGLE FONTS
+         SAME AS BRACELETS / EARRINGS / NECKLACES
+    ====================================================== -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Almarai:wght@400;700&family=Caveat:wght@500;600;700&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@1,600&display=swap"
+          rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- Product Details CSS -->
+    <link rel="stylesheet" href="product-details.css">
+
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+         SAME AS BRACELETS & CUFFS PAGE
+    ====================================================== -->
+
+    <header class="header">
+
+        <!-- Logo -->
+
+        <a href="../index.html"
+           class="header-logo"
+           aria-label="FIRQUI JEWELS Home">
+
+            <img src="../assets\Logo Pink 1.png"
+                 alt="FIRQUI JEWELS Logo">
+
+        </a>
+
+
+        <!-- Navigation -->
+
+        <nav class="navigation"
+             aria-label="Primary Navigation">
+
+            <a href="../index.html"
+               class="nav-link">
+                Home
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a href="../collection/pearls-gone-rogue.html"
+               class="nav-link">
+                Collections
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a href="../index.html#categories"
+               class="nav-link active">
+                Categories
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a href="../about.html"
+               class="nav-link">
+                About
+            </a>
+
+            <span class="nav-dot"></span>
+
+
+            <a href="../contact.html"
+               class="nav-link">
+                Contact
+            </a>
+
+        </nav>
+
+
+        <!-- Header Icons -->
+
+        <div class="header-icons">
+
+            <a href="../authentication/profile.html"
+               class="header-icon-btn"
+               aria-label="Profile">
+
+                <i class="fa-regular fa-user"></i>
+
+            </a>
+
+
+            <button class="header-icon-btn"
+                    aria-label="Search Collection">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <a href="wishlist.html"
+               class="header-icon-btn"
+               aria-label="Wishlist">
+
+                <i class="fa-regular fa-heart"></i>
+
+            </a>
+
+
+            <a href="cart.html"
+               class="header-icon-btn"
+               aria-label="Shopping Cart">
+
+                <i class="fa-solid fa-cart-shopping"></i>
+
+            </a>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         PRODUCT DETAILS
+    ====================================================== -->
+
+    <main>
+
+
+        <section class="product-details-section">
+
+            <div class="product-details-container">
+
+
+                <!-- =================================================
+                     PRODUCT IMAGE
+                ================================================== -->
+
+                <div class="product-gallery">
+
+                    <div class="main-product-image">
+
+                        <img id="mainProductImage"
+                             src="../assets\page_07_image_02.png"
+                             alt="Product">
+
+                        <button class="gallery-arrow gallery-prev"
+                                id="prevImage"
+                                aria-label="Previous Image">
+
+                            <i class="fa-solid fa-chevron-left"></i>
+
+                        </button>
+
+                        <button class="gallery-arrow gallery-next"
+                                id="nextImage"
+                                aria-label="Next Image">
+
+                            <i class="fa-solid fa-chevron-right"></i>
+
+                        </button>
+
+                        <button class="image-wishlist"
+                                id="wishlistButton"
+                                aria-label="Add to Wishlist">
+
+                            <i class="fa-regular fa-heart"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- Thumbnail Images -->
+
+                    <div class="thumbnail-container"
+                         id="thumbnailContainer">
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- =================================================
+                     PRODUCT INFORMATION
+                ================================================== -->
+
+                <div class="product-information">
+
+
+                    <span class="product-category"
+                          id="productCategory">
+                        BRACELETS & CUFFS
+                    </span>
+
+
+                    <h1 id="productName">
+                        Golden Grace
+                    </h1>
+
+
+                    <div class="product-price"
+                         id="productPrice">
+                        ₹1,499
+                    </div>
+
+
+                    <p class="product-short-description"
+                       id="productDescription">
+
+                        Elegant gold bracelet designed to add
+                        sophistication and charm to every look.
+
+                    </p>
+
+
+                    <!-- Divider -->
+
+                    <div class="product-divider"></div>
+
+
+
+                    <!-- =================================================
+                         VARIANTS
+                    ================================================== -->
+
+                  <div class="product-option">
+
+    <h3>
+        Available Size
+    </h3>
+
+    <div
+        class="variant-options"
+        id="variantOptions">
+    </div>
+
+</div>
+
+
+                    <!-- =================================================
+                         QUANTITY
+                    ================================================== -->
+
+                    <div class="product-option">
+
+                        <h3>
+                            Quantity
+                        </h3>
+
+                        <div class="quantity-box">
+
+                            <button id="decreaseQuantity"
+                                    aria-label="Decrease Quantity">
+
+                                −
+
+                            </button>
+
+                            <span id="quantity">
+                                1
+                            </span>
+
+                            <button id="increaseQuantity"
+                                    aria-label="Increase Quantity">
+
+                                +
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         ACTION BUTTONS
+                    ================================================== -->
+
+                    <div class="product-actions">
+
+                        <button class="wishlist-action"
+                                id="wishlistAction">
+
+                            <i class="fa-regular fa-heart"></i>
+
+                            <span>
+                                Wishlist
+                            </span>
+
+                        </button>
+
+
+                        <button class="add-cart-main"
+                                id="addCartButton">
+
+                            <i class="fa-solid fa-bag-shopping"></i>
+
+                            <span>
+                                Add to Cart
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+
+                    <!-- =================================================
+                         PRODUCT DETAILS
+                    ================================================== -->
+
+                    <div class="details-box">
+
+                        <div class="details-title">
+
+                            <span>
+                                PRODUCT DETAILS
+                            </span>
+
+                            <i class="fa-solid fa-chevron-down"></i>
+
+                        </div>
+
+
+                        <div class="details-content" id="productDetailsContent">
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             RELATED PRODUCTS
+        ====================================================== -->
+
+        <section class="related-section">
+
+            <div class="related-heading">
+
+                <span>
+                    DISCOVER MORE
+                </span>
+
+                <h2>
+                    Related Products
+                </h2>
+
+            </div>
+
+
+            <div class="related-grid">
+
+
+                <!-- Related 1 -->
+
+                <article class="related-card">
+
+                    <a href="product-details.html?id=2">
+
+                        <div class="related-image">
+
+                            <img src="assets/bracelets/bracelet2.jpg"
+                                 alt="Pearl Charm">
+
+                            <span class="related-wishlist">
+                                <i class="fa-regular fa-heart"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div class="related-info">
+
+                            <h3>
+                                Pearl Charm
+                            </h3>
+
+                            <p>
+                                Classic Pearl Bracelet
+                            </p>
+
+                            <strong>
+                                ₹1,799
+                            </strong>
+
+                        </div>
+
+                    </a>
+
+                </article>
+
+
+
+                <!-- Related 2 -->
+
+                <article class="related-card">
+
+                    <a href="product-details.html?id=3">
+
+                        <div class="related-image">
+
+                            <img src="assets/bracelets/bracelet3.jpg"
+                                 alt="Rose Harmony">
+
+                            <span class="related-wishlist">
+                                <i class="fa-regular fa-heart"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div class="related-info">
+
+                            <h3>
+                                Rose Harmony
+                            </h3>
+
+                            <p>
+                                Designer Bracelet
+                            </p>
+
+                            <strong>
+                                ₹1,299
+                            </strong>
+
+                        </div>
+
+                    </a>
+
+                </article>
+
+
+
+                <!-- Related 3 -->
+
+                <article class="related-card">
+
+                    <a href="product-details.html?id=4">
+
+                        <div class="related-image">
+
+                            <img src="assets/bracelets/bracelet4.jpg"
+                                 alt="Silver Edge">
+
+                            <span class="related-wishlist">
+                                <i class="fa-regular fa-heart"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div class="related-info">
+
+                            <h3>
+                                Silver Edge
+                            </h3>
+
+                            <p>
+                                Minimal Silver Cuff
+                            </p>
+
+                            <strong>
+                                ₹999
+                            </strong>
+
+                        </div>
+
+                    </a>
+
+                </article>
+
+
+
+                <!-- Related 4 -->
+
+                <article class="related-card">
+
+                    <a href="product-details.html?id=5">
+
+                        <div class="related-image">
+
+                            <img src="assets/bracelets/bracelet5.jpg"
+                                 alt="Floral Bloom">
+
+                            <span class="related-wishlist">
+                                <i class="fa-regular fa-heart"></i>
+                            </span>
+
+                        </div>
+
+
+                        <div class="related-info">
+
+                            <h3>
+                                Floral Bloom
+                            </h3>
+
+                            <p>
+                                Floral Bracelet
+                            </p>
+
+                            <strong>
+                                ₹1,599
+                            </strong>
+
+                        </div>
+
+                    </a>
+
+                </article>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================================
+             LOWER BRAND / FOOTER INFORMATION
+             SAME STRUCTURE AS BRACELETS PAGE
+        ====================================================== -->
+
+        <section class="lower-section"
+                 id="collections">
+
+            <div class="lower-card">
+
+
+                <h3 class="lower-brand-title">
+                    2026 - FIRQUI JEWELS
+                </h3>
+
+
+                <div class="lower-columns">
+
+
+                    <!-- ABOUT -->
+
+                    <div class="lower-col col-about">
+
+                        <h4>
+                            ABOUT
+                        </h4>
+
+                        <p>
+                            Appreciating design-centric yet aesthetic
+                            fashioned jewellery brand, FIRQUI was born
+                            out to create the pieces.
+                        </p>
+
+                        <p>
+                            Explore stunning design and craftsmanship
+                            in our collection including earrings,
+                            necklaces, rings and more at accessible
+                            prices.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- SUPPORT -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SUPPORT
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="#">
+                                    Shipping
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Returns &amp; Exchanges
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Warranty
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Product Care
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    FAQs
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Privacy Policy
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Terms of Service
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- SHOP -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SHOP
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="#">
+                                    Rings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="categories/earrings.html">
+                                    Earrings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="categories/necklaces.html">
+                                    Necklaces
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="categories/bracelets_cuffs.html">
+                                    Cuffs
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Brooches
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- EXPLORE -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            EXPLORE
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="#">
+                                    Crystals
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Journal
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="index.html#about">
+                                    About
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- NEWSLETTER -->
+
+                    <div class="lower-col col-newsletter">
+
+                        <h4>
+                            NEWSLETTER
+                        </h4>
+
+                        <p>
+                            Sign up to get never-before-seen
+                            exclusive offers:
+                        </p>
+
+
+                        <form class="newsletter-form"
+                              id="newsletterForm">
+
+                            <input
+                                type="email"
+                                placeholder="E-mail"
+                                required
+                                aria-label="Email address"
+                                class="newsletter-input"
+                            >
+
+
+                            <button
+                                type="submit"
+                                class="btn-subscribe">
+
+                                SUBSCRIBE
+
+                            </button>
+
+                        </form>
+
+
+                        <div class="newsletter-msg"
+                             id="newsletterMsg">
+                        </div>
+
+
+
+                        <!-- SOCIAL MEDIA -->
+
+                        <div class="social-links">
+
+                            <a href="#"
+                               class="social-link"
+                               aria-label="Instagram"
+                               target="_blank">
+
+                                <i class="fa-brands fa-instagram"></i>
+
+                            </a>
+
+
+                            <a href="#"
+                               class="social-link"
+                               aria-label="Facebook"
+                               target="_blank">
+
+                                <i class="fa-brands fa-facebook-f"></i>
+
+                            </a>
+
+
+                            <a href="#"
+                               class="social-link"
+                               aria-label="Twitter"
+                               target="_blank">
+
+                                <i class="fa-brands fa-x-twitter"></i>
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER BAR
+    ====================================================== -->
+
+    <footer class="footer"
+            id="contact">
+
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+
+        <div class="footer-credit">
+
+            Powered by
+
+            <strong>
+                GENEXA TECH
+            </strong>
+
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- Product Details JS -->
+
+<script src="product-details.js"></script>
+
+</body>
+
+</html>

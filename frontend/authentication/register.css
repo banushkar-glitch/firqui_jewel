@@ -1,0 +1,623 @@
+/* =====================================================
+   FIRQUI JEWELS - SIMPLE REGISTER PAGE
+===================================================== */
+
+:root {
+    --dark-teal: #0A373B;
+    --header-teal: #29474B;
+    --pink: #EC9E96;
+    --light-pink: #FFB9B3;
+    --cream: #FAF5EE;
+    --muted-text: #6F7776;
+
+    --font-imprima: 'Imprima', sans-serif;
+    --font-hurricane: 'Hurricane', cursive;
+    --font-almarai: 'Almarai', sans-serif;
+}
+
+
+/* =====================================================
+   RESET
+===================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+
+body {
+    background: var(--dark-teal);
+    font-family: var(--font-imprima);
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.register-page {
+    min-height: 100vh;
+    width: 100%;
+    background: var(--dark-teal);
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.register-header {
+    width: 100%;
+    height: 110px;
+
+    background: var(--header-teal);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 60px;
+}
+
+
+.brand-logo img {
+    width: 120px;
+    height: auto;
+}
+
+
+.back-home {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    color: var(--pink);
+
+    font-size: 19px;
+    text-decoration: none;
+
+    transition: 0.3s ease;
+}
+
+
+.back-home:hover {
+    color: var(--light-pink);
+}
+
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.register-content {
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    padding: 45px 20px;
+}
+
+
+/* =====================================================
+   REGISTER CARD
+===================================================== */
+
+.register-card {
+    width: 510px;
+
+    background: var(--cream);
+
+    border-radius: 70px;
+
+    padding: 45px 60px 35px;
+
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.20);
+}
+
+
+/* =====================================================
+   HEADING
+===================================================== */
+
+.register-heading {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+
+.register-heading span {
+    display: block;
+
+    color: var(--dark-teal);
+
+    font-family: var(--font-imprima);
+
+    font-size: 25px;
+}
+
+
+.register-heading h1 {
+    color: var(--dark-teal);
+
+    font-family: var(--font-hurricane);
+
+    font-size: 80px;
+
+    font-weight: 400;
+
+    line-height: 0.9;
+}
+
+
+.register-heading p {
+    margin-top: 10px;
+
+    color: var(--muted-text);
+
+    font-family: var(--font-imprima);
+
+    font-size: 18px;
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+.input-group {
+    margin-bottom: 18px;
+}
+
+
+.input-wrapper {
+    position: relative;
+
+    width: 100%;
+    height: 58px;
+}
+
+
+.input-wrapper > i {
+    position: absolute;
+
+    left: 25px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #E1B62E;
+
+    font-size: 19px;
+
+    z-index: 2;
+}
+
+
+.input-wrapper input {
+    width: 100%;
+    height: 100%;
+
+    border: none;
+    outline: none;
+
+    border-radius: 19px;
+
+    background: #063F42;
+
+    color: #FFFFFF;
+
+    font-family: var(--font-imprima);
+
+    font-size: 18px;
+
+    padding: 0 55px 0 64px;
+
+    transition: 0.25s ease;
+}
+
+
+.input-wrapper input::placeholder {
+    color: #969A9A;
+}
+
+
+.input-wrapper input:focus {
+    box-shadow:
+        0 0 0 3px rgba(236, 158, 150, 0.35);
+}
+
+
+/* =====================================================
+   PASSWORD TOGGLE
+===================================================== */
+
+.password-toggle {
+    position: absolute;
+
+    right: 15px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 35px;
+    height: 35px;
+
+    border: none;
+
+    background: transparent;
+
+    color: var(--pink);
+
+    cursor: pointer;
+
+    font-size: 17px;
+}
+
+
+/* =====================================================
+   REGISTER BUTTON
+===================================================== */
+
+.register-button {
+    width: 100%;
+    height: 58px;
+
+    margin-top: 5px;
+
+    border: none;
+
+    border-radius: 29px;
+
+    background: #E1B62E;
+
+    color: #000000;
+
+    font-family: var(--font-imprima);
+
+    font-size: 21px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+
+.register-button:hover {
+    background: #F0C63E;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+.register-button:active {
+    transform: translateY(0);
+}
+
+
+/* =====================================================
+   MESSAGE
+===================================================== */
+
+.register-message {
+    min-height: 20px;
+
+    margin-top: 8px;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+
+.register-message.success {
+    color: #28704F;
+}
+
+
+.register-message.error {
+    color: #B44141;
+}
+
+
+/* =====================================================
+   LOGIN
+===================================================== */
+
+.login-section {
+    margin-top: 20px;
+
+    padding-top: 18px;
+
+    border-top:
+        1px solid rgba(10, 55, 59, 0.12);
+
+    text-align: center;
+
+    color: var(--muted-text);
+
+    font-size: 16px;
+}
+
+
+.login-section a {
+    margin-left: 5px;
+
+    color: var(--dark-teal);
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.login-section a:hover {
+    color: var(--pink);
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.register-footer {
+    width: 100%;
+
+    min-height: 70px;
+
+    padding: 15px 60px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    color: var(--pink);
+
+    font-family: var(--font-almarai);
+
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+
+    .register-header {
+        height: 80px;
+
+        padding: 0 20px;
+    }
+
+
+    .brand-logo img {
+        width: 95px;
+    }
+
+
+    .back-home span {
+        display: none;
+    }
+
+
+    .back-home {
+        font-size: 20px;
+    }
+
+
+    .register-content {
+        padding: 25px 10px;
+    }
+
+
+    .register-card {
+        width: 100%;
+
+        border-radius: 35px;
+
+        padding: 30px 20px 25px;
+    }
+
+
+    .register-heading {
+        margin-bottom: 22px;
+    }
+
+
+    .register-heading span {
+        font-size: 21px;
+    }
+
+
+    .register-heading h1 {
+        font-size: 68px;
+    }
+
+
+    .register-heading p {
+        font-size: 16px;
+    }
+
+
+    .input-group {
+        margin-bottom: 14px;
+    }
+
+
+    .input-wrapper {
+        height: 56px;
+    }
+
+
+    .input-wrapper input {
+        font-size: 16px;
+
+        padding-left: 58px;
+    }
+
+
+    .register-button {
+        height: 56px;
+    }
+
+
+    .register-footer {
+        flex-direction: column;
+
+        gap: 5px;
+
+        text-align: center;
+
+        padding: 15px;
+
+        font-size: 11px;
+    }
+}
+/* =====================================================
+   REGISTER PAGE INSIDE INDEX MODAL
+===================================================== */
+
+body.modal-register {
+    margin: 0;
+    padding: 0;
+
+    background: transparent;
+
+    overflow: hidden;
+}
+
+
+body.modal-register .register-page {
+    min-height: 100vh;
+    width: 100%;
+
+    background: transparent;
+
+    display: block;
+}
+
+
+/* Hide standalone header */
+
+body.modal-register .register-header {
+    display: none;
+}
+
+
+/* Hide standalone footer */
+
+body.modal-register .register-footer {
+    display: none;
+}
+
+
+/* Center register card */
+
+body.modal-register .register-content {
+    width: 100%;
+    min-height: 100vh;
+
+    padding: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: transparent;
+}
+
+
+/* Existing register card */
+
+body.modal-register .register-card {
+    width: 100%;
+    max-width: 510px;
+
+    margin: 0;
+
+    border-radius: 35px;
+
+    box-shadow: none;
+}
+.login-section button {
+    margin-left: 5px;
+
+    border: none;
+    background: transparent;
+
+    color: var(--dark-teal);
+
+    font-family: var(--font-imprima);
+
+    font-size: 16px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.login-section button:hover {
+    color: var(--pink);
+}
+/* Register Card */
+.register-card {
+    width: 510px;
+    max-height: 90vh;
+    overflow-y: auto;
+
+    background: var(--cream);
+    border-radius: 40px;
+
+    padding: 40px 50px;
+}
+.login-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(10,55,59,0.15);
+
+    text-align: center;
+
+    color: #6F7776;
+
+    font-size: 16px;
+}
+
+.login-section button {
+    border: none;
+    background: transparent;
+
+    color: #0A373B;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    margin-left: 5px;
+}
+
+.login-section button:hover {
+    color: #EC9E96;
+}

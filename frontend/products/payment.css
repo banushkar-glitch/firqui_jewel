@@ -1,0 +1,1122 @@
+/* =========================================================
+   FIRQUI JEWELS - UPI PAYMENT PAGE STYLING
+   Brand Theme Tokens:
+   Dark Teal:  #0A373B
+   Cream:      #FAF5EE
+   Pink:       #EC9E96
+   Light Pink: #FFB9B3
+   Text Dark:  #1F2424
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: "Inter", sans-serif;
+    background: #0A373B;
+    color: #1F2424;
+}
+
+/* =========================================================
+   HEADER (Exact FIRQUI JEWELS Navigation & Header)
+========================================================= */
+
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 110px;
+    background: linear-gradient(
+        to bottom,
+        #0A373B 0px,
+        #0A373B 55px,
+        rgba(123, 107, 105, 0.49) 55px,
+        rgba(123, 107, 105, 0.49) 110px
+    );
+    z-index: 1000;
+}
+
+.header-logo {
+    position: absolute;
+    left: 24px;
+    top: 15px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+}
+
+.header-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.navigation {
+    position: absolute;
+    left: clamp(180px, 24vw, 337px);
+    top: 42px;
+    display: flex;
+    align-items: center;
+    gap: clamp(8px, 1.3vw, 18px);
+    z-index: 1100;
+    transform: translateY(22px);
+}
+
+.nav-link {
+    font-family: "Imprima", serif;
+    font-size: clamp(14px, 1.3vw, 18px);
+    color: #FAF5EE;
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.25s ease;
+}
+
+.nav-link:hover {
+    color: #EC9E96;
+}
+
+.nav-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: #FAF5EE;
+    opacity: 0.6;
+}
+
+.header-icons {
+    position: absolute;
+    right: clamp(15px, 3vw, 40px);
+    top: 38px;
+    display: flex;
+    align-items: center;
+    gap: clamp(10px, 1.4vw, 20px);
+    z-index: 1100;
+    transform: translateY(25px);
+}
+
+.header-icon-btn {
+    width: clamp(28px, 2.2vw, 32px);
+    height: clamp(28px, 2.2vw, 32px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    color: #EC9E96;
+    font-size: clamp(16px, 1.5vw, 20px);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.header-icon-btn:hover {
+    color: #FAF5EE;
+    transform: translateY(-2px);
+}
+
+/* =========================================================
+   PAYMENT PAGE CONTAINER
+========================================================= */
+
+.payment-page {
+    width: min(94%, 1240px);
+    margin: 0 auto;
+    padding-top: clamp(145px, 11vw, 175px);
+    padding-bottom: clamp(60px, 8vw, 100px);
+}
+
+.payment-header-section {
+    text-align: center;
+    margin-bottom: clamp(30px, 4vw, 45px);
+}
+
+.payment-badge-pill {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(236, 158, 150, 0.16);
+    border: 1px solid rgba(236, 158, 150, 0.4);
+    border-radius: 999px;
+    color: #FFB9B3;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.payment-title {
+    margin: 0;
+    color: #EC9E96;
+    font-size: clamp(28px, 3.8vw, 44px);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+}
+
+.payment-instructions {
+    margin: 12px auto 0;
+    max-width: 650px;
+    color: #FAF5EE;
+    font-size: clamp(14px, 1.3vw, 16.5px);
+    line-height: 1.6;
+    opacity: 0.95;
+}
+
+/* =========================================================
+   GRID LAYOUT
+========================================================= */
+
+.payment-grid-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
+    gap: clamp(24px, 3vw, 36px);
+    align-items: start;
+}
+
+.payment-left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+.payment-right-column {
+    position: sticky;
+    top: 130px;
+}
+
+/* =========================================================
+   PAYMENT CARDS (Cream Background)
+========================================================= */
+
+.payment-card {
+    background: #FAF5EE;
+    border-radius: 20px;
+    padding: clamp(24px, 3vw, 34px);
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(236, 158, 150, 0.25);
+}
+
+.card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+}
+
+.step-indicator {
+    display: inline-block;
+    color: #0A373B;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: #FFB9B3;
+    padding: 3px 10px;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+
+.card-header h2 {
+    margin: 0;
+    color: #0A373B;
+    font-size: clamp(20px, 2.2vw, 24px);
+    font-weight: 700;
+}
+
+.upi-logos-badge {
+    background: rgba(10, 55, 59, 0.08);
+    border: 1px solid rgba(10, 55, 59, 0.15);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #0A373B;
+    letter-spacing: 0.02em;
+}
+
+/* =========================================================
+   AMOUNT BANNER
+========================================================= */
+
+.amount-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #0A373B;
+    color: #FAF5EE;
+    padding: 16px 22px;
+    border-radius: 14px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 16px rgba(10, 55, 59, 0.22);
+}
+
+.amount-label {
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: #FFB9B3;
+    letter-spacing: 0.02em;
+}
+
+.amount-value {
+    font-size: clamp(1.45rem, 2.3vw, 1.85rem);
+    font-weight: 700;
+    color: #FAF5EE;
+    letter-spacing: 0.02em;
+}
+
+/* =========================================================
+   SECTION C: QR CODE WRAPPER
+========================================================= */
+
+.qr-code-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 22px 16px 18px;
+    background: #FFFFFF;
+    border-radius: 16px;
+    border: 1.5px solid rgba(10, 55, 59, 0.12);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.03);
+    margin-bottom: 22px;
+}
+
+.qr-image-frame {
+    width: 230px;
+    height: 230px;
+    padding: 10px;
+    background: #FFFFFF;
+    border: 2px solid #0A373B;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.qr-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
+}
+
+.qr-helper-text {
+    margin: 14px 0 0;
+    font-size: 0.88rem;
+    color: #4A5656;
+    text-align: center;
+    line-height: 1.45;
+    max-width: 380px;
+}
+
+.qr-helper-text i {
+    color: #EC9E96;
+    margin-right: 5px;
+}
+
+/* =========================================================
+   SECTION D: UPI ID BOX & COPY BUTTON
+========================================================= */
+
+.upi-id-box {
+    background: rgba(10, 55, 59, 0.05);
+    border: 1.5px dashed rgba(10, 55, 59, 0.3);
+    border-radius: 14px;
+    padding: 16px 20px;
+}
+
+.upi-id-label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #0A373B;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+}
+
+.upi-id-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.upi-id-text {
+    font-family: "Courier New", Courier, monospace, "Inter";
+    font-size: clamp(1rem, 1.4vw, 1.15rem);
+    font-weight: 700;
+    color: #0A373B;
+    background: #FFFFFF;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(10, 55, 59, 0.15);
+    word-break: break-all;
+}
+
+.copy-upi-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0A373B;
+    color: #FAF5EE;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.15s ease;
+}
+
+.copy-upi-btn:hover {
+    background: #EC9E96;
+    color: #0A373B;
+    transform: translateY(-1px);
+}
+
+.copy-toast {
+    margin-top: 10px;
+    color: #0D6938;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    animation: fadeIn 0.25s ease;
+}
+
+
+/* =========================================================
+   SECTION E & F: SUBMISSION FORM
+========================================================= */
+
+.submission-instructions {
+    margin: 0 0 20px;
+    font-size: 0.92rem;
+    color: #4A5656;
+    line-height: 1.55;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.input-label {
+    display: block;
+    color: #0A373B;
+    font-size: 0.92rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: 0.01em;
+}
+
+.required-star {
+    color: #D32F2F;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    color: #0A373B;
+    font-size: 1rem;
+    opacity: 0.65;
+    pointer-events: none;
+}
+
+.text-input {
+    width: 100%;
+    padding: 13px 14px 13px 42px;
+    background: #FFFFFF;
+    border: 1.5px solid #D9CEBF;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 0.96rem;
+    color: #1F2424;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: #0A373B;
+    box-shadow: 0 0 0 3px rgba(10, 55, 59, 0.15);
+}
+
+.field-error {
+    display: block;
+    color: #D32F2F;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-top: 5px;
+    min-height: 18px;
+}
+
+.field-hint {
+    display: block;
+    color: #6C7A7A;
+    font-size: 0.8rem;
+    margin-top: 3px;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   SCREENSHOT UPLOAD ZONE
+========================================================= */
+
+.upload-dropzone {
+    border: 2px dashed #0A373B;
+    border-radius: 14px;
+    background: #FFFFFF;
+    padding: 24px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
+    position: relative;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.drag-active {
+    background-color: rgba(236, 158, 150, 0.1);
+    border-color: #EC9E96;
+}
+
+.hidden-file-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.dropzone-icon {
+    font-size: 2.4rem;
+    color: #0A373B;
+    margin-bottom: 10px;
+}
+
+.dropzone-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.choose-file-btn {
+    background: #0A373B;
+    color: #FAF5EE;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    pointer-events: none; /* Passes clicks through to parent file input */
+}
+
+.dropzone-hint {
+    font-size: 0.84rem;
+    color: #6C7A7A;
+}
+
+.upload-restrictions {
+    display: block;
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: #8C9999;
+}
+
+/* SCREENSHOT PREVIEW CARD */
+.screenshot-preview-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #FFFFFF;
+    border: 1.5px solid #D9CEBF;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin-top: 10px;
+    animation: fadeIn 0.25s ease;
+}
+
+.preview-thumbnail-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #F0EDE8;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.preview-meta {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.preview-filename {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #0A373B;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.preview-filesize {
+    font-size: 0.78rem;
+    color: #6C7A7A;
+}
+
+.preview-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.preview-action-btn {
+    border: none;
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: background 0.2s ease;
+}
+
+.replace-btn {
+    background: rgba(10, 55, 59, 0.08);
+    color: #0A373B;
+}
+
+.replace-btn:hover {
+    background: rgba(10, 55, 59, 0.16);
+}
+
+.remove-btn {
+    background: rgba(211, 47, 47, 0.1);
+    color: #D32F2F;
+}
+
+.remove-btn:hover {
+    background: rgba(211, 47, 47, 0.2);
+}
+
+/* =========================================
+   SUBMIT BUTTON & ALERTS
+========================================= */
+
+.submit-payment-btn {
+    width: 100%;
+    background: #0A373B;
+    color: #FAF5EE;
+    border: 2px solid #0A373B;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-size: clamp(1rem, 1.2vw, 1.1rem);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 14px rgba(10, 55, 59, 0.25);
+    margin-top: 10px;
+}
+
+.submit-payment-btn:hover:not(:disabled) {
+    background: #EC9E96;
+    color: #0A373B;
+    border-color: #EC9E96;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(236, 158, 150, 0.35);
+}
+
+.submit-payment-btn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.payment-alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    margin-bottom: 16px;
+    animation: fadeIn 0.25s ease;
+}
+
+.payment-alert.alert-error {
+    background: #FDEDED;
+    color: #5F2120;
+    border: 1px solid #F5C6CB;
+}
+
+.payment-alert.alert-success {
+    background: #EDF7ED;
+    color: #1E4620;
+    border: 1px solid #C3E6CB;
+}
+
+/* =========================================================
+   SECTION B: ORDER SUMMARY ASIDE
+========================================================= */
+
+.order-info-card {
+    position: relative;
+}
+
+.summary-heading {
+    margin: 0 0 16px;
+    color: #0A373B;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.order-meta-box {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.meta-label {
+    color: #6C7A7A;
+    font-weight: 500;
+}
+
+.meta-value {
+    color: #0A373B;
+    font-weight: 600;
+}
+
+.payment-status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.status-pending {
+    background: #FFF3CD;
+    color: #856404;
+}
+
+.status-verification {
+    background: #CCE5FF;
+    color: #004085;
+}
+
+.status-paid {
+    background: #D4EDDA;
+    color: #155724;
+}
+
+.status-rejected {
+    background: #F8D7DA;
+    color: #721C24;
+}
+
+.summary-divider {
+    border: none;
+    border-top: 1px solid #D9CEBF;
+    margin: 18px 0;
+}
+
+.summary-subdivider {
+    border: none;
+    border-top: 1px dashed #D9CEBF;
+    margin: 12px 0;
+}
+
+.items-heading {
+    font-size: 0.94rem;
+    color: #0A373B;
+    font-weight: 700;
+    margin: 0 0 12px;
+}
+
+.order-items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.order-items-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.order-items-list::-webkit-scrollbar-thumb {
+    background: #D9CEBF;
+    border-radius: 4px;
+}
+
+.summary-item-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.summary-item-img {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.summary-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.summary-item-name {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #0A373B;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.summary-item-sub {
+    font-size: 0.78rem;
+    color: #6C7A7A;
+    margin-top: 2px;
+}
+
+.summary-item-price {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0A373B;
+}
+
+.price-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #4A5656;
+}
+
+.free-shipping {
+    color: #0D6938;
+    font-weight: 600;
+}
+
+.price-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    color: #0A373B;
+    font-weight: 700;
+}
+
+.total-price {
+    font-size: 1.35rem;
+    color: #0A373B;
+}
+
+.security-notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(10, 55, 59, 0.05);
+    border: 1px solid rgba(10, 55, 59, 0.1);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 20px;
+}
+
+.security-notice i {
+    color: #0A373B;
+    font-size: 1.1rem;
+    margin-top: 2px;
+}
+
+.security-notice p {
+    margin: 0;
+    font-size: 0.78rem;
+    color: #4A5656;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   CONFIRMATION MODAL
+========================================================= */
+
+.confirmation-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 55, 59, 0.75);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    padding: 20px;
+    animation: fadeIn 0.25s ease;
+}
+
+.confirmation-modal-box {
+    background: #FAF5EE;
+    border-radius: 20px;
+    max-width: 520px;
+    width: 100%;
+    padding: clamp(28px, 4vw, 40px);
+    text-align: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    border: 2px solid #EC9E96;
+    animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-success-icon {
+    font-size: 3.5rem;
+    color: #0D6938;
+    margin-bottom: 14px;
+}
+
+.modal-title {
+    margin: 0 0 10px;
+    color: #0A373B;
+    font-size: clamp(1.4rem, 2vw, 1.7rem);
+    font-weight: 700;
+}
+
+.modal-message {
+    margin: 0 0 22px;
+    color: #4A5656;
+    font-size: 0.96rem;
+    line-height: 1.55;
+}
+
+.modal-order-details {
+    background: #FFFFFF;
+    border-radius: 12px;
+    border: 1px solid #D9CEBF;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+}
+
+.modal-detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.88rem;
+    color: #4A5656;
+}
+
+.modal-detail-row strong {
+    color: #0A373B;
+}
+
+.modal-notice {
+    font-size: 0.82rem;
+    color: #6C7A7A;
+    line-height: 1.45;
+    margin: 0 0 24px;
+}
+
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.modal-btn {
+    display: inline-block;
+    padding: 13px 20px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.modal-btn-primary {
+    background: #0A373B;
+    color: #FAF5EE;
+}
+
+.modal-btn-primary:hover {
+    background: #EC9E96;
+    color: #0A373B;
+}
+
+.modal-btn-secondary {
+    background: transparent;
+    color: #0A373B;
+    border: 1.5px solid #0A373B;
+}
+
+.modal-btn-secondary:hover {
+    background: rgba(10, 55, 59, 0.08);
+}
+
+/* =========================================================
+   FOOTER (Identical to Checkout)
+========================================================= */
+
+.footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px clamp(20px, 4vw, 60px);
+    background: #0A373B;
+    border-top: 1px solid rgba(236, 158, 150, 0.2);
+    color: #FAF5EE;
+    font-size: 0.88rem;
+    gap: 15px;
+}
+
+.footer-copy {
+    opacity: 0.9;
+}
+
+.footer-credit strong {
+    color: #EC9E96;
+}
+
+/* =========================================================
+   ANIMATIONS & RESPONSIVE BREAKPOINTS
+========================================================= */
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes popUp {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (max-width: 900px) {
+    .payment-grid-container {
+        grid-template-columns: 1fr;
+    }
+
+    .payment-right-column {
+        position: static;
+        order: -1; /* Show order summary on top on mobile/tablet */
+    }
+}
+
+@media (max-width: 800px) {
+    .navigation {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        position: absolute;
+        left: 105px;
+        right: 0;
+        top: 58px;
+        width: auto;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        padding: 0 10px 5px 5px;
+        transform: none;
+    }
+
+    .navigation::-webkit-scrollbar {
+        display: none;
+    }
+
+    .header {
+        height: 90px;
+    }
+
+    .header-logo {
+        width: 65px;
+        height: 65px;
+        top: 10px;
+        left: 15px;
+    }
+
+    .header-icons {
+        top: 29px;
+        right: 15px;
+        transform: none;
+    }
+
+    .payment-page {
+        padding-top: 120px;
+    }
+
+    .footer {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+}

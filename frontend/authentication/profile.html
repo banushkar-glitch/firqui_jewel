@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FIRQUI JEWELS | Profile</title>
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Profile CSS -->
+    <link rel="stylesheet" href="profile.css">
+</head>
+
+<body>
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <header class="header">
+
+        <!-- LOGO -->
+        <a href="index.html" class="header-logo">
+            <img src="../assets\Logo Pink 1.png" alt="FIRQUI JEWELS Logo">
+        </a>
+
+        <!-- NAVIGATION -->
+        <nav class="navigation">
+
+            <a href="../index.html" class="nav-link">
+                Home
+            </a>
+
+            <span class="nav-dot"></span>
+
+            <a href="../collection/pearls-gone-rogue.html" class="nav-link">
+                Collections
+            </a>
+
+            <span class="nav-dot"></span>
+
+            <a href="../collection/pearls-gone-rogue.html" class="nav-link">
+                Categories
+            </a>
+
+            <span class="nav-dot"></span>
+
+            <a href="../about.html" class="nav-link">
+                About
+            </a>
+
+            <span class="nav-dot"></span>
+
+            <a href="../contact.html" class="nav-link">
+                Contact
+            </a>
+
+        </nav>
+
+        <!-- HEADER ICONS -->
+        <div class="header-icons">
+
+            <!-- Profile -->
+            <a href="profile.html"
+               class="header-icon-btn active-icon"
+               aria-label="Profile">
+                <i class="fa-regular fa-user"></i>
+            </a>
+
+            <!-- Search -->
+            <a href="#"
+               class="header-icon-btn"
+               aria-label="Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </a>
+
+            <!-- Wishlist -->
+            <a href="../products/wishlist.html"
+               class="header-icon-btn"
+               aria-label="Wishlist">
+                <i class="fa-regular fa-heart"></i>
+            </a>
+
+            <!-- Cart -->
+            <a href="../products/cart.html"
+               class="header-icon-btn"
+               aria-label="Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <!-- =========================================
+         PROFILE PAGE
+    ========================================== -->
+
+    <main class="profile-page">
+
+        <!-- PAGE TITLE -->
+        <h1>My Profile</h1>
+
+        <p class="profile-subtitle">
+            Manage your personal information and view your orders.
+        </p>
+
+
+        <!-- =====================================
+             CUSTOMER INFORMATION
+        ====================================== -->
+
+        <section class="profile-section">
+
+            <div class="section-heading">
+                <i class="fa-regular fa-user"></i>
+                <h2>Customer Information</h2>
+            </div>
+
+
+            <div class="profile-details">
+
+                <!-- NAME -->
+                <div class="profile-field">
+
+                    <span class="field-label">
+                        Full Name
+                    </span>
+
+                    <span class="field-value" id="profile-name">
+                        Not added
+                    </span>
+
+                </div>
+
+
+                <!-- PHONE -->
+                <div class="profile-field">
+
+                    <span class="field-label">
+                        Phone Number
+                    </span>
+
+                    <span class="field-value" id="profile-phone">
+                        Not added
+                    </span>
+
+                </div>
+
+
+                <!-- EMAIL -->
+                <div class="profile-field">
+
+                    <span class="field-label">
+                        Email
+                    </span>
+
+                    <span class="field-value" id="profile-email">
+                        Not added
+                    </span>
+
+                </div>
+
+
+                <!-- PINCODE -->
+                <div class="profile-field">
+
+                    <span class="field-label">
+                        Pincode
+                    </span>
+
+                    <span class="field-value" id="profile-pincode">
+                        Not added
+                    </span>
+
+                </div>
+
+
+                <!-- ADDRESS 1 -->
+                <div class="profile-field full-width">
+
+                    <span class="field-label">
+                        Address 1
+                    </span>
+
+                    <span class="field-value" id="profile-address1">
+                        Not added
+                    </span>
+
+                </div>
+
+
+                <!-- ADDRESS 2 -->
+                <div class="profile-field full-width">
+
+                    <span class="field-label">
+                        Address 2
+                    </span>
+
+                    <span class="field-value" id="profile-address2">
+                        Not added
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- EDIT PROFILE & LOGOUT -->
+            <div class="profile-actions-wrap" style="display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 25px;">
+                <button type="button"
+                        class="edit-profile-button"
+                        id="edit-profile-button"
+                        style="margin-top: 0;">
+
+                    <i class="fa-regular fa-pen-to-square"></i>
+
+                    Edit Profile
+
+                </button>
+
+                <button type="button"
+                        class="logout-profile-button"
+                        id="logout-button">
+
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+                    Logout
+
+                </button>
+            </div>
+
+        </section>
+
+
+
+        <!-- =====================================
+             MY ORDERS
+        ====================================== -->
+
+        <section class="orders-section">
+
+            <div class="section-heading">
+
+                <i class="fa-solid fa-box-open"></i>
+
+                <h2>My Orders</h2>
+
+            </div>
+
+
+            <!-- ORDER HISTORY -->
+            <div id="orders-container">
+
+                <!-- Orders will be added by profile.js -->
+
+                <div class="no-orders">
+
+                    <i class="fa-regular fa-clipboard"></i>
+
+                    <h3>No Orders Yet</h3>
+
+                    <p>
+                        Your order history will appear here after you place an order.
+                    </p>
+
+                    <a href="bracelets_cuffs.html"
+                       class="shop-button">
+
+                        Continue Shopping
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================================
+             EDIT PROFILE MODAL
+        ========================================== -->
+        <div class="profile-modal-overlay" id="editProfileModal" aria-hidden="true">
+            <div class="profile-modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+                <div class="profile-modal-header">
+                    <div class="modal-title-wrap">
+                        <i class="fa-regular fa-pen-to-square"></i>
+                        <h2 id="modalTitle">Edit Profile</h2>
+                    </div>
+                    <button type="button" class="profile-modal-close" id="closeEditModal" aria-label="Close modal">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <form id="editProfileForm" class="edit-profile-form">
+                    <div class="modal-body-fields">
+                        <div class="modal-field">
+                            <label for="edit-name">Full Name *</label>
+                            <input type="text" id="edit-name" name="name" required placeholder="Enter full name">
+                        </div>
+                        <div class="modal-field">
+                            <label for="edit-phone">Phone Number *</label>
+                            <input type="tel" id="edit-phone" name="phone" required placeholder="10-digit mobile number">
+                        </div>
+                        <div class="modal-field full-width">
+                            <label for="edit-email">Email *</label>
+                            <input type="email" id="edit-email" name="email" required placeholder="Enter email address">
+                        </div>
+                        <div class="modal-field">
+                            <label for="edit-pincode">Pincode</label>
+                            <input type="text" id="edit-pincode" name="pincode" placeholder="6-digit pincode" maxlength="6">
+                        </div>
+                        <div class="modal-field full-width">
+                            <label for="edit-address1">Address 1</label>
+                            <input type="text" id="edit-address1" name="address1" placeholder="House/Flat No., Building, Street">
+                        </div>
+                        <div class="modal-field full-width">
+                            <label for="edit-address2">Address 2</label>
+                            <input type="text" id="edit-address2" name="address2" placeholder="Locality, Landmark, City">
+                        </div>
+                    </div>
+
+                    <div id="modalAlert" class="modal-alert" style="display: none;"></div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="modal-btn cancel-btn" id="cancelEditBtn">Cancel</button>
+                        <button type="submit" class="modal-btn save-btn" id="saveProfileBtn">Save Changes</button>
+                    </div>
+
+                    <div class="modal-danger-zone">
+                        <button type="button" class="delete-account-btn" id="deleteAccountBtn">
+                            <i class="fa-regular fa-trash-can"></i> Delete Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </main>
+
+
+
+    <!-- =========================================
+         FOOTER
+    ========================================== -->
+
+    <footer class="footer">
+
+        <div class="footer-copy">
+            © 2025 FIRQUI JEWELS
+        </div>
+
+        <div class="footer-credit">
+            Crafted with
+            <span>♡</span>
+            by
+            <strong>FIRQUI</strong>
+        </div>
+
+    </footer>
+
+
+    <!-- Profile JavaScript -->
+    <script src="profile.js"></script>
+
+</body>
+
+</html>

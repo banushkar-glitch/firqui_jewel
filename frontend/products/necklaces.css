@@ -1,0 +1,1521 @@
+/* ===================================================== 
+   FIRQUI JEWELS 
+   NECKLACES PAGE 
+   SAME STYLE AS EARRINGS PAGE 
+===================================================== */ 
+
+
+/* ===================================================== 
+   ROOT 
+===================================================== */ 
+
+:root { 
+
+    --dark-teal: #0A373B; 
+    --header-teal:  #0A373B;
+    --header-overlay: rgba(123, 107, 105, 0.49); 
+
+    --pink: #EC9E96; 
+    --cream: #FAF5EE; 
+    --light-pink: #FFB9B3; 
+
+    --text-muted: rgba(44, 44, 44, 0.67); 
+    --text-dark: #2C2C2C; 
+
+    --white: #FFFFFF; 
+
+    --font-inter: 'Inter', sans-serif; 
+    --font-imprima: 'Imprima', sans-serif; 
+    --font-hurricane: 'Hurricane', cursive; 
+    --font-almarai: 'Almarai', sans-serif; 
+    --font-hand: 'Caveat', cursive; 
+} 
+
+
+/* ===================================================== 
+   RESET 
+===================================================== */ 
+
+*, 
+*::before, 
+*::after { 
+
+    box-sizing: border-box; 
+
+    margin: 0; 
+    padding: 0; 
+} 
+
+
+html { 
+
+    scroll-behavior: smooth; 
+
+} 
+
+
+body { 
+
+    width: 100%; 
+    min-height: 100vh; 
+
+    background: var(--dark-teal); 
+
+    font-family: var(--font-inter); 
+
+    color: var(--pink); 
+
+    overflow-x: hidden; 
+
+    -webkit-font-smoothing: antialiased; 
+
+} 
+
+
+a { 
+
+    color: inherit; 
+    text-decoration: none; 
+
+} 
+
+
+button { 
+
+    font-family: inherit; 
+    border: none; 
+    background: none; 
+    cursor: pointer; 
+
+} 
+
+
+img { 
+
+    max-width: 100%; 
+    height: auto; 
+    display: block; 
+
+} 
+
+
+/* ===================================================== 
+   PAGE 
+===================================================== */ 
+
+.page { 
+
+    position: relative; 
+    width: 100%; 
+    max-width: 1440px; 
+    margin: 0 auto; 
+    background: var(--dark-teal); 
+    overflow: hidden; 
+
+} 
+
+
+/* ===================================================== 
+   HEADER 
+   SAME AS EARRINGS PAGE 
+===================================================== */ 
+
+.header { 
+
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+
+    width: 100%; 
+    height: 110px; 
+
+    background: linear-gradient( 
+        to bottom, 
+        var(--header-teal) 0px, 
+        var(--header-teal) 55px, 
+        var(--header-overlay) 55px, 
+        var(--header-overlay) 110px 
+    ); 
+
+    z-index: 100; 
+
+} 
+
+
+/* ===================================================== 
+   LOGO 
+===================================================== */ 
+
+.header-logo { 
+
+    position: absolute; 
+    left: 24px; 
+    top: 15px; 
+
+    width: 80px; 
+    height: 80px; 
+
+    z-index: 110; 
+
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+
+    transition: transform 0.25s ease; 
+
+} 
+
+
+.header-logo:hover { 
+
+    transform: scale(1.02); 
+
+} 
+
+
+.header-logo img { 
+
+    width: 100%; 
+    height: 100%; 
+
+    object-fit: contain; 
+
+} 
+
+
+/* ===================================================== 
+   NAVIGATION 
+===================================================== */ 
+
+.navigation { 
+
+    position: absolute; 
+
+    left: 337px; 
+    top: 42px; 
+
+    display: flex; 
+    align-items: center; 
+    gap: 18px; 
+
+    z-index: 110; 
+
+    transform: translateY(25px); 
+
+} 
+
+
+.nav-link { 
+
+    font-family: var(--font-inter); 
+    font-weight: 400; 
+    font-size: 18px; 
+    line-height: 24px; 
+
+    color: var(--pink); 
+
+    display: inline-flex; 
+    align-items: center; 
+    gap: 6px; 
+
+    white-space: nowrap; 
+
+} 
+
+
+.nav-link:hover, 
+.nav-link.active { 
+
+    color: var(--cream); 
+
+} 
+
+
+.nav-arrow { 
+
+    font-size: 14px; 
+
+    transform: translateY(-1px); 
+
+    transition: transform 0.2s ease; 
+
+} 
+
+
+.nav-has-dropdown:hover .nav-arrow { 
+
+    transform: translateY(1px); 
+
+} 
+
+
+/* ===================================================== 
+   NAV DOTS 
+===================================================== */ 
+
+.nav-dot { 
+
+    width: 8px; 
+    height: 8px; 
+
+    border-radius: 50%; 
+    background: var(--pink); 
+
+    flex-shrink: 0; 
+    display: inline-block; 
+
+} 
+
+
+/* ===================================================== 
+   HEADER ICONS 
+===================================================== */ 
+
+.header-icons { 
+
+    position: absolute; 
+
+    right: 40px; 
+    top: 38px; 
+
+    display: flex; 
+    align-items: center; 
+    gap: 20px; 
+
+    z-index: 110; 
+
+    transform: translateY(25px); 
+
+} 
+
+
+.header-icon-btn { 
+
+    width: 32px; 
+    height: 32px; 
+
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+
+    color: var(--pink); 
+
+    font-size: 20px; 
+
+    transition: 
+        color 0.2s ease, 
+        transform 0.2s ease; 
+
+} 
+
+
+.header-icon-btn:hover { 
+
+    color: var(--cream); 
+    transform: translateY(-2px); 
+
+} 
+
+
+/* ===================================================== 
+   NECKLACES HERO 
+===================================================== */ 
+
+.necklaces-hero { 
+
+    position: relative; 
+
+    width: 100%; 
+
+    min-height: 360px; 
+    padding-top: 110px; 
+
+    background: var(--dark-teal); 
+
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+
+    text-align: center; 
+
+} 
+
+
+/* ===================================================== 
+   DECORATIVE SHAPES 
+===================================================== */ 
+
+.necklaces-hero::before { 
+
+    content: ""; 
+
+    position: absolute; 
+
+    width: 300px; 
+    height: 300px; 
+
+    left: -170px; 
+    top: 120px; 
+
+    background: var(--pink); 
+    opacity: 0.12; 
+
+    border-radius: 50%; 
+
+} 
+
+
+.necklaces-hero::after { 
+
+    content: ""; 
+
+    position: absolute; 
+
+    width: 300px; 
+    height: 300px; 
+
+    right: -170px; 
+    top: 120px; 
+
+    background: var(--pink); 
+    opacity: 0.12; 
+
+    border-radius: 50%; 
+
+} 
+
+
+/* ===================================================== 
+   TITLE 
+===================================================== */ 
+
+.necklaces-title { 
+
+    position: relative; 
+    z-index: 2; 
+
+} 
+
+
+.necklaces-title span { 
+
+    display: block; 
+
+    font-family: var(--font-imprima); 
+    font-size: 18px; 
+    letter-spacing: 3px; 
+
+    color: var(--pink); 
+
+    margin-bottom: 5px; 
+
+} 
+
+
+.necklaces-title h1 { 
+
+    font-family: var(--font-hurricane); 
+
+    font-size: 100px; 
+
+    line-height: 1; 
+    font-weight: 400; 
+
+    color: var(--cream); 
+
+} 
+
+
+.necklaces-title p { 
+
+    margin-top: 15px; 
+
+    max-width: 520px; 
+
+    font-family: var(--font-imprima); 
+    font-size: 18px; 
+    line-height: 1.6; 
+
+    color: var(--pink); 
+
+} 
+
+
+/* ===================================================== 
+   PRODUCTS SECTION 
+===================================================== */ 
+
+.products-section { 
+
+    position: relative; 
+
+    width: 100%; 
+
+    padding: 50px 70px 100px; 
+
+    background: var(--dark-teal); 
+
+} 
+
+
+/* ===================================================== 
+   PRODUCT GRID 
+   3 IMAGES IN ONE ROW 
+===================================================== */ 
+
+.products-grid { 
+
+    width: 100%; 
+
+    max-width: 1250px; 
+
+    margin: 0 auto; 
+
+    display: grid; 
+
+    grid-template-columns: 
+        repeat(3, 1fr); 
+
+    gap: 55px 35px; 
+
+} 
+
+
+/* ===================================================== 
+   PRODUCT CARD 
+===================================================== */ 
+
+.product-card { 
+
+    background: var(--cream); 
+
+    border-radius: 35px; 
+
+    overflow: hidden; 
+
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.18); 
+
+    transition: 
+        transform 0.3s ease, 
+        box-shadow 0.3s ease; 
+
+} 
+
+
+.product-card:hover { 
+
+    transform: translateY(-8px); 
+
+    box-shadow: 
+        0 25px 45px rgba(0, 0, 0, 0.25); 
+
+} 
+
+
+/* ===================================================== 
+   PRODUCT IMAGE 
+===================================================== */ 
+
+.product-image { 
+
+    position: relative; 
+
+    width: 100%; 
+
+    height: 380px; 
+
+    overflow: hidden; 
+
+    background: #114246; 
+
+} 
+
+
+.product-image img, 
+.product-image video { 
+
+    width: 100%; 
+    height: 100%; 
+
+    object-fit: cover; 
+    display: block; 
+
+    transition: 
+        transform 0.5s ease; 
+
+} 
+
+
+.product-card:hover .product-image img, 
+.product-card:hover .product-image video { 
+
+    transform: scale(1.05); 
+
+} 
+
+
+/* ===================================================== 
+   WISHLIST 
+===================================================== */ 
+
+.wishlist-btn { 
+
+    position: absolute; 
+
+    top: 18px; 
+    right: 18px; 
+
+    width: 42px; 
+    height: 42px; 
+
+    border-radius: 50%; 
+
+    background: var(--cream); 
+
+    color: var(--dark-teal); 
+
+    display: flex; 
+
+    align-items: center; 
+    justify-content: center; 
+
+    font-size: 18px; 
+
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.15); 
+
+    transition: 
+        color 0.2s ease, 
+        transform 0.2s ease; 
+
+} 
+
+
+.wishlist-btn:hover { 
+
+    color: var(--pink); 
+
+    transform: scale(1.08); 
+
+} 
+
+
+.wishlist-btn.active { 
+
+    color: var(--pink); 
+
+} 
+
+
+/* ===================================================== 
+   PRODUCT INFO 
+===================================================== */ 
+
+.product-info { 
+
+    padding: 22px 24px 25px; 
+
+} 
+
+
+.product-info h3 { 
+
+    font-family: var(--font-imprima); 
+
+    font-size: 23px; 
+    font-weight: 500; 
+
+    color: var(--dark-teal); 
+
+} 
+
+
+.product-info p { 
+
+    margin-top: 5px; 
+
+    font-family: var(--font-inter); 
+    font-size: 13px; 
+
+    color: var(--text-muted); 
+
+} 
+
+
+/* ===================================================== 
+   PRODUCT BOTTOM 
+===================================================== */ 
+
+.product-bottom { 
+
+    margin-top: 20px; 
+
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+
+    gap: 15px; 
+
+} 
+
+
+.price { 
+
+    font-family: var(--font-inter); 
+
+    font-size: 18px; 
+    font-weight: 600; 
+
+    color: var(--dark-teal); 
+
+} 
+
+
+.add-cart { 
+
+    padding: 10px 16px; 
+
+    border-radius: 22px; 
+
+    background: var(--dark-teal); 
+
+    color: var(--pink); 
+
+    font-family: var(--font-inter); 
+
+    font-size: 12px; 
+    font-weight: 600; 
+
+    transition: 0.25s ease; 
+
+} 
+
+
+.add-cart:hover { 
+
+    background: var(--header-teal); 
+
+    color: var(--cream); 
+
+    transform: translateY(-2px); 
+
+} 
+
+
+/* ===================================================== 
+   LOWER COLLECTION SECTION 
+   SAME AS EARRINGS PAGE 
+===================================================== */ 
+
+.lower-section { 
+
+    position: relative; 
+
+    width: 100%; 
+
+    padding: 60px 50px 100px; 
+
+    z-index: 10; 
+
+} 
+
+
+.lower-card { 
+
+    max-width: 1300px; 
+
+    margin: 0 auto; 
+
+    background: var(--cream); 
+
+    border-radius: 101px; 
+
+    padding: 60px 80px; 
+
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.15); 
+
+} 
+
+
+.lower-brand-title { 
+
+    font-family: var(--font-almarai); 
+
+    font-size: 26px; 
+    font-weight: 700; 
+
+    color: var(--pink); 
+
+    letter-spacing: 1.5px; 
+
+    margin-bottom: 40px; 
+
+} 
+
+
+.lower-columns { 
+
+    display: grid; 
+
+    grid-template-columns: 
+        2fr 1fr 1fr 1fr 2fr; 
+
+    gap: 40px; 
+
+    align-items: start; 
+
+} 
+
+
+.lower-col h4 { 
+
+    font-family: var(--font-inter); 
+
+    font-size: 15px; 
+    font-weight: 600; 
+
+    color: var(--text-dark); 
+
+    letter-spacing: 1.2px; 
+
+    margin-bottom: 18px; 
+
+    text-transform: uppercase; 
+
+} 
+
+
+.col-about p { 
+
+    font-size: 14px; 
+
+    line-height: 1.7; 
+
+    color: var(--text-dark); 
+
+    margin-bottom: 12px; 
+
+    opacity: 0.9; 
+
+} 
+
+
+.col-links ul { 
+
+    list-style: none; 
+
+    display: flex; 
+
+    flex-direction: column; 
+
+    gap: 10px; 
+
+} 
+
+
+.col-links a { 
+
+    font-size: 14px; 
+
+    color: var(--text-dark); 
+
+    opacity: 0.85; 
+
+    display: inline-block; 
+
+    transition: 
+        opacity 0.2s ease, 
+        color 0.2s ease, 
+        padding-left 0.2s ease; 
+
+} 
+
+
+.col-links a:hover { 
+
+    opacity: 1; 
+
+    color: var(--pink); 
+
+    padding-left: 4px; 
+
+} 
+
+
+.col-newsletter p { 
+
+    font-size: 14px; 
+
+    line-height: 1.6; 
+
+    color: var(--text-dark); 
+
+    margin-bottom: 16px; 
+
+    opacity: 0.9; 
+
+} 
+
+
+/* ===================================================== 
+   NEWSLETTER 
+===================================================== */ 
+
+.newsletter-form { 
+
+    display: flex; 
+
+    flex-direction: column; 
+
+    gap: 12px; 
+
+    max-width: 260px; 
+
+} 
+
+
+.newsletter-input { 
+
+    width: 100%; 
+
+    padding: 10px 14px; 
+
+    border: 1px solid #CCCCCC; 
+
+    background: #FFFFFF; 
+
+    font-family: var(--font-inter); 
+
+    font-size: 14px; 
+
+    color: var(--text-dark); 
+
+    outline: none; 
+
+    border-radius: 2px; 
+
+} 
+
+
+.newsletter-input:focus { 
+
+    border-color: var(--dark-teal); 
+
+} 
+
+
+.btn-subscribe { 
+
+    width: 100%; 
+
+    padding: 11px 18px; 
+
+    background: var(--dark-teal); 
+
+    color: #FFFFFF; 
+
+    font-family: var(--font-inter); 
+
+    font-size: 13px; 
+
+    font-weight: 600; 
+
+    letter-spacing: 1.5px; 
+
+    border-radius: 2px; 
+
+    text-transform: uppercase; 
+
+    transition: 
+        background-color 0.25s ease, 
+        transform 0.2s ease; 
+
+} 
+
+
+.btn-subscribe:hover { 
+
+    background: #145055; 
+
+    transform: translateY(-1px); 
+
+} 
+
+
+.newsletter-msg { 
+
+    margin-top: 10px; 
+
+    font-size: 13px; 
+
+    font-weight: 500; 
+
+    color: #145055; 
+
+} 
+
+
+/* ===================================================== 
+   FOOTER BAR 
+   SAME AS EARRINGS PAGE 
+===================================================== */ 
+
+.footer { 
+
+    position: relative; 
+
+    width: 100%; 
+
+    height: 100px; 
+
+    padding: 0 77px 40px; 
+
+    display: flex; 
+
+    align-items: center; 
+
+    justify-content: space-between; 
+
+    font-family: var(--font-almarai); 
+
+    font-size: 24px; 
+
+    line-height: 1; 
+
+    color: var(--pink); 
+
+    z-index: 10; 
+
+} 
+
+
+.footer-copy { 
+
+    display: flex; 
+
+    align-items: center; 
+
+} 
+
+
+.footer-credit { 
+
+    display: flex; 
+
+    align-items: center; 
+
+    gap: 6px; 
+
+} 
+
+
+.footer-credit strong { 
+
+    font-weight: 700; 
+
+    color: var(--cream); 
+
+} 
+
+
+/* ===================================================== 
+   RESPONSIVE
+===================================================== */
+
+
+/* =====================================================
+   MAX WIDTH 1399px
+===================================================== */
+
+@media (max-width: 1399px) { 
+
+    .header-icons { 
+
+        right: 30px; 
+        gap: 16px; 
+
+    } 
+
+
+    .navigation { 
+
+        left: 280px; 
+        gap: 16px; 
+
+    } 
+
+
+    .nav-link { 
+
+        font-size: 20px; 
+
+    } 
+
+
+    .products-grid { 
+
+        max-width: 1100px; 
+
+    } 
+
+
+    .lower-columns { 
+
+        grid-template-columns: 
+            repeat(3, 1fr); 
+
+        gap: 30px; 
+
+    } 
+
+
+    .col-newsletter { 
+
+        grid-column: 1 / -1; 
+
+    } 
+
+} 
+
+
+/* =====================================================
+   MAX WIDTH 1199px
+===================================================== */
+
+@media (max-width: 1199px) { 
+
+    .navigation { 
+
+        left: 240px; 
+        gap: 14px; 
+
+    } 
+
+
+    .nav-link { 
+
+        font-size: 18px; 
+
+    } 
+
+
+    .products-grid { 
+
+        grid-template-columns: 
+            repeat(2, 1fr); 
+
+        max-width: 800px; 
+
+    } 
+
+
+    .lower-card { 
+
+        padding: 50px 50px; 
+
+    } 
+
+} 
+
+
+/* =====================================================
+   MAX WIDTH 991px
+   TABLET — SAME STRUCTURE AS EARRINGS/BROOCHES
+===================================================== */
+
+@media (max-width: 991px) { 
+
+    .header { 
+
+        height: 200px; 
+
+        background: var(--header-teal); 
+
+        position: fixed; 
+
+    } 
+
+
+    .header-logo { 
+
+        width: 160px; 
+        height: 160px; 
+
+        top: 10px; 
+
+    } 
+
+
+    .navigation { 
+
+        left: 180px; 
+
+        top: 130px; 
+
+        gap: 12px; 
+
+    } 
+
+
+    .nav-link { 
+
+        font-size: 16px; 
+
+    } 
+
+
+    .nav-dot { 
+
+        width: 8px; 
+        height: 8px; 
+
+    } 
+
+
+    .header-icons { 
+
+        top: 125px; 
+        right: 20px; 
+
+    } 
+
+
+    .necklaces-hero { 
+
+        padding-top: 220px; 
+
+        min-height: 480px; 
+
+    } 
+
+
+    .necklaces-title h1 { 
+
+        font-size: 85px; 
+
+    } 
+
+
+    .products-section { 
+
+        padding: 50px 30px 80px; 
+
+    } 
+
+
+    .products-grid { 
+
+        grid-template-columns: 
+            repeat(2, minmax(0, 1fr)); 
+
+        max-width: 800px; 
+
+        gap: 30px; 
+
+    } 
+
+
+    .product-image { 
+
+        height: 330px; 
+
+    } 
+
+
+    .lower-card { 
+
+        border-radius: 60px; 
+
+        padding: 40px; 
+
+    } 
+
+
+    .lower-columns { 
+
+        grid-template-columns: 
+            repeat(2, 1fr); 
+
+    } 
+
+
+    .footer { 
+
+        padding: 0 30px 30px; 
+
+        font-size: 18px; 
+
+    } 
+
+} 
+
+
+/* =====================================================
+   MAX WIDTH 767px
+   MOBILE — SAME STRUCTURE AS EARRINGS/BROOCHES
+===================================================== */
+
+@media (max-width: 767px) { 
+
+    .header { 
+
+        height: 120px; 
+
+        position: relative; 
+
+        background: var(--header-teal); 
+
+    } 
+
+
+    .header-logo { 
+
+        width: 90px; 
+        height: 90px; 
+
+        top: 15px; 
+        left: 10px; 
+
+    } 
+
+
+    .navigation { 
+
+        left: 110px; 
+
+        top: 70px; 
+
+        gap: 8px; 
+
+        overflow-x: auto; 
+
+        max-width: 
+            calc(100% - 120px); 
+
+        padding-bottom: 6px; 
+
+        transform: none; 
+
+    } 
+
+
+    .nav-link { 
+
+        font-size: 13px; 
+
+    } 
+
+
+    .nav-dot { 
+
+        width: 5px; 
+        height: 5px; 
+
+    } 
+
+
+    .header-icons { 
+
+        top: 20px; 
+
+        right: 15px; 
+
+        gap: 12px; 
+
+        transform: none; 
+
+    } 
+
+
+    .header-icon-btn { 
+
+        width: 28px; 
+        height: 28px; 
+
+        font-size: 16px; 
+
+    } 
+
+
+    .necklaces-hero { 
+
+        min-height: 350px; 
+
+        padding: 60px 20px; 
+
+    } 
+
+
+    .necklaces-title h1 { 
+
+        font-size: 70px; 
+
+    } 
+
+
+    .necklaces-title p { 
+
+        font-size: 16px; 
+
+    } 
+
+
+    .products-section { 
+
+        padding: 40px 15px 60px; 
+
+    } 
+
+
+    .section-heading { 
+
+        margin-bottom: 35px; 
+
+    } 
+
+
+    .section-heading h2 { 
+
+        font-size: 55px; 
+
+    } 
+
+
+    /* =================================================
+       MOBILE PRODUCT GRID
+       2 PRODUCTS PER ROW
+    ================================================= */
+
+    .products-grid { 
+
+        grid-template-columns: 
+            repeat(2, minmax(0, 1fr)); 
+
+        max-width: 100%; 
+
+        gap: 18px 12px; 
+
+    } 
+
+
+    .product-card { 
+
+        border-radius: 22px; 
+
+    } 
+
+
+    .product-image { 
+
+        height: 190px; 
+
+    } 
+
+
+    .wishlist-btn { 
+
+        top: 10px; 
+        right: 10px; 
+
+        width: 34px; 
+        height: 34px; 
+
+        font-size: 14px; 
+
+    } 
+
+
+    .product-info { 
+
+        padding: 15px 12px 17px; 
+
+    } 
+
+
+    .product-info h3 { 
+
+        font-size: 17px; 
+
+    } 
+
+
+    .product-info p { 
+
+        font-size: 11px; 
+
+        line-height: 1.4; 
+
+    } 
+
+
+    .product-bottom { 
+
+        margin-top: 13px; 
+
+        gap: 5px; 
+
+        align-items: center; 
+
+    } 
+
+
+    .price { 
+
+        font-size: 14px; 
+
+    } 
+
+
+    .add-cart { 
+
+        padding: 7px 9px; 
+
+        font-size: 9px; 
+
+    } 
+
+
+    .lower-section { 
+
+        padding: 20px 15px 60px; 
+
+    } 
+
+
+    .lower-card { 
+
+        border-radius: 40px; 
+
+        padding: 30px 20px; 
+
+    } 
+
+
+    .lower-columns { 
+
+        grid-template-columns: 1fr; 
+
+        gap: 25px; 
+
+    } 
+
+
+    .footer { 
+
+        flex-direction: column; 
+
+        gap: 12px; 
+
+        text-align: center; 
+
+        height: auto; 
+
+        padding: 0 15px 30px; 
+
+        font-size: 16px; 
+
+    } 
+
+}

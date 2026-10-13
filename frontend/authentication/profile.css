@@ -1,0 +1,1150 @@
+/* =========================================
+   GLOBAL
+========================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+
+    font-family: "Inter", sans-serif;
+
+    background: #0A373B;
+    color: #2C2C2C;
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.header {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 110px;
+
+    background: linear-gradient(
+        to bottom,
+        #0A373B 0px,
+        #0A373B 55px,
+        rgba(123, 107, 105, 0.49) 55px,
+        rgba(123, 107, 105, 0.49) 110px
+    );
+
+    z-index: 1000;
+}
+
+
+/* =========================================
+   LOGO
+========================================= */
+
+.header-logo {
+    position: absolute;
+
+    left: 24px;
+    top: 15px;
+
+    width: 80px;
+    height: 80px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    z-index: 1100;
+}
+
+.header-logo img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+}
+
+
+/* =========================================
+   NAVIGATION
+========================================= */
+
+.navigation {
+    position: absolute;
+
+    left: clamp(180px, 24vw, 337px);
+    top: 42px;
+
+    display: flex;
+    align-items: center;
+
+    gap: clamp(8px, 1.3vw, 18px);
+
+    z-index: 1100;
+
+    transform: translateY(25px);
+}
+
+.nav-link {
+    font-family: "Inter", sans-serif;
+
+    font-weight: 400;
+
+    font-size: clamp(13px, 1.3vw, 18px);
+
+    line-height: 24px;
+
+    color: #EC9E96;
+
+    display: inline-flex;
+    align-items: center;
+
+    white-space: nowrap;
+
+    text-decoration: none;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #FAF5EE;
+}
+
+.nav-dot {
+    width: clamp(5px, 0.55vw, 8px);
+    height: clamp(5px, 0.55vw, 8px);
+
+    border-radius: 50%;
+
+    background: #EC9E96;
+
+    flex-shrink: 0;
+}
+
+
+/* =========================================
+   HEADER ICONS
+========================================= */
+
+.header-icons {
+    position: absolute;
+
+    right: clamp(15px, 3vw, 40px);
+    top: 38px;
+
+    display: flex;
+    align-items: center;
+
+    gap: clamp(10px, 1.4vw, 20px);
+
+    z-index: 1100;
+
+    transform: translateY(25px);
+}
+
+.header-icon-btn {
+    width: clamp(28px, 2.2vw, 32px);
+    height: clamp(28px, 2.2vw, 32px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+    margin: 0;
+
+    border: none;
+
+    background: transparent;
+
+    color: #EC9E96;
+
+    font-size: clamp(16px, 1.5vw, 20px);
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    appearance: none;
+}
+
+.header-icon-btn:hover {
+    color: #FAF5EE;
+
+    background: transparent;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   PROFILE PAGE
+========================================= */
+
+.profile-page {
+    width: min(94%, 1200px);
+
+    margin: 0 auto;
+
+    padding-top: clamp(150px, 12vw, 175px);
+    padding-bottom: clamp(60px, 8vw, 100px);
+}
+
+
+/* =========================================
+   PAGE TITLE
+========================================= */
+
+.profile-page > h1 {
+    margin: 0;
+
+    text-align: center;
+
+    color: #EC9E96;
+
+    font-size: clamp(32px, 4vw, 48px);
+
+    line-height: 1.1;
+}
+
+.profile-subtitle {
+    margin: 14px auto clamp(35px, 4vw, 55px);
+
+    text-align: center;
+
+    color: #FAF5EE;
+
+    font-size: clamp(14px, 1.5vw, 17px);
+
+    line-height: 1.6;
+
+    max-width: 650px;
+}
+
+
+/* =========================================
+   PROFILE / ORDER SECTIONS
+========================================= */
+
+.profile-section,
+.orders-section {
+    width: 100%;
+
+    background: #FAF5EE;
+
+    border-radius: clamp(18px, 2vw, 28px);
+
+    padding: clamp(22px, 3.5vw, 45px);
+
+    margin-bottom: clamp(25px, 4vw, 40px);
+}
+
+
+/* =========================================
+   SECTION HEADING
+========================================= */
+
+.section-heading {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: clamp(22px, 3vw, 30px);
+}
+
+.section-heading i {
+    color: #EC9E96;
+
+    font-size: clamp(20px, 2vw, 26px);
+}
+
+.section-heading h2 {
+    margin: 0;
+
+    color: #0A373B;
+
+    font-size: clamp(22px, 2.2vw, 28px);
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   PROFILE DETAILS
+========================================= */
+
+.profile-details {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(min(100%, 280px), 1fr)
+        );
+
+    gap: 18px;
+}
+
+.profile-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+
+    padding: 18px;
+
+    background: #FFFFFF;
+
+    border: 1px solid #D8D0C8;
+
+    border-radius: 12px;
+
+    min-width: 0;
+}
+
+.profile-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.field-label {
+    color: #777;
+
+    font-size: 13px;
+
+    font-weight: 500;
+}
+
+.field-value {
+    color: #0A373B;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    word-break: break-word;
+}
+
+
+/* =========================================
+   EDIT PROFILE BUTTON
+========================================= */
+
+.edit-profile-button {
+    margin-top: 25px;
+
+    min-height: 50px;
+
+    padding: 12px 25px;
+
+    border: none;
+
+    border-radius: 30px;
+
+    background: #0A373B;
+
+    color: #EC9E96;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 15px;
+
+    cursor: pointer;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.edit-profile-button:hover {
+    background: #EC9E96;
+
+    color: #0A373B;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   ORDERS
+========================================= */
+
+#orders-container {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+
+/* =========================================
+   NO ORDERS
+========================================= */
+
+.no-orders {
+    width: 100%;
+
+    padding: clamp(35px, 6vw, 60px) 20px;
+
+    text-align: center;
+
+    background: #FFFFFF;
+
+    border: 1px solid #E0D8D0;
+
+    border-radius: 16px;
+}
+
+.no-orders > i {
+    color: #EC9E96;
+
+    font-size: 42px;
+
+    margin-bottom: 15px;
+}
+
+.no-orders h3 {
+    margin: 10px 0;
+
+    color: #0A373B;
+
+    font-size: clamp(20px, 2vw, 25px);
+}
+
+.no-orders p {
+    margin: 0 auto 22px;
+
+    max-width: 450px;
+
+    color: #777;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   SHOP BUTTON
+========================================= */
+
+.shop-button {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    min-height: 48px;
+
+    padding: 12px 25px;
+
+    border-radius: 30px;
+
+    background: #0A373B;
+
+    color: #EC9E96;
+
+    text-decoration: none;
+
+    font-size: 15px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.shop-button:hover {
+    background: #EC9E96;
+
+    color: #0A373B;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   ORDER CARD
+   Used by profile.js later
+========================================= */
+
+.order-card {
+    width: 100%;
+
+    padding: clamp(18px, 3vw, 25px);
+
+    background: #FFFFFF;
+
+    border: 1px solid #D8D0C8;
+
+    border-radius: 16px;
+}
+
+
+/* ORDER HEADER */
+
+.order-header {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding-bottom: 15px;
+
+    border-bottom: 1px solid #E1DAD3;
+}
+
+.order-id {
+    color: #0A373B;
+
+    font-size: 16px;
+
+    font-weight: 700;
+}
+
+.order-date {
+    color: #777;
+
+    font-size: 13px;
+}
+
+
+/* ORDER PRODUCTS */
+
+.order-products {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 10px;
+
+    padding: 18px 0;
+}
+
+.order-product {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+.order-product-name {
+    color: #333;
+
+    font-size: 14px;
+
+    font-weight: 500;
+}
+
+.order-product-quantity {
+    color: #777;
+
+    font-size: 12px;
+}
+
+.order-product-price {
+    color: #0A373B;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================
+   ORDER INFORMATION
+========================================= */
+
+.order-info {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(min(100%, 180px), 1fr)
+        );
+
+    gap: 12px;
+
+    padding-top: 15px;
+
+    border-top: 1px solid #E1DAD3;
+}
+
+.order-info-item {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+.order-info-label {
+    color: #777;
+
+    font-size: 12px;
+}
+
+.order-info-value {
+    color: #0A373B;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   ORDER STATUS
+========================================= */
+
+.order-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: fit-content;
+
+    padding: 6px 12px;
+
+    border-radius: 20px;
+
+    background: #FFF0EE;
+
+    color: #0A373B;
+
+    font-size: 12px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.footer {
+    width: 100%;
+
+    min-height: 100px;
+
+    padding:
+        20px
+        clamp(20px, 5vw, 77px)
+        40px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    font-family: "Almarai", sans-serif;
+
+    font-size: clamp(16px, 2vw, 24px);
+
+    color: #EC9E96;
+}
+
+.footer-copy {
+    display: flex;
+
+    align-items: center;
+}
+
+.footer-credit {
+    display: flex;
+
+    align-items: center;
+
+    gap: 6px;
+}
+
+.footer-credit strong {
+    color: #FAF5EE;
+}
+
+
+/* =========================================
+   SMALL SCREEN AUTO-ADAPTATION
+========================================= */
+
+@media (max-width: 800px) {
+
+    /* PROFILE CONTENT */
+
+    .profile-page {
+        padding-top: 125px;
+    }
+
+
+    /* =====================================
+       MOBILE NAVIGATION
+    ====================================== */
+
+    .navigation {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: flex-start;
+
+        gap: 8px;
+
+        position: absolute;
+
+        /* Start after logo */
+        left: 105px;
+
+        right: 0;
+
+        top: 58px;
+
+        width: auto;
+
+        /* Keep everything in one line */
+        flex-wrap: nowrap;
+
+        /* Horizontal scrolling */
+        overflow-x: auto;
+
+        overflow-y: hidden;
+
+        /* Hide scrollbar */
+        scrollbar-width: none;
+
+        padding: 0 10px 5px 5px;
+
+        transform: none;
+    }
+
+    /* Chrome / Edge scrollbar */
+
+    .navigation::-webkit-scrollbar {
+        display: none;
+    }
+
+
+    /* =====================================
+       HEADER
+    ====================================== */
+
+    .header {
+        height: 90px;
+    }
+
+    .header-logo {
+        width: 65px;
+        height: 65px;
+
+        top: 10px;
+        left: 15px;
+    }
+
+    .header-icons {
+        top: 29px;
+
+        right: 15px;
+
+        transform: none;
+    }
+
+
+    /* =====================================
+       PROFILE SECTIONS
+    ====================================== */
+
+    .profile-section,
+    .orders-section {
+        padding: 22px 18px;
+    }
+
+    .profile-details {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-field.full-width {
+        grid-column: auto;
+    }
+
+
+    /* =====================================
+       ORDER HEADER
+    ====================================== */
+
+    .order-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        gap: 7px;
+    }
+
+
+    /* =====================================
+       ORDER PRODUCTS
+    ====================================== */
+
+    .order-product {
+        align-items: flex-start;
+    }
+
+
+    /* =====================================
+       FOOTER
+    ====================================== */
+
+    .footer {
+        flex-direction: column;
+
+        justify-content: center;
+
+        text-align: center;
+    }
+}
+
+/* =========================================
+   CANCEL ORDER BUTTON
+========================================= */
+
+.cancel-order-button {
+    width: 100%;
+
+    min-height: 48px;
+
+    margin-top: 20px;
+
+    padding: 12px 20px;
+
+    border: 1px solid #EC9E96;
+
+    border-radius: 30px;
+
+    background: transparent;
+
+    color: #0A373B;
+
+    font-family: "Inter", sans-serif;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 8px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.cancel-order-button:hover {
+    background: #EC9E96;
+
+    color: #0A373B;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================
+   LOGOUT BUTTON
+========================================= */
+
+.logout-profile-button {
+    min-height: 50px;
+    padding: 12px 25px;
+    border: 1px solid #D8D0C8;
+    border-radius: 30px;
+    background: transparent;
+    color: #0A373B;
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-profile-button:hover {
+    background: #FAF0ED;
+    border-color: #EC9E96;
+    color: #b73838;
+}
+
+
+/* =========================================
+   EDIT PROFILE MODAL
+========================================= */
+
+.profile-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(10, 55, 59, 0.72);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.profile-modal-overlay.active {
+    display: flex;
+}
+
+.profile-modal-box {
+    background: #FAF5EE;
+    border-radius: 24px;
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: clamp(22px, 3.5vw, 36px);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(236, 158, 150, 0.5);
+    animation: modalFadeIn 0.25s ease-out;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96) translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.profile-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #E2DAD2;
+}
+
+.modal-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-title-wrap i {
+    color: #EC9E96;
+    font-size: 20px;
+}
+
+.modal-title-wrap h2 {
+    margin: 0;
+    color: #0A373B;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.profile-modal-close {
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    color: #888;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    transition: background 0.2s, color 0.2s;
+}
+
+.profile-modal-close:hover {
+    background: #ECE5DC;
+    color: #0A373B;
+}
+
+.modal-body-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.modal-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.modal-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.modal-field label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #0A373B;
+}
+
+.modal-field input {
+    padding: 11px 14px;
+    border: 1px solid #D8D0C8;
+    border-radius: 10px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    color: #0A373B;
+    background: #FFFFFF;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modal-field input:focus {
+    border-color: #EC9E96;
+    box-shadow: 0 0 0 3px rgba(236, 158, 150, 0.2);
+}
+
+.modal-alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.modal-alert.error {
+    background: #FDF0EE;
+    color: #C0392B;
+    border: 1px solid #F5C6CB;
+}
+
+.modal-alert.success {
+    background: #EDF7EE;
+    color: #27AE60;
+    border: 1px solid #C3E6CB;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.modal-btn {
+    min-height: 44px;
+    padding: 10px 22px;
+    border-radius: 30px;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.modal-btn.cancel-btn {
+    background: transparent;
+    border: 1px solid #D8D0C8;
+    color: #666;
+}
+
+.modal-btn.cancel-btn:hover {
+    background: #ECE5DC;
+    color: #0A373B;
+}
+
+.modal-btn.save-btn {
+    background: #0A373B;
+    border: none;
+    color: #EC9E96;
+    font-weight: 600;
+}
+
+.modal-btn.save-btn:hover {
+    background: #EC9E96;
+    color: #0A373B;
+    transform: translateY(-2px);
+}
+
+.modal-danger-zone {
+    margin-top: 20px;
+    padding-top: 14px;
+    border-top: 1px solid #E2DAD2;
+    text-align: center;
+}
+
+.delete-account-btn {
+    background: transparent;
+    border: none;
+    color: #b73838;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+}
+
+.delete-account-btn:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+    .modal-body-fields {
+        grid-template-columns: 1fr;
+    }
+    .modal-field.full-width {
+        grid-column: auto;
+    }
+}
