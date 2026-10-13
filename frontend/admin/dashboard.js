@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
         productCount.textContent =
             String(dashboardData.products).padStart(2, "0");
 
-        const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+        const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
         fetch(`${API_BASE}/api/admin/products`)
             .then(res => res.ok ? res.json() : null)
             .then(data => {

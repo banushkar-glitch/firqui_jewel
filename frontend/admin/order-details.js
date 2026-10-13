@@ -793,7 +793,7 @@ async function updateOrderStatus() {
     const newStatus =
         document.getElementById("orderStatus").value;
 
-    const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
     const token = localStorage.getItem("firqui_token");
 
     if (token && orderId) {
@@ -1079,7 +1079,7 @@ document.addEventListener(
 
         setupHeaderButtons();
 
-        const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+        const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
         const token = localStorage.getItem("firqui_token");
         const orderId = getOrderIdFromURL();
 

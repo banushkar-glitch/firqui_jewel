@@ -9,6 +9,7 @@ import Firqui.repository.ProductCollectionRepository;
 import Firqui.repository.ProductRepository;
 import Firqui.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -37,6 +38,15 @@ public class DataMigrationRunner implements CommandLineRunner {
 
     @Autowired
     private org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+
+    @Value("${app.admin.email:admin@firqui.com}")
+    private String adminEmail;
+
+    @Value("${app.admin.password:Admin@123}")
+    private String adminPassword;
+
+    @Value("${app.seed.demo-user:true}")
+    private boolean seedDemoUser;
 
     @Override
     public void run(String... args) throws Exception {
@@ -67,19 +77,20 @@ public class DataMigrationRunner implements CommandLineRunner {
     }
 
     private void seedUsers() {
-        if (!userRepository.existsByEmail("admin@firqui.com")) {
+        String email = adminEmail.trim().toLowerCase();
+        if (!userRepository.existsByEmail(email)) {
             User admin = new User(
                     "FIRQUI Admin",
-                    "admin@firqui.com",
+                    email,
                     "9999999999",
-                    passwordEncoder.encode("Admin@123"),
+                    passwordEncoder.encode(adminPassword),
                     "ADMIN"
             );
             userRepository.save(admin);
-            System.out.println("✅ Seeded default Admin user: admin@firqui.com");
+            System.out.println("✅ Seeded default Admin user: " + email);
         }
 
-        if (!userRepository.existsByEmail("user@firqui.com")) {
+        if (seedDemoUser && !userRepository.existsByEmail("user@firqui.com")) {
             User user = new User(
                     "Demo Customer",
                     "user@firqui.com",
