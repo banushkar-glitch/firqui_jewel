@@ -61,22 +61,25 @@ public class ProductService {
     }
 
     public static String normalizeCategory(String cat) {
-        if (cat == null) return "GENERAL";
+        if (cat == null) return null;
         String clean = cat.trim().toLowerCase();
+        if (clean.isEmpty() || clean.equals("none") || clean.equals("select category")) return null;
         if (clean.contains("earring")) return "EARRINGS";
         if (clean.contains("ring")) return "RINGS";
         if (clean.contains("necklace")) return "NECKLACES";
         if (clean.contains("bracelet") || clean.contains("cuff") || clean.contains("bangle")) return "BRACELETS & CUFFS";
         if (clean.contains("brooch")) return "BROOCHES";
-        if (clean.contains("pearl")) return "PEARLS GONE ROGUE";
         return cat.trim().toUpperCase();
     }
 
     public List<Product> getProductsByCategory(String category) {
-        if (category == null || category.trim().isEmpty()) {
+        if (category == null || category.trim().isEmpty() || category.equalsIgnoreCase("all")) {
             return productRepository.findByActiveTrue();
         }
         String normalized = normalizeCategory(category);
+        if (normalized == null) {
+            return java.util.Collections.emptyList();
+        }
         List<Product> matches = new ArrayList<>(productRepository.findByCategoryIgnoreCase(normalized));
         if (!normalized.equalsIgnoreCase(category.trim())) {
             List<Product> rawMatches = productRepository.findByCategoryIgnoreCase(category.trim());
@@ -109,9 +112,6 @@ public class ProductService {
         String name = dto.getName() != null && !dto.getName().trim().isEmpty() ? dto.getName().trim() : dto.getProductName();
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Product name is required.");
-        }
-        if (dto.getCategory() == null || dto.getCategory().trim().isEmpty()) {
-            throw new IllegalArgumentException("Category is required.");
         }
         if (dto.getPrice() == null) {
             throw new IllegalArgumentException("Price is required.");
@@ -251,7 +251,16 @@ public class ProductService {
         if (dto.getComparePrice() != null) product.setComparePrice(dto.getComparePrice());
         if (dto.getDiscount() != null) product.setDiscount(dto.getDiscount());
         if (dto.getStockQuantity() != null) product.setStockQuantity(dto.getStockQuantity());
-        if (dto.getCategory() != null) product.setCategory(normalizeCategory(dto.getCategory()));
+        if (dto.getCategory() != null) {
+            String cat = dto.getCategory().trim();
+            if (cat.isEmpty() || cat.equalsIgnoreCase("none") || cat.equalsIgnoreCase("select category")) {
+                product.setCategory(null);
+            } else {
+                product.setCategory(normalizeCategory(cat));
+            }
+        } else {
+            product.setCategory(null);
+        }
 
         if (dto.getCollection() != null) {
             String col = dto.getCollection().trim();

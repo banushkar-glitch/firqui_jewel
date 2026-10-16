@@ -854,44 +854,103 @@
 
         if (contactForm) {
 
-            contactForm.addEventListener("submit", function (event) {
+            let API_BASE = "http://localhost:8080";
+            if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+                if (window.location.port === "8080") {
+                    API_BASE = "";
+                } else if (window.location.hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.includes("127.0.0.1")) {
+                    API_BASE = window.location.origin;
+                }
+            }
+
+            contactForm.addEventListener("submit", async function (event) {
 
                 event.preventDefault();
 
+                const sendBtn = contactForm.querySelector(".send-message-btn");
+                const nameInput = document.getElementById("contactName");
+                const emailInput = document.getElementById("contactEmail");
+                const subjectInput = document.getElementById("contactSubject");
+                const messageInput = document.getElementById("contactMessage");
 
-                const name =
-                    document.getElementById("contactName").value.trim();
+                const name = nameInput ? nameInput.value.trim() : "";
+                const email = emailInput ? emailInput.value.trim() : "";
+                const subject = subjectInput ? subjectInput.value.trim() : "";
+                const message = messageInput ? messageInput.value.trim() : "";
 
-                const email =
-                    document.getElementById("contactEmail").value.trim();
-
-                const subject =
-                    document.getElementById("contactSubject").value.trim();
-
-                const message =
-                    document.getElementById("contactMessage").value.trim();
-
+                contactFormMessage.textContent = "";
+                contactFormMessage.className = "contact-form-message";
+                contactFormMessage.style.color = "";
 
                 if (!name || !email || !subject || !message) {
-
-                    contactFormMessage.textContent =
-                        "Please fill in all fields.";
-
-                    contactFormMessage.classList.remove("success");
-
+                    contactFormMessage.textContent = "Please fill in all required fields.";
+                    contactFormMessage.style.color = "#ff6b6b";
                     return;
-
                 }
 
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    contactFormMessage.textContent = "Please enter a valid email address.";
+                    contactFormMessage.style.color = "#ff6b6b";
+                    return;
+                }
 
-                contactFormMessage.textContent =
-                    "Thank you! Your message has been received.";
+                if (message.length < 5) {
+                    contactFormMessage.textContent = "Please enter a message of at least 5 characters.";
+                    contactFormMessage.style.color = "#ff6b6b";
+                    return;
+                }
 
-                contactFormMessage.classList.add("success");
+                const originalBtnText = sendBtn ? sendBtn.innerHTML : "Send Message";
+                if (sendBtn) {
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+                }
 
+                try {
+                    const response = await fetch(`${API_BASE}/api/contact`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            subject: subject,
+                            message: message
+                        })
+                    });
 
-                contactForm.reset();
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch (parseErr) {
+                        // In case response is non-JSON
+                    }
 
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || "Failed to send message. Please try again later.");
+                    }
+
+                    contactFormMessage.textContent = data.message || "Thank you! Your message has been received. We will get back to you shortly.";
+                    contactFormMessage.className = "contact-form-message success";
+                    contactFormMessage.style.color = "#99FFCC";
+                    contactForm.reset();
+
+                } catch (err) {
+                    let errMsg = err.message || "";
+                    if (!errMsg || errMsg.toLowerCase().includes("failed to fetch") || errMsg.toLowerCase().includes("networkerror")) {
+                        errMsg = "Unable to connect to the backend server. Please verify the Spring Boot server is running on port 8080, or contact us at info@firquijewels.com.";
+                    }
+                    contactFormMessage.textContent = errMsg;
+                    contactFormMessage.className = "contact-form-message";
+                    contactFormMessage.style.color = "#ff6b6b";
+                } finally {
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = originalBtnText;
+                    }
+                }
             });
 
         }

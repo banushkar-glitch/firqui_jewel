@@ -27,14 +27,6 @@ document.addEventListener("DOMContentLoaded", function () {
        1. AUTHENTICATION & ORDER NUMBER VALIDATION
     ====================================================== */
     const token = getToken();
-    if (!token) {
-        alert("Please log in to access your payment page.");
-        try {
-            sessionStorage.setItem("firqui_redirect", window.location.pathname + window.location.search);
-        } catch (e) {}
-        window.location.href = "../authentication/login.html";
-        return;
-    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const orderNumber = urlParams.get("orderNumber") || urlParams.get("id") || urlParams.get("orderId");
@@ -167,13 +159,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function fetchOrderDetails() {
         try {
+            const headers = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
             const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderNumber)}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                headers: headers
             });
 
-            if (response.status === 401 || response.status === 403) {
+            if ((response.status === 401 || response.status === 403) && token) {
                 alert("Session expired. Please log in again.");
                 window.location.href = "../authentication/login.html";
                 return;
@@ -459,11 +453,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 formData.append("screenshot", selectedFile);
 
                 try {
+                    const headers = {};
+                    if (token) {
+                        headers["Authorization"] = `Bearer ${token}`;
+                    }
                     const response = await fetch(`${API_BASE}/api/orders/place-payment`, {
                         method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        },
+                        headers: headers,
                         body: formData
                     });
 
@@ -503,11 +499,13 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("screenshot", selectedFile);
 
             try {
+                const headers = {};
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                }
                 const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderNumber)}/payment`, {
                     method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    },
+                    headers: headers,
                     body: formData
                 });
 

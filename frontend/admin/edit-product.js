@@ -654,7 +654,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         setSelectValueCaseInsensitive(category, prod.category);
         if (collection) {
-            collection.value = prod.collection || "";
+            setSelectValueCaseInsensitive(collection, prod.collection);
         }
         sku.value = prod.sku || "";
         tags.value = prod.tags || "";
@@ -1032,7 +1032,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 stockQuantity: stockQuantity.value,
                 price: Number(price.value) || price.value,
                 comparePrice: comparePrice.value,
-                category: category.value,
+                category: (() => {
+                    const c = category ? category.value.trim() : "";
+                    return (c && c.toLowerCase() !== "none" && c.toLowerCase() !== "select category") ? c : null;
+                })(),
                 collection: collection.value,
                 sku: sku.value.trim(),
                 tags: tags.value.trim(),

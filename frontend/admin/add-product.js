@@ -956,7 +956,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     comparePrice || null,
 
                 category:
-                    catVal,
+                    catVal && catVal.trim() ? catVal.trim() : null,
 
                 collection:
                     (() => {

@@ -43,6 +43,12 @@ public class OrderService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private Firqui.repository.UserRepository userRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OrderService.class);
 
     /* =====================================================
@@ -50,16 +56,16 @@ public class OrderService {
     ====================================================== */
     @Transactional
     public OrderResponse createOrder(User user, CreateOrderRequest request) {
-        if (user == null) {
-            throw new IllegalArgumentException("User authentication required to place an order.");
-        }
-
         // Validate shipping address
         ShippingAddressDTO address = request != null ? request.getShippingAddress() : null;
-        if (address == null || address.getFullName().isEmpty() || address.getPhone().isEmpty()
-                || address.getAddress1().isEmpty() || address.getPincode().isEmpty()) {
+        if (address == null || address.getFullName() == null || address.getFullName().isEmpty()
+                || address.getPhone() == null || address.getPhone().isEmpty()
+                || address.getAddress1() == null || address.getAddress1().isEmpty()
+                || address.getPincode() == null || address.getPincode().isEmpty()) {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
         }
+
+        user = resolveOrCreateGuestUser(user, address);
 
         // Gather items to order
         List<OrderItemData> itemsToProcess = new ArrayList<>();
@@ -125,7 +131,7 @@ public class OrderService {
 
         order.setShippingFullName(address.getFullName());
         order.setShippingPhone(address.getPhone());
-        order.setShippingEmail(address.getEmail().isEmpty() ? user.getEmail() : address.getEmail());
+        order.setShippingEmail(address.getEmail() != null && !address.getEmail().trim().isEmpty() ? address.getEmail().trim() : (user != null ? user.getEmail() : ""));
         order.setShippingAddress1(address.getAddress1());
         order.setShippingAddress2(address.getAddress2());
         order.setShippingPincode(address.getPincode());
@@ -200,10 +206,6 @@ public class OrderService {
     ====================================================== */
     @Transactional
     public OrderResponse placeOrderWithPayment(User user, CreateOrderRequest request, String transactionId, MultipartFile screenshot) {
-        if (user == null) {
-            throw new IllegalArgumentException("User authentication required to place an order.");
-        }
-
         // Validate shipping address
         ShippingAddressDTO address = request != null ? request.getShippingAddress() : null;
         if (address == null || address.getFullName() == null || address.getFullName().trim().isEmpty() ||
@@ -212,6 +214,8 @@ public class OrderService {
                 address.getPincode() == null || address.getPincode().trim().isEmpty()) {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
         }
+
+        user = resolveOrCreateGuestUser(user, address);
 
         // Validate Transaction ID / UTR
         if (transactionId == null || transactionId.trim().isEmpty()) {
@@ -730,5 +734,51 @@ public class OrderService {
             this.quantity = quantity;
             this.imageUrl = imageUrl;
         }
+    }
+
+    private User resolveOrCreateGuestUser(User user, ShippingAddressDTO address) {
+        if (user != null) {
+            return user;
+        }
+        if (address == null) {
+            throw new IllegalArgumentException("Delivery information is required for checkout.");
+        }
+
+        String customerEmail = address.getEmail() != null ? address.getEmail().trim().toLowerCase() : null;
+        String customerPhone = address.getPhone() != null ? address.getPhone().trim() : null;
+
+        if (customerEmail != null && !customerEmail.isEmpty()) {
+            Optional<User> existing = userRepository.findByEmail(customerEmail);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+        }
+        if (customerPhone != null && !customerPhone.isEmpty()) {
+            Optional<User> existing = userRepository.findByMobileNumber(customerPhone);
+            if (existing.isPresent()) {
+                return existing.get();
+            }
+        }
+
+        // Create guest user profile
+        String guestEmail = (customerEmail != null && !customerEmail.isEmpty())
+                ? customerEmail
+                : ("guest_" + UUID.randomUUID().toString().substring(0, 8) + "@firquijewels.com");
+        String guestPhone = (customerPhone != null && !customerPhone.isEmpty())
+                ? customerPhone
+                : ("0" + (System.currentTimeMillis() % 1000000000L));
+
+        User guestUser = new User();
+        guestUser.setName(address.getFullName() != null && !address.getFullName().trim().isEmpty() ? address.getFullName().trim() : "Guest Customer");
+        guestUser.setEmail(guestEmail);
+        guestUser.setMobileNumber(guestPhone);
+        guestUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        guestUser.setRole("USER");
+        guestUser.setAddress1(address.getAddress1() != null ? address.getAddress1().trim() : "");
+        guestUser.setAddress2(address.getAddress2() != null ? address.getAddress2().trim() : "");
+        guestUser.setPincode(address.getPincode() != null ? address.getPincode().trim() : "");
+        guestUser.setActive(true);
+        guestUser.setCreatedAt(LocalDateTime.now());
+        return userRepository.save(guestUser);
     }
 }

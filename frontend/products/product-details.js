@@ -332,6 +332,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const paramCategory = params.get("category");
     const paramImage = params.get("image") || params.get("img");
     const paramDesc = params.get("description") || params.get("desc");
+    const paramGemstone = params.get("gemstone") || params.get("gem");
+    const paramMaterial = params.get("material") || params.get("mat");
+    const paramColor = params.get("color") || params.get("productColor");
+    const paramMeasurement = params.get("measurement") || params.get("size") || params.get("measurements");
 
     let localProducts = [];
     try {
@@ -403,6 +407,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Apply URL parameters if provided
+    if (paramGemstone) product.gemstone = paramGemstone;
+    if (paramMaterial) product.material = paramMaterial;
+    if (paramColor) product.color = paramColor;
+    if (paramMeasurement) {
+        product.measurement = paramMeasurement.split(",").map(s => s.trim()).filter(Boolean);
+    }
+
     let productId =
         String(product.id || paramId || "1");
 
@@ -429,6 +441,21 @@ document.addEventListener("DOMContentLoaded", () => {
         ];
     }
 
+    /* Default gemstone if not already present */
+    if (!product.gemstone) {
+        product.gemstone = (product.category && product.category.toLowerCase().includes("pearl")) ? "Freshwater Pearl" : "Moissanite";
+    }
+
+    /* Default material if not already present */
+    if (!product.material) {
+        product.material = "18K Gold Plated";
+    }
+
+    /* Default color if not already present */
+    if (!product.color && !product.productColor) {
+        product.color = "Rose Gold";
+    }
+
     /* Normalize price string */
     if (typeof product.price === "number") {
         product.price =
@@ -449,41 +476,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       DYNAMIC PRODUCT DETAILS & SIZES HELPERS
+       DYNAMIC PRODUCT DETAILS & SPECIFICATIONS HELPERS
     ===================================================== */
 
     let selectedMeasurement = "";
+    let selectedGemstone = "";
+    let selectedMaterial = "";
+    let selectedColor = "";
+
+    function parseSpecValues(val) {
+        if (!val) return [];
+        if (Array.isArray(val)) {
+            return val.map(s => String(s).trim()).filter(Boolean);
+        }
+        if (typeof val === "string") {
+            return val.split(",").map(s => s.trim()).filter(Boolean);
+        }
+        return [String(val).trim()].filter(Boolean);
+    }
 
     function renderAvailableSizes(prod) {
         const variantOptions =
             document.getElementById("variantOptions");
+        const optionGroup =
+            document.getElementById("productOptionSize");
 
         if (!variantOptions) return;
 
-        let sizes = [];
-
-        if (Array.isArray(prod.measurement)) {
-            sizes =
-                prod.measurement
-                    .map(s => String(s).trim())
-                    .filter(Boolean);
-        } else if (
-            typeof prod.measurement === "string" &&
-            prod.measurement.trim()
-        ) {
-            sizes =
-                prod.measurement
-                    .split(",")
-                    .map(s => s.trim())
-                    .filter(Boolean);
-        }
+        let sizes = parseSpecValues(prod.measurement || prod.measurements);
 
         variantOptions.innerHTML = "";
 
         if (sizes.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
             selectedMeasurement = "";
             return;
         }
+
+        if (optionGroup) optionGroup.style.display = "";
 
         sizes.forEach((size, idx) => {
             const btn =
@@ -516,6 +546,172 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         selectedMeasurement = sizes[0] || "";
+    }
+
+    function renderGemstoneOptions(prod) {
+        const container =
+            document.getElementById("gemstoneOptions");
+        const optionGroup =
+            document.getElementById("productOptionGemstone");
+
+        if (!container) return;
+
+        let items = parseSpecValues(prod.gemstone);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
+            selectedGemstone = "";
+            return;
+        }
+
+        if (optionGroup) optionGroup.style.display = "";
+
+        items.forEach((item, idx) => {
+            const btn =
+                document.createElement("button");
+
+            btn.type =
+                "button";
+
+            btn.className =
+                "variant-btn" + (idx === 0 ? " active" : "");
+
+            btn.textContent =
+                item;
+
+            btn.setAttribute(
+                "aria-label",
+                `Gemstone ${item}`
+            );
+
+            btn.addEventListener("click", () => {
+                container
+                    .querySelectorAll(".variant-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                btn.classList.add("active");
+                selectedGemstone = item;
+            });
+
+            container.appendChild(btn);
+        });
+
+        selectedGemstone = items[0] || "";
+    }
+
+    function renderMaterialOptions(prod) {
+        const container =
+            document.getElementById("materialOptions");
+        const optionGroup =
+            document.getElementById("productOptionMaterial");
+
+        if (!container) return;
+
+        let items = parseSpecValues(prod.material);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
+            selectedMaterial = "";
+            return;
+        }
+
+        if (optionGroup) optionGroup.style.display = "";
+
+        items.forEach((item, idx) => {
+            const btn =
+                document.createElement("button");
+
+            btn.type =
+                "button";
+
+            btn.className =
+                "variant-btn" + (idx === 0 ? " active" : "");
+
+            btn.textContent =
+                item;
+
+            btn.setAttribute(
+                "aria-label",
+                `Material ${item}`
+            );
+
+            btn.addEventListener("click", () => {
+                container
+                    .querySelectorAll(".variant-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                btn.classList.add("active");
+                selectedMaterial = item;
+            });
+
+            container.appendChild(btn);
+        });
+
+        selectedMaterial = items[0] || "";
+    }
+
+    function renderColorOptions(prod) {
+        const container =
+            document.getElementById("colorOptions");
+        const optionGroup =
+            document.getElementById("productOptionColor");
+
+        if (!container) return;
+
+        let items = parseSpecValues(prod.color || prod.productColor);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
+            selectedColor = "";
+            return;
+        }
+
+        if (optionGroup) optionGroup.style.display = "";
+
+        items.forEach((item, idx) => {
+            const btn =
+                document.createElement("button");
+
+            btn.type =
+                "button";
+
+            btn.className =
+                "variant-btn" + (idx === 0 ? " active" : "");
+
+            btn.textContent =
+                item;
+
+            btn.setAttribute(
+                "aria-label",
+                `Color ${item}`
+            );
+
+            btn.addEventListener("click", () => {
+                container
+                    .querySelectorAll(".variant-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                btn.classList.add("active");
+                selectedColor = item;
+            });
+
+            container.appendChild(btn);
+        });
+
+        selectedColor = items[0] || "";
+    }
+
+    function renderAllSpecifications(prod) {
+        renderAvailableSizes(prod);
+        renderGemstoneOptions(prod);
+        renderMaterialOptions(prod);
+        renderColorOptions(prod);
     }
 
     function renderProductDetailsAccordion(prod) {
@@ -573,7 +769,7 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `</ul>`;
         }
 
-        // If both are empty: keep empty without broken or undefined text
+        // Set accordion content (description and highlights only)
         detailsContent.innerHTML = html;
     }
 
@@ -625,8 +821,8 @@ document.addEventListener("DOMContentLoaded", () => {
             product.description;
     }
 
-    /* Render Available Sizes & Product Details Accordion */
-    renderAvailableSizes(product);
+    /* Render Available Sizes, Gemstone, Material, Color & Details Accordion */
+    renderAllSpecifications(product);
     renderProductDetailsAccordion(product);
     loadRelatedProducts();
 
@@ -675,20 +871,28 @@ document.addEventListener("DOMContentLoaded", () => {
                         product.images = dynamicImgs;
                         createThumbnails();
                     }
+                    if (apiData.gemstone) {
+                        product.gemstone = apiData.gemstone;
+                    }
+                    if (apiData.material) {
+                        product.material = apiData.material;
+                    }
+                    if (apiData.color || apiData.productColor) {
+                        product.color = apiData.color || apiData.productColor;
+                    }
                     if (apiData.measurement && apiData.measurement.length > 0) {
                         product.measurement = apiData.measurement;
-                        renderAvailableSizes(product);
                     } else if (apiData.measurements) {
-                        product.measurement = apiData.measurements.split(",").map(s => s.trim()).filter(Boolean);
-                        renderAvailableSizes(product);
+                        product.measurement = Array.isArray(apiData.measurements) ? apiData.measurements : apiData.measurements.split(",").map(s => s.trim()).filter(Boolean);
                     }
                     if (apiData.productDetailsDescription || (apiData.productDetailsHighlights && apiData.productDetailsHighlights.length > 0)) {
                         product.productDetails = {
                             description: apiData.productDetailsDescription,
                             highlights: apiData.productDetailsHighlights
                         };
-                        renderProductDetailsAccordion(product);
                     }
+                    renderAllSpecifications(product);
+                    renderProductDetailsAccordion(product);
                     syncProductWishlist();
                     loadRelatedProducts();
                 }
@@ -939,33 +1143,35 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Local wishlist cache error:", e);
         }
 
-        if (willBeActive) {
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        productId: String(productId),
-                        name: product.name,
-                        description: product.description,
-                        price: product.price,
-                        image: (product.images && product.images[0]) || ""
-                    })
-                });
-            } catch (e) {
-                console.error("Add wishlist error:", e);
-            }
-        } else {
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(product.name)}`, {
-                    method: "DELETE",
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-            } catch (e) {
-                console.error("Remove wishlist error:", e);
+        if (token) {
+            if (willBeActive) {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            productId: String(productId),
+                            name: product.name,
+                            description: product.description,
+                            price: product.price,
+                            image: (product.images && product.images[0]) || ""
+                        })
+                    });
+                } catch (e) {
+                    console.error("Add wishlist error:", e);
+                }
+            } else {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(product.name)}`, {
+                        method: "DELETE",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                } catch (e) {
+                    console.error("Remove wishlist error:", e);
+                }
             }
         }
     }
@@ -1060,6 +1266,79 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
+       CART BADGE COUNTER
+    ===================================================== */
+
+    function updateCartBadge() {
+        let count = 0;
+        try {
+            const localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
+            if (Array.isArray(localC)) {
+                count = localC.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
+            }
+        } catch (e) {
+            count = 0;
+        }
+
+        const cartLink =
+            document.getElementById("cartHeaderButton") ||
+            document.querySelector('.header-icon-btn[aria-label="Shopping Cart"]') ||
+            document.querySelector('.header-icon-btn[href*="cart.html"]');
+
+        if (!cartLink) return;
+
+        let badge = cartLink.querySelector(".cart-count-badge") || document.getElementById("cartCountBadge");
+        if (!badge) {
+            badge = document.createElement("span");
+            badge.className = "cart-count-badge";
+            badge.id = "cartCountBadge";
+            cartLink.appendChild(badge);
+        }
+
+        if (count > 0) {
+            badge.textContent = count > 99 ? "99+" : String(count);
+            badge.style.display = "flex";
+        } else {
+            badge.style.display = "none";
+        }
+    }
+
+    async function syncCartBadge() {
+        updateCartBadge();
+
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/cart`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Array.isArray(data.items)) {
+                    try {
+                        localStorage.setItem("firquiCart", JSON.stringify(data.items));
+                    } catch (err) {}
+                    updateCartBadge();
+                }
+            }
+        } catch (err) {
+            // Keep local count on fetch error
+        }
+    }
+
+    syncCartBadge();
+
+    window.addEventListener("storage", (e) => {
+        if (e.key === "firquiCart") {
+            updateCartBadge();
+        }
+    });
+
+    /* =====================================================
        ADD TO CART BACKEND INTEGRATION
     ===================================================== */
 
@@ -1075,17 +1354,15 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             async () => {
 
-                const token = getToken();
-                if (!token) {
-                    requireLogin();
-                    return;
-                }
-
+                // Save to local cart cache and update badge immediately
                 try {
                     let localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
                     const existing = localC.find(i =>
                         i.name === product.name &&
-                        (i.measurement || i.size || "") === (selectedMeasurement || "")
+                        (i.measurement || i.size || "") === (selectedMeasurement || "") &&
+                        (i.gemstone || "") === (selectedGemstone || "") &&
+                        (i.material || "") === (selectedMaterial || "") &&
+                        (i.color || "") === (selectedColor || "")
                     );
                     if (existing) {
                         existing.quantity = (existing.quantity || 1) + quantity;
@@ -1097,33 +1374,47 @@ document.addEventListener("DOMContentLoaded", () => {
                             description: product.description,
                             measurement: selectedMeasurement || "",
                             size: selectedMeasurement || "",
+                            gemstone: selectedGemstone || "",
+                            material: selectedMaterial || "",
+                            color: selectedColor || "",
                             image: (product.images && product.images[0]) || "",
                             quantity: quantity
                         });
                     }
                     localStorage.setItem("firquiCart", JSON.stringify(localC));
+                    updateCartBadge();
                 } catch (e) {
                     console.error("Local cart cache error:", e);
                 }
 
-                try {
-                    await fetch(`${API_BASE}/api/cart/items`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            productId: String(productId),
-                            name: product.name,
-                            description: product.description + (selectedMeasurement ? ` (Size: ${selectedMeasurement})` : ""),
-                            price: product.price,
-                            image: (product.images && product.images[0]) || "",
-                            quantity: quantity
-                        })
-                    });
-                } catch (e) {
-                    console.error("Add to cart error:", e);
+                const token = getToken();
+                if (token) {
+                    try {
+                        let descDetails = [];
+                        if (selectedMeasurement) descDetails.push(`Size: ${selectedMeasurement}`);
+                        if (selectedGemstone) descDetails.push(`Gemstone: ${selectedGemstone}`);
+                        if (selectedMaterial) descDetails.push(`Material: ${selectedMaterial}`);
+                        if (selectedColor) descDetails.push(`Color: ${selectedColor}`);
+                        const fullDesc = product.description + (descDetails.length > 0 ? ` (${descDetails.join(", ")})` : "");
+
+                        await fetch(`${API_BASE}/api/cart/items`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                productId: String(productId),
+                                name: product.name,
+                                description: fullDesc,
+                                price: product.price,
+                                image: (product.images && product.images[0]) || "",
+                                quantity: quantity
+                            })
+                        });
+                    } catch (e) {
+                        console.error("Add to cart error:", e);
+                    }
                 }
 
                 const originalHTML =
@@ -1454,12 +1745,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon.classList.remove("fa-solid");
                 icon.classList.add("fa-regular");
             }
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(relName)}`, {
-                    method: "DELETE",
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-            } catch (_) {}
+            if (token) {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(relName)}`, {
+                        method: "DELETE",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                } catch (_) {}
+            }
         } else {
             localW.push({
                 id: relId,
@@ -1475,22 +1768,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon.classList.remove("fa-regular");
                 icon.classList.add("fa-solid");
             }
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        productId: relId,
-                        name: relName,
-                        description: relDesc,
-                        price: relPrice,
-                        image: relImg
-                    })
-                });
-            } catch (_) {}
+            if (token) {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            productId: relId,
+                            name: relName,
+                            description: relDesc,
+                            price: relPrice,
+                            image: relImg
+                        })
+                    });
+                } catch (_) {}
+            }
         }
     }
 

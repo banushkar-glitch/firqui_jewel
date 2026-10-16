@@ -7,6 +7,63 @@ document.addEventListener("DOMContentLoaded", function () {
         return localStorage.getItem("firqui_token");
     }
 
+    function updateCartBadge() {
+        let count = 0;
+        try {
+            const localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
+            if (Array.isArray(localC)) {
+                count = localC.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
+            }
+        } catch (e) {
+            count = 0;
+        }
+
+        const cartLink =
+            document.getElementById("cartHeaderButton") ||
+            document.querySelector('.header-icon-btn[aria-label="Shopping Cart"]') ||
+            document.querySelector('.header-icon-btn[href*="cart.html"]');
+
+        if (!cartLink) return;
+
+        let badge = cartLink.querySelector(".cart-count-badge");
+        if (!badge) {
+            badge = document.createElement("span");
+            badge.className = "cart-count-badge";
+            badge.id = "cartCountBadge";
+            cartLink.appendChild(badge);
+        }
+
+        if (count > 0) {
+            badge.textContent = count > 99 ? "99+" : String(count);
+            badge.style.display = "flex";
+        } else {
+            badge.style.display = "none";
+        }
+    }
+
+    async function syncCartBadge() {
+        updateCartBadge();
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/cart`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Array.isArray(data.items)) {
+                    try {
+                        localStorage.setItem("firquiCart", JSON.stringify(data.items));
+                    } catch (e) {}
+                    updateCartBadge();
+                }
+            }
+        } catch (e) {
+            console.error("Cart sync error:", e);
+        }
+    }
+
     function getPrice(priceText) {
         if (typeof priceText === "number") return priceText;
         return Number(
@@ -230,7 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (localWishlist.length > 0) {
                 renderWishlist(localWishlist);
             } else {
-                renderLoginRequired();
+                renderWishlist([]);
             }
             return;
         }
@@ -247,7 +304,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (localWishlist.length > 0) {
                     renderWishlist(localWishlist);
                 } else {
-                    renderLoginRequired();
+                    renderWishlist([]);
                 }
                 return;
             }
@@ -450,6 +507,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                     });
                                 }
                                 localStorage.setItem("firquiCart", JSON.stringify(cart));
+                                updateCartBadge();
                             } catch (e) {}
 
                             button.textContent = "Added ✓";
@@ -482,6 +540,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 localStorage.setItem("firquiCart", JSON.stringify(cart));
+                updateCartBadge();
 
                 button.textContent = "Added ✓";
                 setTimeout(function () {
@@ -517,5 +576,12 @@ document.addEventListener("DOMContentLoaded", function () {
     ========================================= */
 
     fetchWishlist();
+    syncCartBadge();
+
+    window.addEventListener("storage", function (e) {
+        if (e.key === "firquiCart") {
+            updateCartBadge();
+        }
+    });
 
 });
