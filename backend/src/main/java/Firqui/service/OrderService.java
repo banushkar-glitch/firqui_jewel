@@ -65,6 +65,9 @@ public class OrderService {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
         }
 
+        // A guest order may only contain the items it sends; it must never read or clear
+        // the saved cart of an account that happens to share the email or phone.
+        boolean guestCheckout = user == null;
         user = resolveOrCreateGuestUser(user, address);
 
         // Gather items to order
@@ -85,7 +88,7 @@ public class OrderService {
         }
 
         // If items were not sent directly in request body, retrieve from user's persistent cart in DB
-        if (itemsToProcess.isEmpty()) {
+        if (itemsToProcess.isEmpty() && !guestCheckout) {
             List<CartItem> dbCartItems = cartItemRepository.findByUserOrderByCreatedAtAsc(user);
             for (CartItem ci : dbCartItems) {
                 itemsToProcess.add(new OrderItemData(
@@ -194,7 +197,7 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         // For Cash on Delivery, clear cart immediately. For "Pay Now", retain cart until payment submission succeeds
-        if (!"Pay Now".equalsIgnoreCase(paymentMethod)) {
+        if (!"Pay Now".equalsIgnoreCase(paymentMethod) && !guestCheckout) {
             cartItemRepository.deleteByUser(user);
         }
 
@@ -215,6 +218,9 @@ public class OrderService {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
         }
 
+        // A guest order may only contain the items it sends; it must never read or clear
+        // the saved cart of an account that happens to share the email or phone.
+        boolean guestCheckout = user == null;
         user = resolveOrCreateGuestUser(user, address);
 
         // Validate Transaction ID / UTR
@@ -277,7 +283,7 @@ public class OrderService {
             }
         }
 
-        if (itemsToProcess.isEmpty()) {
+        if (itemsToProcess.isEmpty() && !guestCheckout) {
             List<CartItem> dbCartItems = cartItemRepository.findByUserOrderByCreatedAtAsc(user);
             for (CartItem ci : dbCartItems) {
                 itemsToProcess.add(new OrderItemData(
@@ -369,9 +375,11 @@ public class OrderService {
         Order savedOrder = orderRepository.save(order);
 
         // Clear user database cart now that order has been placed
-        try {
-            cartItemRepository.deleteByUser(user);
-        } catch (Exception ignored) {}
+        if (!guestCheckout) {
+            try {
+                cartItemRepository.deleteByUser(user);
+            } catch (Exception ignored) {}
+        }
 
         return OrderResponse.fromEntity(savedOrder);
     }

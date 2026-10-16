@@ -22,6 +22,10 @@ public class ContactMessageRequest {
     @Size(min = 2, max = 150, message = "Subject must be between 2 and 150 characters")
     private String subject;
 
+    // Honeypot: hidden on the form, so only bots fill it in
+    @Size(max = 200)
+    private String website;
+
     @NotBlank(message = "Message is required")
     @Size(min = 5, max = 5000, message = "Message must be between 5 and 5000 characters")
     private String message;
@@ -74,5 +78,13 @@ public class ContactMessageRequest {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 }

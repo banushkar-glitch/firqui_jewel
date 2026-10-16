@@ -47,7 +47,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         Path uploadDir = getUploadsPath();
         String location = "file:" + uploadDir.toString().replace("\\", "/") + "/";
+        // Uploaded files get a unique random prefix and are never overwritten, so browsers may keep them
         registry.addResourceHandler("/uploads/**")
-                .addResourceLocations(location);
+                .addResourceLocations(location)
+                .setCachePeriod(30 * 24 * 60 * 60);
     }
 }

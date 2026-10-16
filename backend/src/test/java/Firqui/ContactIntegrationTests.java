@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.Validator;
@@ -43,7 +44,7 @@ public class ContactIntegrationTests {
         validator.validate(request, bindingResult);
         assertFalse(bindingResult.hasErrors(), "Valid request should not have validation errors");
 
-        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult);
+        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult, new MockHttpServletRequest());
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
@@ -61,7 +62,7 @@ public class ContactIntegrationTests {
         validator.validate(request, bindingResult);
         assertTrue(bindingResult.hasErrors(), "Blank fields must trigger validation errors");
 
-        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult);
+        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult, new MockHttpServletRequest());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertFalse(response.getBody().isSuccess());
@@ -81,7 +82,7 @@ public class ContactIntegrationTests {
         validator.validate(request, bindingResult);
         assertTrue(bindingResult.hasErrors(), "Malformed email must trigger validation error");
 
-        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult);
+        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult, new MockHttpServletRequest());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertFalse(response.getBody().isSuccess());
@@ -101,7 +102,7 @@ public class ContactIntegrationTests {
         validator.validate(request, bindingResult);
         assertTrue(bindingResult.hasErrors(), "Short message must trigger validation error");
 
-        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult);
+        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult, new MockHttpServletRequest());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertFalse(response.getBody().isSuccess());
@@ -137,5 +138,46 @@ public class ContactIntegrationTests {
         );
         boolean result = emailService.sendContactMessage(request);
         assertTrue(result, "sendContactMessage should succeed (either via SMTP or development fallback)");
+    }
+
+    @Test
+    @DisplayName("Test 7: Submissions with the hidden honeypot field filled are accepted but not emailed")
+    void testHoneypotSubmissionIsIgnored() {
+        ContactMessageRequest request = new ContactMessageRequest(
+                "Spam Bot",
+                "bot@example.com",
+                "Cheap offers",
+                "Buy now buy now buy now"
+        );
+        request.setWebsite("http://spam.example.com");
+
+        BindingResult bindingResult = new BeanPropertyBindingResult(request, "request");
+        validator.validate(request, bindingResult);
+
+        ResponseEntity<ApiResponse> response = contactController.submitContactMessage(request, bindingResult, new MockHttpServletRequest());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertTrue(response.getBody().isSuccess());
+    }
+
+    @Test
+    @DisplayName("Test 8: One visitor cannot send unlimited messages")
+    void testRateLimitPerClient() {
+        MockHttpServletRequest httpRequest = new MockHttpServletRequest();
+        httpRequest.setRemoteAddr("203.0.113.77");
+
+        int lastStatus = 0;
+        for (int i = 0; i <= ContactController.MAX_MESSAGES_PER_WINDOW; i++) {
+            ContactMessageRequest request = new ContactMessageRequest(
+                    "Repeat Visitor",
+                    "repeat@example.com",
+                    "Message " + i,
+                    "Checking on my order once more, thank you."
+            );
+            BindingResult bindingResult = new BeanPropertyBindingResult(request, "request");
+            validator.validate(request, bindingResult);
+            lastStatus = contactController.submitContactMessage(request, bindingResult, httpRequest).getStatusCode().value();
+        }
+
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS.value(), lastStatus);
     }
 }

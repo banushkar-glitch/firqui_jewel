@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Runtime data (customer payment proofs, uploaded media) ###
+private_storage/
+uploads/
