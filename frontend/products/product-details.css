@@ -231,29 +231,6 @@ img {
     transform: translateY(-2px);
 }
 
-.cart-count-badge {
-    position: absolute;
-    top: -5px;
-    right: -7px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    background-color: var(--pink, #EC9E96);
-    color: var(--dark-teal, #0A373B);
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 700;
-    font-family: var(--font-inter, sans-serif);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1;
-    pointer-events: none;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
-    z-index: 10;
-}
-
-
 /* =====================================================
    PRODUCT DETAILS SECTION
    ONLY THIS SECTION HAS BEEN ADJUSTED

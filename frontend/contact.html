@@ -50,6 +50,7 @@
         href="contact.css"
     >
 
+    <link rel="stylesheet" href="css/site.css">
 </head>
 
 
@@ -382,6 +383,7 @@
                             <input
                                 type="text"
                                 id="contactName"
+                                aria-label="Your name"
                                 name="name"
                                 class="contact-input"
                                 placeholder="Your Name"
@@ -392,16 +394,39 @@
                             <input
                                 type="email"
                                 id="contactEmail"
+                                aria-label="Your email"
                                 name="email"
                                 class="contact-input"
                                 placeholder="Your Email"
                                 required
                             >
 
+                            <!-- PHONE (optional) -->
+                            <input
+                                type="tel"
+                                id="contactPhone"
+                                aria-label="Phone number (optional)"
+                                name="phone"
+                                class="contact-input"
+                                placeholder="Phone (optional)"
+                                autocomplete="tel"
+                                maxlength="30"
+                            >
+                            <!-- Left empty by people; bots fill every field -->
+                            <input
+                                type="text"
+                                id="contactWebsite"
+                                name="website"
+                                class="contact-honeypot"
+                                tabindex="-1"
+                                autocomplete="off"
+                                aria-hidden="true"
+                            >
                             <!-- SUBJECT -->
                             <input
                                 type="text"
                                 id="contactSubject"
+                                aria-label="Subject"
                                 name="subject"
                                 class="contact-input"
                                 placeholder="Subject"
@@ -411,6 +436,7 @@
                             <!-- MESSAGE -->
                             <textarea
                                 id="contactMessage"
+                                aria-label="Your message"
                                 name="message"
                                 class="contact-textarea"
                                 placeholder="Your Message"
@@ -854,14 +880,7 @@
 
         if (contactForm) {
 
-            let API_BASE = "http://localhost:8080";
-            if (window.location.protocol === "http:" || window.location.protocol === "https:") {
-                if (window.location.port === "8080") {
-                    API_BASE = "";
-                } else if (window.location.hostname && !window.location.hostname.includes("localhost") && !window.location.hostname.includes("127.0.0.1")) {
-                    API_BASE = window.location.origin;
-                }
-            }
+            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
 
             contactForm.addEventListener("submit", async function (event) {
 
@@ -872,6 +891,8 @@
                 const emailInput = document.getElementById("contactEmail");
                 const subjectInput = document.getElementById("contactSubject");
                 const messageInput = document.getElementById("contactMessage");
+                const phoneInput = document.getElementById("contactPhone");
+                const websiteInput = document.getElementById("contactWebsite");
 
                 const name = nameInput ? nameInput.value.trim() : "";
                 const email = emailInput ? emailInput.value.trim() : "";
@@ -917,7 +938,9 @@
                             name: name,
                             email: email,
                             subject: subject,
-                            message: message
+                            message: message,
+                            phone: phoneInput ? phoneInput.value.trim() : "",
+                            website: websiteInput ? websiteInput.value : ""
                         })
                     });
 
@@ -940,7 +963,7 @@
                 } catch (err) {
                     let errMsg = err.message || "";
                     if (!errMsg || errMsg.toLowerCase().includes("failed to fetch") || errMsg.toLowerCase().includes("networkerror")) {
-                        errMsg = "Unable to connect to the backend server. Please verify the Spring Boot server is running on port 8080, or contact us at info@firquijewels.com.";
+                        errMsg = "We couldn't reach the server. Please check your connection and try again, or email us at info@firquijewels.com.";
                     }
                     contactFormMessage.textContent = errMsg;
                     contactFormMessage.className = "contact-form-message";
@@ -1176,6 +1199,7 @@
 </script>
 <script src="js/search.js"></script>
 
+    <script src="js/site-nav.js"></script>
 </body>
 
 </html>

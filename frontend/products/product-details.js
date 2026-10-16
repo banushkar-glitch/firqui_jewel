@@ -1269,38 +1269,9 @@ document.addEventListener("DOMContentLoaded", () => {
        CART BADGE COUNTER
     ===================================================== */
 
+    // Badge rendering lives in js/site-nav.js
     function updateCartBadge() {
-        let count = 0;
-        try {
-            const localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
-            if (Array.isArray(localC)) {
-                count = localC.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
-            }
-        } catch (e) {
-            count = 0;
-        }
-
-        const cartLink =
-            document.getElementById("cartHeaderButton") ||
-            document.querySelector('.header-icon-btn[aria-label="Shopping Cart"]') ||
-            document.querySelector('.header-icon-btn[href*="cart.html"]');
-
-        if (!cartLink) return;
-
-        let badge = cartLink.querySelector(".cart-count-badge") || document.getElementById("cartCountBadge");
-        if (!badge) {
-            badge = document.createElement("span");
-            badge.className = "cart-count-badge";
-            badge.id = "cartCountBadge";
-            cartLink.appendChild(badge);
-        }
-
-        if (count > 0) {
-            badge.textContent = count > 99 ? "99+" : String(count);
-            badge.style.display = "flex";
-        } else {
-            badge.style.display = "none";
-        }
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
     }
 
     async function syncCartBadge() {
@@ -1814,7 +1785,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (isVid) {
                     mediaHtml = `<video src="${imgSrc}" autoplay muted loop playsinline onerror="this.style.display='none';" style="width:100%;height:100%;object-fit:cover;"></video>`;
                 } else {
-                    mediaHtml = `<img src="${imgSrc}" alt="${escapeHtml(relName)}" onerror="this.style.display='none';">`;
+                    mediaHtml = `<img loading="lazy" decoding="async" src="${imgSrc}" alt="${escapeHtml(relName)}" onerror="this.style.display='none';">`;
                 }
             }
 

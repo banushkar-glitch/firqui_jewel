@@ -469,7 +469,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const slot = mediaSlots[key];
         if (!slot || !slot.preview) return;
 
-        const src = slot.file ? URL.createObjectURL(slot.file) : slot.url;
+        if (slot.previewUrl) {
+            URL.revokeObjectURL(slot.previewUrl);
+            slot.previewUrl = null;
+        }
+        if (slot.file) slot.previewUrl = URL.createObjectURL(slot.file);
+        const src = slot.previewUrl || slot.url;
         if (!src || slot.isRemoved) {
             slot.preview.innerHTML = "";
             slot.preview.classList.remove("show");
@@ -558,9 +563,19 @@ document.addEventListener("DOMContentLoaded", () => {
         const slot = mediaSlots[key];
         if (!slot || !slot.input) return;
 
-        slot.input.addEventListener("change", (e) => {
-            const file = e.target.files && e.target.files[0];
-            if (!file) return;
+        slot.input.addEventListener("change", async (e) => {
+            const picked = e.target.files && e.target.files[0];
+            if (!picked) return;
+
+            // Phone photos are often 5-12 MB; shrink them before preview and upload
+            const pickToken = (slot.pickToken || 0) + 1;
+            slot.pickToken = pickToken;
+            if (slot.box) slot.box.classList.add("is-processing");
+            const file = window.FirquiImage
+                ? await window.FirquiImage.compress(picked, { maxDimension: 2000, quality: 0.85 })
+                : picked;
+            if (slot.box) slot.box.classList.remove("is-processing");
+            if (slot.pickToken !== pickToken) return; // a newer file was picked meanwhile
 
             if (!validateMediaFile(file)) {
                 slot.input.value = "";
@@ -940,34 +955,39 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
-                for (const slotKey of ["main", "ref1", "ref2", "ref3", "ref4"]) {
-                    const slot = mediaSlots[slotKey];
-                    if (slot && slot.file) {
-                        const fd = new FormData();
-                        fd.append("file", slot.file);
-                        fd.append("slot", slotKey);
+                const pendingSlots = ["main", "ref1", "ref2", "ref3", "ref4"]
+                    .filter((key) => mediaSlots[key] && mediaSlots[key].file);
 
-                        const upRes = await fetch(`${API_BASE}/api/admin/media/upload`, {
-                            method: "POST",
-                            headers: { ...(token ? { "Authorization": `Bearer ${token}` } : {}) },
-                            body: fd
-                        });
-                        const upData = await upRes.json().catch(() => null);
-                        if (!upRes.ok || !upData || !upData.success) {
-                            const upErr = (upData && (upData.message || upData.error)) || `Server upload error (${upRes.status})`;
-                            alert(`Failed to upload ${slot.label}.\n${upErr}`);
-                            if (submitBtn) {
-                                submitBtn.disabled = false;
-                                submitBtn.innerHTML = originalBtnText;
-                            }
-                            return; // DO NOT continue on upload failure
+                const uploadSlot = async (slotKey) => {
+                    const slot = mediaSlots[slotKey];
+                    const fd = new FormData();
+                    fd.append("file", slot.file);
+                    fd.append("slot", slotKey);
+
+                    const upRes = await fetch(`${API_BASE}/api/admin/media/upload`, {
+                        method: "POST",
+                        headers: { ...(token ? { "Authorization": `Bearer ${token}` } : {}) },
+                        body: fd
+                    });
+                    const upData = await upRes.json().catch(() => null);
+                    if (!upRes.ok || !upData || !upData.success) {
+                        const upErr = (upData && (upData.message || upData.error)) || `Server upload error (${upRes.status})`;
+                        alert(`Failed to upload ${slot.label}.\n${upErr}`);
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = originalBtnText;
                         }
-                        slot.url = upData.url;
-                        slot.mediaType = upData.mediaType;
-                        slot.file = null;
-                        slot.isRemoved = false;
+                        return false; // DO NOT continue on upload failure
                     }
-                }
+                    slot.url = upData.url;
+                    slot.mediaType = upData.mediaType;
+                    slot.file = null;
+                    slot.isRemoved = false;
+                    return true;
+                };
+
+                const results = await Promise.all(pendingSlots.map(uploadSlot));
+                if (results.includes(false)) return;
             } catch (upNetworkErr) {
                 alert(`Upload failed: ${upNetworkErr.message || "Network error"}`);
                 if (submitBtn) {

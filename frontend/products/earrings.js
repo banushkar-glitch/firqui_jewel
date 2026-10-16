@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const mediaHtml = isVid
                 ? `<video src="${escapeHtml(imgSrc)}" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
-                : `<img src="${escapeHtml(imgSrc)}" alt="${escapeHtml(product.name)}" onerror="this.onerror=null;this.src='../assets/FE1007 Ice Cream Earrings.png'">`;
+                : `<img loading="lazy" decoding="async" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(product.name)}" onerror="this.onerror=null;this.src='../assets/FE1007 Ice Cream Earrings.png'">`;
 
             card.innerHTML = `
                 <div class="product-image">
@@ -466,38 +466,9 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Badge rendering lives in js/site-nav.js
     function updateCartBadge() {
-        let count = 0;
-        try {
-            const localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
-            if (Array.isArray(localC)) {
-                count = localC.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
-            }
-        } catch (e) {
-            count = 0;
-        }
-
-        const cartLink =
-            document.getElementById("cartHeaderButton") ||
-            document.querySelector('.header-icon-btn[aria-label="Shopping Cart"]') ||
-            document.querySelector('.header-icon-btn[href*="cart.html"]');
-
-        if (!cartLink) return;
-
-        let badge = cartLink.querySelector(".cart-count-badge");
-        if (!badge) {
-            badge = document.createElement("span");
-            badge.className = "cart-count-badge";
-            badge.id = "cartCountBadge";
-            cartLink.appendChild(badge);
-        }
-
-        if (count > 0) {
-            badge.textContent = count > 99 ? "99+" : String(count);
-            badge.style.display = "flex";
-        } else {
-            badge.style.display = "none";
-        }
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
     }
 
     async function syncCart() {

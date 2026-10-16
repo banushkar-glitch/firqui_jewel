@@ -10,38 +10,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return localStorage.getItem("firqui_token");
     }
 
+    // Badge rendering lives in js/site-nav.js
     function updateCartBadge() {
-        let count = 0;
-        try {
-            const localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
-            if (Array.isArray(localC)) {
-                count = localC.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
-            }
-        } catch (e) {
-            count = 0;
-        }
-
-        const cartLink =
-            document.getElementById("cartHeaderButton") ||
-            document.querySelector('.header-icon-btn[aria-label="Shopping Cart"]') ||
-            document.querySelector('.header-icon-btn[href*="cart.html"]');
-
-        if (!cartLink) return;
-
-        let badge = cartLink.querySelector(".cart-count-badge");
-        if (!badge) {
-            badge = document.createElement("span");
-            badge.className = "cart-count-badge";
-            badge.id = "cartCountBadge";
-            cartLink.appendChild(badge);
-        }
-
-        if (count > 0) {
-            badge.textContent = count > 99 ? "99+" : String(count);
-            badge.style.display = "flex";
-        } else {
-            badge.style.display = "none";
-        }
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
     }
 
     function getPrice(priceText) {
@@ -362,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             cartItem.innerHTML = `
                 <div class="cart-product-image" style="cursor: pointer;" title="View product details">
-                    <img src="${resolvedImg}"
+                    <img loading="lazy" decoding="async" src="${resolvedImg}"
                          alt="${product.name || 'Product'}"
                          onerror="if(!this.dataset.triedFallback){this.dataset.triedFallback='1';this.src='${fallbackImg}';}else{this.src='../assets/Logo Pink 1.png';}">
                 </div>

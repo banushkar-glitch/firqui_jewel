@@ -330,8 +330,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function handleFileSelection(file) {
+    let previewUrl = null;
+    let selectionToken = 0;
+
+    async function handleFileSelection(picked) {
         clearScreenshotError();
+        const token = ++selectionToken;
+
+        // Large phone screenshots are shrunk first so the preview and upload stay quick
+        let file = picked;
+        if (picked && window.FirquiImage) {
+            file = await window.FirquiImage.compress(picked, { maxDimension: 2400, quality: 0.9, output: "jpeg" });
+            if (token !== selectionToken) return; // a newer file was chosen meanwhile
+        }
 
         if (!file) {
             selectedFile = null;
@@ -362,22 +373,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         selectedFile = file;
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            if (previewImg) previewImg.src = e.target.result;
-            if (previewFilename) previewFilename.textContent = file.name;
-            if (previewFilesize) previewFilesize.textContent = formatBytes(file.size);
+        // An object URL avoids building a multi-megabyte base64 string on the main thread
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        if (previewImg) previewImg.src = previewUrl;
+        if (previewFilename) previewFilename.textContent = picked.name;
+        if (previewFilesize) previewFilesize.textContent = formatBytes(file.size);
 
-            if (uploadDropzone) uploadDropzone.style.display = "none";
-            if (previewContainer) previewContainer.style.display = "flex";
-        };
-        reader.readAsDataURL(file);
+        if (uploadDropzone) uploadDropzone.style.display = "none";
+        if (previewContainer) previewContainer.style.display = "flex";
     }
 
     function hidePreview() {
         if (previewContainer) previewContainer.style.display = "none";
         if (uploadDropzone) uploadDropzone.style.display = "block";
-        if (previewImg) previewImg.src = "";
+        if (previewImg) previewImg.removeAttribute("src");
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
     }
 
     if (replaceFileBtn) {

@@ -30,6 +30,7 @@
         href="order-details.css"
     >
 
+    <link rel="stylesheet" href="../css/site.css">
 </head>
 
 
@@ -45,7 +46,7 @@
     <!-- LOGO -->
 
     <a
-        href="../dashboard.html"
+        href="dashboard.html"
         class="header-logo-link"
     >
 
@@ -60,51 +61,74 @@
 
     <!-- NAVIGATION -->
 
-    <nav class="navigation">
-
-        <a
-            href="../dashboard.html"
-            class="nav-link"
+    <nav
+            class="navigation"
+            aria-label="Admin Navigation"
         >
-            Dashboard
-        </a>
 
-        <a
-            href="../products/products.html"
-            class="nav-link"
-        >
-            Products
-        </a>
 
-        <a
-            href="../categories/categories.html"
-            class="nav-link"
-        >
-            Categories
-        </a>
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
 
-        <a
-            href="../collections/collections.html"
-            class="nav-link"
-        >
-            Collections
-        </a>
 
-        <a
-            href="orders.html"
-            class="nav-link"
-        >
-            Orders
-        </a>
+            <span class="nav-dot"></span>
 
-        <a
-            href="cancellation-requests.html"
-            class="nav-link"
-        >
-            Cancellation Requests
-        </a>
 
-    </nav>
+            <a
+                href="products.html"
+                class="nav-link"
+            >
+                Products
+            </a>
+
+
+            
+
+
+    
+
+
+            
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link active"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellation Requests
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
+            </a>
+
+
+        </nav>
 
 
     <!-- HEADER ICONS -->
@@ -895,11 +919,11 @@
                     QUICK LINKS
                 </h4>
 
-                <a href="../dashboard.html">
+                <a href="dashboard.html">
                     Dashboard
                 </a>
 
-                <a href="../products/products.html">
+                <a href="products.html">
                     Products
                 </a>
 
@@ -922,7 +946,7 @@
                     Add Product
                 </a>
 
-                <a href="../products/products.html">
+                <a href="products.html">
                     Product List
                 </a>
 
@@ -1019,6 +1043,7 @@
 <script src="order-details.js"></script>
 <script src="admin-search.js"></script>
 
+    <script src="../js/site-nav.js"></script>
 </body>
 
 </html>

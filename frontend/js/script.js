@@ -222,7 +222,13 @@ document.addEventListener("DOMContentLoaded", () => {
             `translateX(-${step}px)`;
 
 
-        const handleTransitionEnd = () => {
+        let finished = false;
+
+        const handleTransitionEnd = (e) => {
+
+            // transitionend bubbles up from the slides' own transitions; only the track's counts
+            if (finished || (e && e.target !== track)) return;
+            finished = true;
 
             track.removeEventListener(
                 "transitionend",
@@ -258,21 +264,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         track.addEventListener(
             "transitionend",
-            handleTransitionEnd,
-            { once: true }
+            handleTransitionEnd
         );
 
 
         // Fallback in case transitionend does not fire
-        setTimeout(() => {
-
-            if (isAnimating) {
-
-                handleTransitionEnd();
-
-            }
-
-        }, 700);
+        setTimeout(() => handleTransitionEnd(), 700);
     }
 
 
@@ -326,7 +323,13 @@ document.addEventListener("DOMContentLoaded", () => {
         track.style.transform = "translateX(0)";
 
 
-        const handleTransitionEnd = () => {
+        let finished = false;
+
+        const handleTransitionEnd = (e) => {
+
+            // transitionend bubbles up from the slides' own transitions; only the track's counts
+            if (finished || (e && e.target !== track)) return;
+            finished = true;
 
             track.removeEventListener(
                 "transitionend",
@@ -351,21 +354,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         track.addEventListener(
             "transitionend",
-            handleTransitionEnd,
-            { once: true }
+            handleTransitionEnd
         );
 
 
         // Fallback
-        setTimeout(() => {
-
-            if (isAnimating) {
-
-                handleTransitionEnd();
-
-            }
-
-        }, 700);
+        setTimeout(() => handleTransitionEnd(), 700);
     }
 
 
@@ -1048,74 +1042,6 @@ document.addEventListener(
                 window.location.href = 'products/cart.html';
             });
         }
-
-        function updateCartBadge() {
-            let count = 0;
-            try {
-                const localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
-                if (Array.isArray(localC)) {
-                    count = localC.reduce((sum, item) => sum + (parseInt(item.quantity, 10) || 1), 0);
-                }
-            } catch (e) {
-                count = 0;
-            }
-
-            const cartLink =
-                document.getElementById("cartHeaderButton") ||
-                document.querySelector('.header-icons [aria-label="Shopping Cart"]') ||
-                document.querySelector('.header-icon-btn[aria-label="Shopping Cart"]') ||
-                document.querySelector('.header-icon-btn[href*="cart.html"]');
-
-            if (!cartLink) return;
-
-            let badge = cartLink.querySelector(".cart-count-badge");
-            if (!badge) {
-                badge = document.createElement("span");
-                badge.className = "cart-count-badge";
-                badge.id = "cartCountBadge";
-                cartLink.appendChild(badge);
-            }
-
-            if (count > 0) {
-                badge.textContent = count > 99 ? "99+" : String(count);
-                badge.style.display = "flex";
-            } else {
-                badge.style.display = "none";
-            }
-        }
-
-        async function syncCartBadge() {
-            updateCartBadge();
-            const token = localStorage.getItem("firqui_token");
-            if (!token) return;
-
-            const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
-            try {
-                const res = await fetch(`${API_BASE}/api/cart`, {
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && Array.isArray(data.items)) {
-                        try {
-                            localStorage.setItem("firquiCart", JSON.stringify(data.items));
-                        } catch (e) {}
-                        updateCartBadge();
-                    }
-                }
-            } catch (e) {
-                console.error("Cart sync error:", e);
-            }
-        }
-
-        updateCartBadge();
-        syncCartBadge();
-
-        window.addEventListener("storage", (e) => {
-            if (e.key === "firquiCart") {
-                updateCartBadge();
-            }
-        });
 
     }
 );
