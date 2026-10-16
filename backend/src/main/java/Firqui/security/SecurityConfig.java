@@ -1,6 +1,7 @@
 package Firqui.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
@@ -32,6 +33,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    @Value("${app.cors.allowed-origins:http://localhost:*,http://127.0.0.1:*,null}")
+    private String allowedOrigins;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -52,11 +56,14 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
-                .requestMatchers("/api/admin/media/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories", "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/collections", "/api/collections/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/admin/products", "/api/admin/products/**").permitAll()
+                // Catalogue is read-only for everyone except admins
+                .requestMatchers("/api/products", "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+                .requestMatchers("/api/categories", "/api/categories/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
+                .requestMatchers("/api/collections", "/api/collections/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                 .requestMatchers("/api/admin/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                 .requestMatchers("/api/cart/**").authenticated()
                 .requestMatchers("/api/wishlist/**").authenticated()
@@ -73,13 +80,11 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allow all local origins (port 5500, 5501, 8080, file:// null origin, etc.)
-        configuration.setAllowedOriginPatterns(Arrays.asList(
-            "http://localhost:*",
-            "http://127.0.0.1:*",
-            "null",
-            "*"
-        ));
+        // Origins come from app.cors.allowed-origins (local dev patterns by default, the live domains in production)
+        configuration.setAllowedOriginPatterns(Arrays.stream(allowedOrigins.split(","))
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList());
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setExposedHeaders(Arrays.asList("Authorization", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials", "Access-Control-Allow-Private-Network"));

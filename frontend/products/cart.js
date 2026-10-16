@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const subtotalElement = document.getElementById("cart-subtotal");
     const totalElement = document.getElementById("cart-total");
 
-    const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
 
     function getToken() {
         return localStorage.getItem("firqui_token");

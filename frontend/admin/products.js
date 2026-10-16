@@ -113,7 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
         mergeProducts(localProducts);
     }
 
-    const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
 
     async function getAdminToken() {
         let token = localStorage.getItem("firqui_token");
@@ -121,28 +121,10 @@ document.addEventListener("DOMContentLoaded", () => {
         try { userObj = JSON.parse(localStorage.getItem("firqui_user") || "{}"); } catch (_) {}
         const isAdmin = userObj && (userObj.role === "ADMIN" || userObj.role === "ROLE_ADMIN");
 
+        // No valid admin session: send to the login page
         if (!token || !isAdmin) {
-            try {
-                const authRes = await fetch(`${API_BASE}/api/auth/login`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ identifier: "admin@firqui.com", password: "Admin@123" })
-                });
-                if (authRes.ok) {
-                    const authData = await authRes.json();
-                    if (authData.token) {
-                        token = authData.token;
-                        localStorage.setItem("firqui_token", token);
-                        localStorage.setItem("firqui_user", JSON.stringify({
-                            name: authData.name,
-                            email: authData.email,
-                            role: authData.role
-                        }));
-                    }
-                }
-            } catch (authErr) {
-                console.warn("Admin auth session attempt error:", authErr);
-            }
+            window.location.href = "../authentication/login.html";
+            return null;
         }
         return token;
     }

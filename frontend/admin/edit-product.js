@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
        GET PRODUCT ID
     ====================================================== */
 
-    const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
 
     const urlParams =
         new URLSearchParams(
@@ -917,7 +917,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     .map(inp => inp.value.trim())
                     .filter(val => val.length > 0);
 
-            const API_BASE = window.location.port === "8080" ? "" : "http://localhost:8080";
+            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
 
             // 1. Ensure valid Admin JWT token for Spring Boot API call
             let token = localStorage.getItem("firqui_token");
@@ -926,27 +926,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const isAdmin = userObj && (userObj.role === "ADMIN" || userObj.role === "ROLE_ADMIN");
 
             if (!token || !isAdmin) {
-                try {
-                    const authRes = await fetch(`${API_BASE}/api/auth/login`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ identifier: "admin@firqui.com", password: "Admin@123" })
-                    });
-                    if (authRes.ok) {
-                        const authData = await authRes.json();
-                        if (authData.token) {
-                            token = authData.token;
-                            localStorage.setItem("firqui_token", token);
-                            localStorage.setItem("firqui_user", JSON.stringify({
-                                name: authData.name,
-                                email: authData.email,
-                                role: authData.role
-                            }));
-                        }
-                    }
-                } catch (authErr) {
-                    console.warn("Admin auth session attempt error:", authErr);
-                }
+                alert("Your admin session has expired. Please log in again.");
+                window.location.href = "../authentication/login.html";
+                return;
             }
 
             // 2. Upload newly selected media files for each slot
