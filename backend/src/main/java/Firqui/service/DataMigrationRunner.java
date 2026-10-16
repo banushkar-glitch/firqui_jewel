@@ -62,6 +62,11 @@ public class DataMigrationRunner implements CommandLineRunner {
             jdbcTemplate.execute("ALTER TABLE products ALTER COLUMN main_image TYPE TEXT");
             jdbcTemplate.execute("ALTER TABLE product_images ALTER COLUMN image_url TYPE TEXT");
             try {
+                jdbcTemplate.execute("ALTER TABLE products ALTER COLUMN category DROP NOT NULL");
+            } catch (Exception dropNotNullEx) {
+                // Column is already nullable
+            }
+            try {
                 jdbcTemplate.execute("ALTER TABLE order_items DROP CONSTRAINT IF EXISTS fkcf7rywrdyh4drhnslwb4v79er");
                 jdbcTemplate.execute("ALTER TABLE order_items ADD CONSTRAINT fkcf7rywrdyh4drhnslwb4v79er FOREIGN KEY (product_db_id) REFERENCES products(id) ON DELETE SET NULL");
             } catch (Exception fkEx) {
@@ -74,6 +79,7 @@ public class DataMigrationRunner implements CommandLineRunner {
         seedCategories();
         seedCollections();
         seedProducts();
+        migratePearlsGoneRogueStoreOrganization();
     }
 
     private void seedUsers() {
@@ -110,17 +116,17 @@ public class DataMigrationRunner implements CommandLineRunner {
                     new Category("RINGS", "rings", "Timeless handcrafted rings.", "../assets/Heart Pearl Ring.png"),
                     new Category("BROOCHES", "brooches", "Artisanal brooches for statement elegance.", "../assets/page_10_image_02.png"),
                     new Category("EARRINGS", "earrings", "Dazzling earrings for every occasion.", "../assets/FE1007 Ice Cream Earrings.png"),
-                    new Category("NECKLACES", "necklaces", "Majestic necklaces crafted to radiate.", "../assets/FN1003 Ice Cream Necklace.png"),
-                    new Category("PEARLS GONE ROGUE", "pearls-gone-rogue", "Unconventional, modern pearl artistry.", "../assets/page_06_image_02.png")
+                    new Category("NECKLACES", "necklaces", "Majestic necklaces crafted to radiate.", "../assets/FN1003 Ice Cream Necklace.png")
             );
             categoryRepository.saveAll(categories);
-            System.out.println("✅ Seeded 6 FIRQUI categories.");
+            System.out.println("✅ Seeded 5 FIRQUI categories.");
         }
     }
 
     private void seedCollections() {
         if (collectionRepository.count() == 0) {
             List<ProductCollection> collections = Arrays.asList(
+                    new ProductCollection("Pearls Gone Rogue", "pearls-gone-rogue", "Unconventional, modern pearl artistry.", "../assets/page_06_image_02.png"),
                     new ProductCollection("Firqui Originals", "firqui-originals", "Signature designs from Firqui.", "../assets/page_07_image_02.png"),
                     new ProductCollection("Royale Heritage", "royale-heritage", "Regal inspirations and timeless motifs.", "../assets/page_08_image_02.png"),
                     new ProductCollection("Celestial Glow", "celestial-glow", "Lustrous pieces that capture celestial radiance.", "../assets/page_09_image_02.png"),
@@ -128,7 +134,47 @@ public class DataMigrationRunner implements CommandLineRunner {
                     new ProductCollection("Vintage Charm", "vintage-charm", "Old-world romance infused with contemporary sparkle.", "../assets/page_12_image_02.png")
             );
             collectionRepository.saveAll(collections);
-            System.out.println("✅ Seeded 5 FIRQUI collections.");
+            System.out.println("✅ Seeded 6 FIRQUI collections.");
+        }
+    }
+
+    private void migratePearlsGoneRogueStoreOrganization() {
+        try {
+            // 1. Ensure Pearls Gone Rogue exists in collections
+            if (collectionRepository.findByNameIgnoreCase("Pearls Gone Rogue").isEmpty()) {
+                collectionRepository.save(new ProductCollection(
+                        "Pearls Gone Rogue",
+                        "pearls-gone-rogue",
+                        "Unconventional, modern pearl artistry.",
+                        "../assets/page_06_image_02.png"
+                ));
+                System.out.println("✅ Seeded collection: Pearls Gone Rogue");
+            }
+
+            // 2. Remove PEARLS GONE ROGUE from categories table if it exists
+            categoryRepository.findByNameIgnoreCase("PEARLS GONE ROGUE").ifPresent(cat -> {
+                categoryRepository.delete(cat);
+                System.out.println("✅ Removed 'PEARLS GONE ROGUE' from categories table.");
+            });
+
+            // 3. Migrate any products where category was set to PEARLS GONE ROGUE
+            List<Product> products = productRepository.findAll();
+            for (Product p : products) {
+                if (p.getCategory() != null && p.getCategory().toUpperCase().contains("PEARL")) {
+                    p.setCollection("Pearls Gone Rogue");
+                    String nameLower = (p.getName() != null ? p.getName() : "").toLowerCase();
+                    if (nameLower.contains("earring")) p.setCategory("EARRINGS");
+                    else if (nameLower.contains("ring")) p.setCategory("RINGS");
+                    else if (nameLower.contains("necklace")) p.setCategory("NECKLACES");
+                    else if (nameLower.contains("bracelet") || nameLower.contains("cuff") || nameLower.contains("bangle")) p.setCategory("BRACELETS & CUFFS");
+                    else if (nameLower.contains("brooch")) p.setCategory("BROOCHES");
+                    else p.setCategory("NECKLACES");
+                    productRepository.save(p);
+                    System.out.println("✅ Migrated product #" + p.getId() + " (" + p.getName() + ") to Collection: Pearls Gone Rogue, Category: " + p.getCategory());
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Pearls Gone Rogue store organization migration: " + ex.getMessage());
         }
     }
 

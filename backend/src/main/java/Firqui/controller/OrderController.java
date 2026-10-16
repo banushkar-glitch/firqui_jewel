@@ -30,11 +30,6 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @RequestBody CreateOrderRequest request) {
 
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Authentication required. Please log in to complete your checkout."));
-        }
-
         try {
             OrderResponse response = orderService.createOrder(user, request);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -124,11 +119,6 @@ public class OrderController {
             @RequestPart("orderData") CreateOrderRequest request,
             @RequestParam("transactionId") String transactionId,
             @RequestParam("screenshot") org.springframework.web.multipart.MultipartFile screenshot) {
-
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Authentication required. Please log in to complete your order."));
-        }
 
         try {
             OrderResponse response = orderService.placeOrderWithPayment(user, request, transactionId, screenshot);

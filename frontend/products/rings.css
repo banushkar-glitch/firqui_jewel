@@ -216,6 +216,7 @@ img {
 } 
  
 .header-icon-btn { 
+    position: relative;
     width: 32px; 
     height: 32px; 
  
@@ -1152,3 +1153,67 @@ img {
         font-size: 16px; 
     } 
 }
+
+/* =====================================================
+   PRODUCT DESCRIPTION TRUNCATION (2 LINES)
+===================================================== */
+
+.product-info p.product-description {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    line-height: 1.5em !important;
+    max-height: 3em !important;
+    height: 3em !important;
+    margin-top: 5px;
+}
+
+/* READ MORE LINK */
+.product-info a.read-more-link {
+    display: inline-block !important;
+    margin-top: 5px;
+    color: #0A373B;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+/* MOBILE: PRESERVE THE TWO-LINE LIMIT */
+@media (max-width: 767px) {
+    .product-info p.product-description {
+        -webkit-line-clamp: 2 !important;
+        line-height: 1.4em !important;
+        max-height: 2.8em !important;
+        height: 2.8em !important;
+    }
+}
+
+/* =====================================================
+   HEADER CART BADGE
+===================================================== */
+.cart-count-badge {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background-color: var(--pink, #EC9E96);
+    color: var(--dark-teal, #0A373B);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-inter, sans-serif);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+}
+
