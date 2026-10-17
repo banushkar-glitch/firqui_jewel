@@ -38,11 +38,27 @@
         if (e.target instanceof HTMLImageElement) useFallback(e.target);
     }, true);
 
-    // Images that already failed before this script ran
+    function checkImage(img) {
+        if (img.complete) {
+            if (img.naturalWidth === 0 && img.getAttribute("src")) useFallback(img);
+        } else {
+            img.addEventListener("error", function () { useFallback(img); }, { once: true });
+        }
+    }
+
+    // Images that already failed before this script ran, plus images that scripts
+    // build off-page and insert later (their error event never reaches the document)
     function replaceFailedImages() {
-        Array.prototype.forEach.call(document.images, function (img) {
-            if (img.complete && img.naturalWidth === 0 && img.getAttribute("src")) useFallback(img);
-        });
+        Array.prototype.forEach.call(document.images, checkImage);
+        new MutationObserver(function (mutations) {
+            mutations.forEach(function (m) {
+                m.addedNodes.forEach(function (node) {
+                    if (node.nodeType !== 1) return;
+                    if (node.tagName === "IMG") checkImage(node);
+                    else if (node.querySelectorAll) node.querySelectorAll("img").forEach(checkImage);
+                });
+            });
+        }).observe(document.body, { childList: true, subtree: true });
     }
 
     /* =====================================================
@@ -107,6 +123,68 @@
     window.addEventListener("storage", function (e) {
         if (e.key === "firquiCart") updateCartBadge();
     });
+
+    /* =====================================================
+       NEWSLETTER SIGN-UP (footer form on every page)
+    ===================================================== */
+    function newsletterMessage(form) {
+        let msg = document.getElementById("newsletterMsg");
+        if (!msg || !form.parentNode.contains(msg)) {
+            msg = form.parentNode.querySelector(".newsletter-message");
+        }
+        if (!msg) {
+            msg = document.createElement("p");
+            msg.className = "newsletter-message";
+            msg.setAttribute("role", "status");
+            form.insertAdjacentElement("afterend", msg);
+        }
+        // Some pages ship their own hidden message box; make sure it can be seen
+        msg.classList.add("newsletter-message");
+        msg.style.display = "block";
+        return msg;
+    }
+
+    // Capture phase on window runs before the pages' own (placeholder) handlers
+    window.addEventListener("submit", async function (e) {
+        const form = e.target;
+        if (!(form instanceof HTMLFormElement) || !form.matches(".newsletter-form, #newsletterForm")) return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        const input = form.querySelector('input[type="email"]');
+        const button = form.querySelector('button[type="submit"], button');
+        const msg = newsletterMessage(form);
+        const email = input ? input.value.trim() : "";
+
+        msg.classList.remove("is-error", "is-success");
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+            msg.textContent = "Please enter a valid email address.";
+            msg.classList.add("is-error");
+            return;
+        }
+
+        if (button) button.disabled = true;
+        msg.textContent = "Subscribing...";
+        try {
+            const res = await fetch(API_BASE + "/api/newsletter/subscribe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email, source: window.location.pathname })
+            });
+            const data = await res.json().catch(function () { return {}; });
+            if (!res.ok || !data.success) throw new Error(data.message || "Could not subscribe right now.");
+            msg.textContent = data.message || "Thank you for subscribing!";
+            msg.classList.add("is-success");
+            form.reset();
+        } catch (err) {
+            msg.textContent = err && err.message && !/fetch|network/i.test(err.message)
+                ? err.message
+                : "Could not subscribe right now. Please try again in a moment.";
+            msg.classList.add("is-error");
+        } finally {
+            if (button) button.disabled = false;
+        }
+    }, true);
 
     /* =====================================================
        "CATEGORIES" LINK

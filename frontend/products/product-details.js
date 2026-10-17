@@ -432,14 +432,6 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    /* Default measurement if not already present */
-    if (!product.measurement) {
-        product.measurement = [
-            "16 inch",
-            "18 inch",
-            "20 inch"
-        ];
-    }
 
     /* Default gemstone if not already present */
     if (!product.gemstone) {
@@ -505,7 +497,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let sizes = parseSpecValues(prod.measurement || prod.measurements);
 
-        variantOptions.innerHTML = "";
+        variantOptions.textContent = "";
 
         if (sizes.length === 0) {
             if (optionGroup) optionGroup.style.display = "none";
@@ -515,37 +507,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (optionGroup) optionGroup.style.display = "";
 
-        sizes.forEach((size, idx) => {
-            const btn =
-                document.createElement("button");
-
-            btn.type =
-                "button";
-
-            btn.className =
-                "variant-btn" + (idx === 0 ? " active" : "");
-
-            btn.textContent =
-                size;
-
-            btn.setAttribute(
-                "aria-label",
-                `Size ${size}`
-            );
-
-            btn.addEventListener("click", () => {
-                variantOptions
-                    .querySelectorAll(".variant-btn")
-                    .forEach(b => b.classList.remove("active"));
-
-                btn.classList.add("active");
-                selectedMeasurement = size;
-            });
-
-            variantOptions.appendChild(btn);
-        });
-
-        selectedMeasurement = sizes[0] || "";
+        // The size is shown as product information; customers do not pick one
+        selectedMeasurement = sizes.join(", ");
+        variantOptions.textContent = selectedMeasurement;
     }
 
     function renderGemstoneOptions(prod) {

@@ -11,141 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
        FRONTEND PROTOTYPE
     ===================================================== */
 
-    let orders = [
-
-        {
-            id: "FJ1001",
-            customer: "Rahul Sharma",
-            email: "rahul@example.com",
-            date: "01 Oct 2026",
-            items: 2,
-            amount: 2998,
-            payment: "Paid",
-            status: "Processing"
-        },
-
-        {
-            id: "FJ1002",
-            customer: "Priya Patil",
-            email: "priya@example.com",
-            date: "30 Sep 2026",
-            items: 1,
-            amount: 1499,
-            payment: "Paid",
-            status: "Shipped"
-        },
-
-        {
-            id: "FJ1003",
-            customer: "Sneha Kulkarni",
-            email: "sneha@example.com",
-            date: "29 Sep 2026",
-            items: 3,
-            amount: 3499,
-            payment: "Paid",
-            status: "Delivered"
-        },
-
-        {
-            id: "FJ1004",
-            customer: "Amit Joshi",
-            email: "amit@example.com",
-            date: "28 Sep 2026",
-            items: 1,
-            amount: 1899,
-            payment: "Pending",
-            status: "Pending"
-        },
-
-        {
-            id: "FJ1005",
-            customer: "Neha Deshmukh",
-            email: "neha@example.com",
-            date: "27 Sep 2026",
-            items: 2,
-            amount: 4298,
-            payment: "Paid",
-            status: "Confirmed"
-        },
-
-        {
-            id: "FJ1006",
-            customer: "Rohan Patil",
-            email: "rohan@example.com",
-            date: "26 Sep 2026",
-            items: 1,
-            amount: 1299,
-            payment: "Paid",
-            status: "Delivered"
-        },
-
-        {
-            id: "FJ1007",
-            customer: "Snehal More",
-            email: "snehal@example.com",
-            date: "25 Sep 2026",
-            items: 2,
-            amount: 2798,
-            payment: "Paid",
-            status: "Shipped"
-        },
-
-        {
-            id: "FJ1008",
-            customer: "Akash Shah",
-            email: "akash@example.com",
-            date: "24 Sep 2026",
-            items: 1,
-            amount: 999,
-            payment: "Failed",
-            status: "Cancelled"
-        },
-
-        {
-            id: "FJ1009",
-            customer: "Anjali Singh",
-            email: "anjali@example.com",
-            date: "23 Sep 2026",
-            items: 3,
-            amount: 5197,
-            payment: "Paid",
-            status: "Delivered"
-        },
-
-        {
-            id: "FJ1010",
-            customer: "Karan Mehta",
-            email: "karan@example.com",
-            date: "22 Sep 2026",
-            items: 1,
-            amount: 1599,
-            payment: "Paid",
-            status: "Processing"
-        },
-
-        {
-            id: "FJ1011",
-            customer: "Pooja Jadhav",
-            email: "pooja@example.com",
-            date: "21 Sep 2026",
-            items: 2,
-            amount: 3198,
-            payment: "Paid",
-            status: "Pending"
-        },
-
-        {
-            id: "FJ1012",
-            customer: "Vivek Pawar",
-            email: "vivek@example.com",
-            date: "20 Sep 2026",
-            items: 1,
-            amount: 2199,
-            payment: "Paid",
-            status: "Shipped"
-        }
-
-    ];
+    // Filled from the backend; no sample data, so the admin only ever sees real orders
+    let orders = [];
 
 
     /* =====================================================
@@ -748,7 +615,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const token = localStorage.getItem("firqui_token");
 
     async function fetchLiveOrders() {
-        if (!token) return;
+        if (!token) {
+            window.location.href = "../authentication/login.html";
+            return;
+        }
         try {
             const response = await fetch(`${API_BASE}/api/admin/orders`, {
                 headers: {
@@ -756,30 +626,35 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            if (response.ok) {
-                const liveOrders = await response.json();
-                if (liveOrders && liveOrders.length > 0) {
-                    const mappedLive = liveOrders.map(o => ({
-                        id: o.orderNumber || o.orderId || o.id,
-                        customer: o.customer || (o.shippingAddress && o.shippingAddress.fullName) || "Customer",
-                        email: o.email || "",
-                        date: o.orderDate || o.date || "Today",
-                        items: o.items || (o.products ? o.products.length : 1),
-                        amount: Number(o.totalAmount || o.total || o.amount || 0),
-                        payment: o.paymentStatus || o.payment || "Pending",
-                        status: o.orderStatus || o.status || "Processing"
-                    }));
-
-                    const liveIds = new Set(mappedLive.map(x => String(x.id)));
-                    const remainingProto = orders.filter(x => !liveIds.has(String(x.id)));
-                    orders = [...mappedLive, ...remainingProto];
-
-                    updateSummary();
-                    renderOrders(orders);
-                }
+            if (response.status === 401 || response.status === 403) {
+                window.location.href = "../authentication/login.html";
+                return;
             }
+            if (!response.ok) throw new Error("HTTP " + response.status);
+
+            const liveOrders = await response.json();
+            orders = (Array.isArray(liveOrders) ? liveOrders : []).map(o => ({
+                id: o.orderNumber || o.orderId || o.id,
+                customer: o.customer || (o.shippingAddress && o.shippingAddress.fullName) || "Customer",
+                email: o.email || "",
+                date: o.orderDate || o.date || "",
+                items: o.items || (o.products ? o.products.length : 1),
+                amount: Number(o.totalAmount || o.total || o.amount || 0),
+                payment: o.paymentStatus || o.payment || "Pending",
+                status: o.orderStatus || o.status || "Processing"
+            }));
+
+            updateSummary();
+            renderOrders(orders);
         } catch (err) {
             console.warn("Unable to fetch live admin orders:", err);
+            const empty = document.getElementById("emptyOrders");
+            if (empty) {
+                const h = empty.querySelector("h3");
+                const p = empty.querySelector("p");
+                if (h) h.textContent = "Could not load orders";
+                if (p) p.textContent = "The server did not respond. Check that the backend is running, then refresh.";
+            }
         }
     }
 

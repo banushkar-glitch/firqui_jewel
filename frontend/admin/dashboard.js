@@ -23,66 +23,62 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("orderCount");
 
 
-    /*
-       STATIC DEMO DATA
+    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const token = localStorage.getItem("firqui_token");
+    const authHeaders = token ? { "Authorization": `Bearer ${token}` } : {};
 
-       Later these values can come from
-       Spring Boot + PostgreSQL.
-    */
+    function setCount(el, value) {
+        if (el) el.textContent = String(value).padStart(2, "0");
+    }
 
-    const dashboardData = {
-
-        products: 24,
-
-        categories: 6,
-
-        collections: 4,
-
-        orders: 12
-
-    };
-
-
-    if (productCount) {
-        productCount.textContent =
-            String(dashboardData.products).padStart(2, "0");
-
-        const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
-        fetch(`${API_BASE}/api/admin/products`)
+    function getJson(path, withAuth) {
+        return fetch(`${API_BASE}${path}`, { headers: withAuth ? authHeaders : {} })
             .then(res => res.ok ? res.json() : null)
-            .then(data => {
-                if (Array.isArray(data)) {
-                    productCount.textContent = String(data.length).padStart(2, "0");
-                }
-            })
-            .catch(() => {});
+            .catch(() => null);
     }
 
-
-    if (categoryCount) {
-
-        categoryCount.textContent =
-            String(dashboardData.categories).padStart(2, "0");
-
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
     }
 
+    [productCount, categoryCount, collectionCount, orderCount].forEach(el => { if (el) el.textContent = "--"; });
 
-    if (collectionCount) {
+    getJson("/api/admin/products").then(products => {
+        if (!Array.isArray(products)) return;
+        setCount(productCount, products.length);
+        renderRecentProducts(products);
+    });
+    getJson("/api/categories").then(list => { if (Array.isArray(list)) setCount(categoryCount, list.length); });
+    getJson("/api/collections").then(list => { if (Array.isArray(list)) setCount(collectionCount, list.length); });
+    getJson("/api/admin/orders", true).then(list => { if (Array.isArray(list)) setCount(orderCount, list.length); });
 
-        collectionCount.textContent =
-            String(dashboardData.collections).padStart(2, "0");
-
+    function renderRecentProducts(products) {
+        const body = document.getElementById("recentProductsBody");
+        if (!body) return;
+        const latest = products.slice().sort((a, b) => (b.id || 0) - (a.id || 0)).slice(0, 5);
+        if (latest.length === 0) {
+            body.innerHTML = '<tr><td colspan="6">No products yet. Use "Add Product" to create one.</td></tr>';
+            return;
+        }
+        body.innerHTML = latest.map(p => `
+            <tr>
+                <td>
+                    <div class="product-info">
+                        <div class="product-image"><i class="fa-solid fa-gem"></i></div>
+                        <div>
+                            <strong>${escapeHtml(p.name)}</strong>
+                            <small>Product #${String(p.id).padStart(3, "0")}</small>
+                        </div>
+                    </div>
+                </td>
+                <td>${escapeHtml(p.category || "-")}</td>
+                <td>${escapeHtml(p.collection || "-")}</td>
+                <td>&#8377;${Number(p.price || 0).toLocaleString("en-IN")}</td>
+                <td><span class="status ${p.active === false ? "inactive" : "active"}">${p.active === false ? "Inactive" : "Active"}</span></td>
+                <td><a class="table-action" href="edit-product.html?id=${encodeURIComponent(p.id)}" aria-label="Edit ${escapeHtml(p.name)}"><i class="fa-solid fa-pen"></i></a></td>
+            </tr>`).join("");
     }
-
-
-    if (orderCount) {
-
-        orderCount.textContent =
-            String(dashboardData.orders).padStart(2, "0");
-
-    }
-
-
 
     /* =================================================
        EDIT PRODUCT BUTTONS

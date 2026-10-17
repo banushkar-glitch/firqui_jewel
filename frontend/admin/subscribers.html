@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firqui Jewels | Subscribers</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         ORDERS CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="orders.css"
+    >
+    <link rel="stylesheet" href="subscribers.css">
+
+    <link rel="stylesheet" href="../css/site.css">
+</head>
+
+
+<body>
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="dashboard.html"
+            class="header-logo"
+        >
+
+            <img
+                src="../assets/Logo Pink 1.png"
+                alt="Firqui Jewels"
+            >
+
+        </a>
+
+
+        <!-- NAVIGATION -->
+
+        <nav
+            class="navigation"
+            aria-label="Admin Navigation"
+        >
+
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="products.html"
+                class="nav-link"
+            >
+                Products
+            </a>
+
+
+            
+
+
+    
+
+
+            
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellations
+            </a>
+
+
+            <span class="nav-dot"></span>
+            <a
+                href="subscribers.html"
+                class="nav-link active"
+            >
+                Subscribers
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
+            </a>
+
+
+        </nav>
+
+
+        <!-- HEADER ICONS -->
+
+        <div class="header-icons">
+
+
+            <button
+                class="header-icon-btn"
+                id="adminButton"
+                type="button"
+                aria-label="Admin"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="searchButton"
+                type="button"
+                aria-label="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="notificationButton"
+                type="button"
+                aria-label="Notifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <button
+                class="header-icon-btn"
+                id="logoutButton"
+                type="button"
+                aria-label="Logout"
+            >
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+        <section class="orders-section" id="subscribers">
+
+            <div class="orders-heading">
+                <div>
+                    <span class="page-label">MARKETING</span>
+                    <h1>Newsletter Subscribers</h1>
+                    <p>Everyone who signed up through the newsletter form on the website.</p>
+                </div>
+            </div>
+
+            <div class="orders-container">
+
+                <div class="order-summary">
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fa-solid fa-envelope-open-text"></i></div>
+                        <div>
+                            <span>TOTAL SUBSCRIBERS</span>
+                            <strong id="totalSubscribers">--</strong>
+                        </div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon"><i class="fa-solid fa-calendar-week"></i></div>
+                        <div>
+                            <span>LAST 30 DAYS</span>
+                            <strong id="recentSubscribers">--</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="orders-card">
+
+                    <div class="orders-card-header">
+                        <div>
+                            <span class="section-label">EMAIL LIST</span>
+                            <h2>All Subscribers</h2>
+                        </div>
+                        <div class="subscriber-actions">
+                            <div class="orders-count">
+                                <span id="visibleSubscriberCount">0</span>
+                                Subscribers
+                            </div>
+                            <button type="button" class="subscriber-export" id="exportSubscribers">
+                                <i class="fa-solid fa-download"></i> Download CSV
+                            </button>
+                            <button type="button" class="subscriber-export" id="copySubscribers">
+                                <i class="fa-regular fa-copy"></i> Copy emails
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="orders-filters">
+                        <div class="order-search">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="subscriberSearch" placeholder="Search email..." autocomplete="off" aria-label="Search subscribers">
+                        </div>
+                    </div>
+
+                    <div class="orders-table-wrapper">
+                        <table class="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>EMAIL</th>
+                                    <th>SUBSCRIBED</th>
+                                    <th>SIGNED UP ON</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subscribersTableBody"></tbody>
+                        </table>
+
+                        <div class="empty-orders" id="emptySubscribers">
+                            <div class="empty-icon"><i class="fa-solid fa-inbox"></i></div>
+                            <h3>No subscribers yet</h3>
+                            <p>Emails entered in the website's newsletter form will appear here.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer
+        class="footer"
+        id="footer"
+    >
+
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+
+
+        <div class="footer-credit">
+
+            Powered by
+
+            <strong>
+                GENEXA TECH
+            </strong>
+
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     ORDERS JAVASCRIPT
+====================================================== -->
+
+<script src="subscribers.js"></script>
+<script src="admin-search.js"></script>
+
+    <script src="../js/site-nav.js"></script>
+</body>
+
+</html>

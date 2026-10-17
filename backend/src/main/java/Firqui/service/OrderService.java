@@ -43,6 +43,9 @@ public class OrderService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired(required = false)
+    private ShopNotificationService shopNotifications;
+
     @Autowired
     private Firqui.repository.UserRepository userRepository;
 
@@ -195,6 +198,7 @@ public class OrderService {
 
         // Save order and order items in PostgreSQL
         Order savedOrder = orderRepository.save(order);
+        if (shopNotifications != null) shopNotifications.orderPlaced(savedOrder);
 
         // For Cash on Delivery, clear cart immediately. For "Pay Now", retain cart until payment submission succeeds
         if (!"Pay Now".equalsIgnoreCase(paymentMethod) && !guestCheckout) {
@@ -373,6 +377,7 @@ public class OrderService {
         order.setTotalAmount(calculatedSubtotal);
 
         Order savedOrder = orderRepository.save(order);
+        if (shopNotifications != null) shopNotifications.orderPlaced(savedOrder);
 
         // Clear user database cart now that order has been placed
         if (!guestCheckout) {
@@ -572,6 +577,7 @@ public class OrderService {
         order.setRejectionReason(null);
 
         Order saved = orderRepository.save(order);
+        if (shopNotifications != null) shopNotifications.paymentSubmitted(saved);
 
         // Clear user database cart upon successful payment submission
         try {
