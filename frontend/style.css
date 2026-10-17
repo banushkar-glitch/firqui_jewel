@@ -178,6 +178,7 @@ img {
 }
 
 .header-icon-btn {
+    position: relative;
     width: 32px;
     height: 32px;
     display: flex;
@@ -282,18 +283,7 @@ img {
 }
 
 /* Sparkle accent in bottom-right corner of shadow pattern like Figma */
-.slide-bg-shape::after {
-    content: '✦';
-    position: absolute;
-    right: 7px;
-    bottom: 5px;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.55);
-    line-height: 1;
-    pointer-events: none;
-    opacity: 0.75;
-    transition: color 0.6s ease, opacity 0.6s ease;
-}
+
 
 /* Secondary (left and right) slides: Dusty Rose / Mauve shadow pattern */
 .slide:not(.center-active) {
@@ -654,6 +644,8 @@ img {
 .card-brooches .category-image {
     object-fit: cover;
 }
+
+
 /* =========================================================
    HERO CONTROLS & SIDE TEXT
    ========================================================= */
@@ -730,21 +722,26 @@ img {
 }
 
 
-.slider-arrow-right,
-.slider-arrow-right:hover,
-.slider-arrow-right:active,
-.slider-arrow-right:focus,
-.slider-arrow-right:focus-visible {
-    top: 405px !important;
-    left: calc(50% + 225px) !important;
+/* Desktop only: keep the triangle fixed while hovered or pressed.
+   Unscoped, these :hover/:active rules outranked the mobile position and
+   threw the arrow off-screen as soon as it was tapped. */
+@media (min-width: 769px) {
+    .slider-arrow-right,
+    .slider-arrow-right:hover,
+    .slider-arrow-right:active,
+    .slider-arrow-right:focus,
+    .slider-arrow-right:focus-visible {
+        top: 405px !important;
+        left: calc(50% + 225px) !important;
 
-    transform: translate(-50%, -50%) rotate(90deg) !important;
+        transform: translate(-50%, -50%) rotate(90deg) !important;
 
-    transition: none !important;
-    animation: none !important;
+        transition: none !important;
+        animation: none !important;
 
-    margin: 0 !important;
-    box-shadow: none !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+    }
 }
 
 
@@ -1025,7 +1022,7 @@ img {
 .categories .card-necklaces .category-title {
     bottom: 28px;
     left: 32px;
-    color: #EC9E96 !important;
+    color:  #FFFFFF !important;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -1664,39 +1661,33 @@ img {
 
     /* =========================================================
        MOBILE CATEGORIES (<= 768px)
-       All 5 category images have the EXACT SAME 4:5 visual ratio and dimensions
+       One wide feature tile, then the other four in a 2 x 2 grid
        ========================================================= */
     .categories {
-        padding: 0 0 50px 0 !important;
+        padding: 12px 12px 50px !important;
         margin: 0 !important;
         width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .categories .category-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
         width: 100% !important;
         max-width: 100% !important;
-        gap: 0 !important;
+        gap: 10px !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
+    /* Let the five cards sit directly in the grid */
     .categories .category-col-left,
     .categories .category-col-center,
     .categories .category-col-right {
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: none !important;
-        gap: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        display: contents !important;
     }
 
-    /* All 5 category cards have identical dimensions and 4:5 ratio on mobile */
+    /* Category cards: 4:5 tiles on mobile */
     .categories .category-card,
     .categories .category-col-left .category-card,
     .categories .category-col-center .category-card,
@@ -1711,7 +1702,7 @@ img {
         overflow: hidden !important;
         margin: 0 !important;
         padding: 0 !important;
-        border-radius: 0 !important;
+        border-radius: 14px !important;
         border: none !important;
         box-shadow: none !important;
         background: transparent !important;
@@ -1740,16 +1731,30 @@ img {
     }
 
     .categories .category-title {
-        font-size: 22px !important;
-        bottom: 20px !important;
-        left: 22px !important;
-        right: auto !important;
+        font-size: 17px !important;
+        line-height: 1.15 !important;
+        bottom: 12px !important;
+        left: 12px !important;
+        right: 12px !important;
+        text-align: left !important;
     }
 
     .categories .card-bracelets .category-title,
     .categories .card-brooches .category-title {
-        right: 22px !important;
-        left: auto !important;
+        right: 12px !important;
+        left: 12px !important;
+    }
+
+    /* Feature tile */
+    .categories .category-col-left .card-necklaces {
+        grid-column: 1 / -1 !important;
+        aspect-ratio: 16 / 11 !important;
+    }
+
+    .categories .card-necklaces .category-title {
+        font-size: 24px !important;
+        bottom: 16px !important;
+        left: 18px !important;
     }
 
     .lower-section {
@@ -2854,5 +2859,3 @@ body.auth-modal-open {
         font-size: 25px !important;
     }
 }
-
-

@@ -4,6 +4,7 @@
 <head>
 
     <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261017d"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>FIRQUI JEWELS | Product Details</title>
@@ -23,8 +24,9 @@
           href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- Product Details CSS -->
-    <link rel="stylesheet" href="product-details.css">
+    <link rel="stylesheet" href="product-details.css?v=20261017d">
 
+    <link rel="stylesheet" href="../css/site.css?v=20261017d">
 </head>
 
 
@@ -46,7 +48,7 @@
            class="header-logo"
            aria-label="FIRQUI JEWELS Home">
 
-            <img src="../assets\Logo Pink 1.png"
+            <img src="../assets/Logo Pink 1.png"
                  alt="FIRQUI JEWELS Logo">
 
         </a>
@@ -129,9 +131,11 @@
 
             <a href="cart.html"
                class="header-icon-btn"
+               id="cartHeaderButton"
                aria-label="Shopping Cart">
 
                 <i class="fa-solid fa-cart-shopping"></i>
+                <span class="cart-count-badge" id="cartCountBadge" style="display: none;">0</span>
 
             </a>
 
@@ -162,7 +166,7 @@
                     <div class="main-product-image">
 
                         <img id="mainProductImage"
-                             src="../assets\page_07_image_02.png"
+                             src="../assets/page_07_image_02.png"
                              alt="Product">
 
                         <button class="gallery-arrow gallery-prev"
@@ -246,18 +250,29 @@
                          VARIANTS
                     ================================================== -->
 
-                  <div class="product-option">
+                  <!-- SIZE (information only, not a choice) -->
+                  <div class="product-option" id="productOptionSize">
+                      <h3>Size</h3>
+                      <p class="product-size-value" id="variantOptions"></p>
+                  </div>
 
-    <h3>
-        Available Size
-    </h3>
+                  <!-- GEMSTONE -->
+                  <div class="product-option" id="productOptionGemstone">
+                      <h3>Gemstone</h3>
+                      <div class="variant-options" id="gemstoneOptions"></div>
+                  </div>
 
-    <div
-        class="variant-options"
-        id="variantOptions">
-    </div>
+                  <!-- MATERIAL -->
+                  <div class="product-option" id="productOptionMaterial">
+                      <h3>Material</h3>
+                      <div class="variant-options" id="materialOptions"></div>
+                  </div>
 
-</div>
+                  <!-- COLOR -->
+                  <div class="product-option" id="productOptionColor">
+                      <h3>Color</h3>
+                      <div class="variant-options" id="colorOptions"></div>
+                  </div>
 
 
                     <!-- =================================================
@@ -688,9 +703,10 @@
 
 <!-- Product Details JS -->
 
-<script src="product-details.js"></script>
-<script src="../js/search.js"></script>
+<script src="product-details.js?v=20261017d"></script>
+<script src="../js/search.js?v=20261017d"></script>
 
+    <script src="../js/site-nav.js?v=20261017d"></script>
 </body>
 
 </html>

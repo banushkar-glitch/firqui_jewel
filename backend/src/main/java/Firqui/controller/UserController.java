@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
+    private Firqui.security.SessionCookies sessionCookies;
+
+    @Autowired
     private UserService userService;
 
     /* =====================================================
@@ -74,7 +77,9 @@ public class UserController {
         }
         try {
             userService.deleteAccount(currentUser);
-            return ResponseEntity.ok(new ApiResponse(true, "Account successfully deactivated."));
+            return ResponseEntity.ok()
+                    .header(org.springframework.http.HttpHeaders.SET_COOKIE, sessionCookies.clear().toString())
+                    .body(new ApiResponse(true, "Account successfully deactivated."));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse(false, "Failed to deactivate account: " + e.getMessage()));

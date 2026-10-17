@@ -54,12 +54,13 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/newsletter/subscribe").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories", "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/collections", "/api/collections/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/admin/products", "/api/admin/products/**").permitAll()
                 // Catalogue is read-only for everyone except admins
                 .requestMatchers("/api/products", "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                 .requestMatchers("/api/categories", "/api/categories/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
@@ -68,7 +69,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/cart/**").authenticated()
                 .requestMatchers("/api/wishlist/**").authenticated()
                 .requestMatchers("/api/users/**").authenticated()
-                .requestMatchers("/api/orders/**").authenticated()
+                // Ordering and paying need an account
+                .requestMatchers("/api/orders", "/api/orders/**").authenticated()
+                .requestMatchers("/api/payments/**").authenticated()
                 .requestMatchers("/api/cancellation-requests/**").authenticated()
                 .anyRequest().authenticated()
             )

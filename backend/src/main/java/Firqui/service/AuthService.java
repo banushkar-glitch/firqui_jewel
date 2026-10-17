@@ -26,6 +26,9 @@ public class AuthService {
     private static final Pattern MOBILE_PATTERN =
             Pattern.compile("^\\d{10}$");
 
+    // Hash of a random string, compared against when no account matches
+    private volatile String dummyHash;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -131,6 +134,9 @@ public class AuthService {
         String genericAuthError = "Invalid email/mobile number or password.";
 
         if (userOptional.isEmpty()) {
+            // Spend the same time as a real check so response timing does not reveal which accounts exist
+            if (dummyHash == null) dummyHash = passwordEncoder.encode(UUID.randomUUID().toString());
+            passwordEncoder.matches(password, dummyHash);
             return new LoginResponse(false, genericAuthError, null, null, null);
         }
 
@@ -141,8 +147,12 @@ public class AuthService {
             return new LoginResponse(false, genericAuthError, null, null, null);
         }
 
-        // Generate JWT token
-        String token = jwtUtils.generateToken(user.getEmail(), user.getName(), user.getId(), user.getRole());
+        if (Boolean.FALSE.equals(user.getActive())) {
+            return new LoginResponse(false, "This account has been disabled. Please contact info@firquijewels.com.", null, null, null);
+        }
+
+        // Generate JWT token (carried in an HttpOnly cookie by AuthController)
+        String token = jwtUtils.generateToken(user);
 
         return new LoginResponse(true, "Login successful!", token, user.getName(), user.getEmail(), user.getRole());
     }
@@ -231,9 +241,10 @@ public class AuthService {
             return ApiResponse.error("Passwords do not match.");
         }
 
-        // Update user password with BCrypt hash
+        // Update user password with BCrypt hash; signing out every existing session
         User user = token.getUser();
         user.setPassword(passwordEncoder.encode(newPassword));
+        user.bumpTokenVersion();
         userRepository.save(user);
 
         // Mark token as used to prevent replay attacks

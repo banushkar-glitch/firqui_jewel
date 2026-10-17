@@ -43,6 +43,15 @@ public class OrderService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired(required = false)
+    private ShopNotificationService shopNotifications;
+
+    @Autowired
+    private Firqui.repository.UserRepository userRepository;
+
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OrderService.class);
 
     /* =====================================================
@@ -50,15 +59,17 @@ public class OrderService {
     ====================================================== */
     @Transactional
     public OrderResponse createOrder(User user, CreateOrderRequest request) {
-        if (user == null) {
-            throw new IllegalArgumentException("User authentication required to place an order.");
-        }
-
         // Validate shipping address
         ShippingAddressDTO address = request != null ? request.getShippingAddress() : null;
-        if (address == null || address.getFullName().isEmpty() || address.getPhone().isEmpty()
-                || address.getAddress1().isEmpty() || address.getPincode().isEmpty()) {
+        if (address == null || address.getFullName() == null || address.getFullName().isEmpty()
+                || address.getPhone() == null || address.getPhone().isEmpty()
+                || address.getAddress1() == null || address.getAddress1().isEmpty()
+                || address.getPincode() == null || address.getPincode().isEmpty()) {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
+        }
+
+        if (user == null) {
+            throw new IllegalArgumentException("Please log in to place your order.");
         }
 
         // Gather items to order
@@ -125,7 +136,7 @@ public class OrderService {
 
         order.setShippingFullName(address.getFullName());
         order.setShippingPhone(address.getPhone());
-        order.setShippingEmail(address.getEmail().isEmpty() ? user.getEmail() : address.getEmail());
+        order.setShippingEmail(address.getEmail() != null && !address.getEmail().trim().isEmpty() ? address.getEmail().trim() : (user != null ? user.getEmail() : ""));
         order.setShippingAddress1(address.getAddress1());
         order.setShippingAddress2(address.getAddress2());
         order.setShippingPincode(address.getPincode());
@@ -142,10 +153,8 @@ public class OrderService {
 
             int requestedQty = itemData.quantity;
 
-            // Stock validation
-            if (product.getStockQuantity() != null && product.getStockQuantity() < requestedQty) {
-                throw new IllegalStateException("Only " + product.getStockQuantity() + " items are available for " + product.getName() + ".");
-            }
+            // Out of stock / pre-order / quantity rules shared with the admin form
+            ProductRules.checkCanOrder(product, requestedQty);
 
             // Price validation strictly from database product
             double unitPrice = product.getPrice() != null ? product.getPrice() : 0.0;
@@ -153,10 +162,8 @@ public class OrderService {
             calculatedSubtotal += itemSubtotal;
 
             // Deduct stock in DB
-            if (product.getStockQuantity() != null) {
-                product.setStockQuantity(Math.max(0, product.getStockQuantity() - requestedQty));
-                productRepository.save(product);
-            }
+            ProductRules.deductStock(product, requestedQty);
+            productRepository.save(product);
 
             // Create OrderItem snapshot
             String itemImage = (product.getMainImage() != null && !product.getMainImage().isEmpty())
@@ -186,6 +193,7 @@ public class OrderService {
 
         // Save order and order items in PostgreSQL
         Order savedOrder = orderRepository.save(order);
+        if (shopNotifications != null) shopNotifications.orderPlaced(savedOrder);
 
         // For Cash on Delivery, clear cart immediately. For "Pay Now", retain cart until payment submission succeeds
         if (!"Pay Now".equalsIgnoreCase(paymentMethod)) {
@@ -200,10 +208,6 @@ public class OrderService {
     ====================================================== */
     @Transactional
     public OrderResponse placeOrderWithPayment(User user, CreateOrderRequest request, String transactionId, MultipartFile screenshot) {
-        if (user == null) {
-            throw new IllegalArgumentException("User authentication required to place an order.");
-        }
-
         // Validate shipping address
         ShippingAddressDTO address = request != null ? request.getShippingAddress() : null;
         if (address == null || address.getFullName() == null || address.getFullName().trim().isEmpty() ||
@@ -211,6 +215,10 @@ public class OrderService {
                 address.getAddress1() == null || address.getAddress1().trim().isEmpty() ||
                 address.getPincode() == null || address.getPincode().trim().isEmpty()) {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
+        }
+
+        if (user == null) {
+            throw new IllegalArgumentException("Please log in to place your order.");
         }
 
         // Validate Transaction ID / UTR
@@ -326,17 +334,14 @@ public class OrderService {
                 throw new IllegalArgumentException("Product not found in catalogue: " + itemData.name);
             }
             int requestedQty = itemData.quantity;
-            if (product.getStockQuantity() != null && product.getStockQuantity() < requestedQty) {
-                throw new IllegalStateException("Only " + product.getStockQuantity() + " items are available for " + product.getName() + ".");
-            }
+            // Out of stock / pre-order / quantity rules shared with the admin form
+            ProductRules.checkCanOrder(product, requestedQty);
             double unitPrice = product.getPrice() != null ? product.getPrice() : 0.0;
             double itemSubtotal = unitPrice * requestedQty;
             calculatedSubtotal += itemSubtotal;
 
-            if (product.getStockQuantity() != null) {
-                product.setStockQuantity(Math.max(0, product.getStockQuantity() - requestedQty));
-                productRepository.save(product);
-            }
+            ProductRules.deductStock(product, requestedQty);
+            productRepository.save(product);
 
             String itemImage = (product.getMainImage() != null && !product.getMainImage().isEmpty())
                     ? product.getMainImage() : itemData.imageUrl;
@@ -363,6 +368,7 @@ public class OrderService {
         order.setTotalAmount(calculatedSubtotal);
 
         Order savedOrder = orderRepository.save(order);
+        if (shopNotifications != null) shopNotifications.orderPlaced(savedOrder);
 
         // Clear user database cart now that order has been placed
         try {
@@ -460,6 +466,9 @@ public class OrderService {
                     Product prod = item.getProduct();
                     int currentStock = prod.getStockQuantity() != null ? prod.getStockQuantity() : 0;
                     prod.setStockQuantity(currentStock + item.getQuantity());
+                    if (ProductRules.OUT_OF_STOCK.equals(prod.getAvailability()) && prod.getStockQuantity() > 0) {
+                        prod.setAvailability(ProductRules.IN_STOCK);
+                    }
                     productRepository.save(prod);
                 }
             }
@@ -560,6 +569,7 @@ public class OrderService {
         order.setRejectionReason(null);
 
         Order saved = orderRepository.save(order);
+        if (shopNotifications != null) shopNotifications.paymentSubmitted(saved);
 
         // Clear user database cart upon successful payment submission
         try {
@@ -669,6 +679,33 @@ public class OrderService {
     }
 
     /* =====================================================
+       PRICE QUOTE (for the UPI payment QR)
+       Same product lookup and database prices as order placement,
+       but read-only: no order is created and no stock is reserved.
+    ====================================================== */
+    @Transactional(readOnly = true)
+    public double quoteTotal(List<OrderItemRequest> items) {
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("Your cart is empty. Please add items before paying.");
+        }
+        double total = 0.0;
+        for (OrderItemRequest item : items) {
+            int qty = item.getQuantity() != null ? item.getQuantity() : 0;
+            if (qty <= 0) continue;
+            Product product = findProductByIdOrLegacyOrName(item.getProductId(), item.getName());
+            if (product == null) {
+                throw new IllegalArgumentException("Product not found in catalogue: " + item.getName());
+            }
+            ProductRules.checkCanOrder(product, qty);
+            total += (product.getPrice() != null ? product.getPrice() : 0.0) * qty;
+        }
+        if (total <= 0) {
+            throw new IllegalArgumentException("Your cart is empty. Please add items before paying.");
+        }
+        return total;
+    }
+
+    /* =====================================================
        HELPERS
     ====================================================== */
     private Product findProductByIdOrLegacyOrName(String identifier, String productName) {
@@ -731,4 +768,5 @@ public class OrderService {
             this.imageUrl = imageUrl;
         }
     }
+
 }

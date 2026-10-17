@@ -4,10 +4,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const subtotalElement = document.getElementById("cart-subtotal");
     const totalElement = document.getElementById("cart-total");
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
+    }
+
+    // Badge rendering lives in js/site-nav.js
+    function updateCartBadge() {
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
     }
 
     function getPrice(priceText) {
@@ -229,7 +234,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (localCart.length > 0) {
                 renderLocalCart(localCart);
             } else {
-                renderLoginRequired();
+                renderCart([]);
             }
             return;
         }
@@ -246,7 +251,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (localCart.length > 0) {
                     renderLocalCart(localCart);
                 } else {
-                    renderLoginRequired();
+                    renderCart([]);
                 }
                 return;
             }
@@ -328,15 +333,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             cartItem.innerHTML = `
                 <div class="cart-product-image" style="cursor: pointer;" title="View product details">
-                    <img src="${resolvedImg}"
-                         alt="${product.name || 'Product'}"
+                    <img loading="lazy" decoding="async" src="${window.FirquiHtml.escape(resolvedImg)}"
+                         alt="${window.FirquiHtml.escape(product.name || 'Product')}"
                          onerror="if(!this.dataset.triedFallback){this.dataset.triedFallback='1';this.src='${fallbackImg}';}else{this.src='../assets/Logo Pink 1.png';}">
                 </div>
 
                 <div class="cart-item-details">
-                    <h3 style="cursor: pointer;" title="View product details">${product.name || ''}</h3>
+                    <h3 style="cursor: pointer;" title="View product details">${window.FirquiHtml.escape(product.name || '')}</h3>
 
-                    <p>${product.description || ""}${(product.selectedSize || product.measurement || product.size) ? ` • Size: ${product.selectedSize || product.measurement || product.size}` : ""}</p>
+                    <p>${window.FirquiHtml.escape(window.FirquiHtml.text(product.description || ""))}${(product.selectedSize || product.measurement || product.size) ? ` • Size: ${window.FirquiHtml.escape(product.selectedSize || product.measurement || product.size)}` : ""}</p>
 
                     <div class="cart-item-price">
                         ${product.formattedPrice || formatPrice(price)}
@@ -385,6 +390,7 @@ document.addEventListener("DOMContentLoaded", function () {
             totalElement.textContent = totalStr || formatPrice(calculatedSubtotal);
         }
 
+        updateCartBadge();
         attachCartEvents(cartItems);
     }
 
@@ -539,6 +545,7 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem("firquiCart", JSON.stringify(items));
         } catch (e) {}
         renderCart(items);
+        updateCartBadge();
     }
 
     /* =====================================================
@@ -560,22 +567,24 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Check if user is authenticated
-            if (!token) {
-                // Preserve cart data and redirect to login with return target
-                try {
-                    sessionStorage.setItem("firqui_redirect", "checkout.html");
-                } catch (e) {}
-                window.location.href = "../authentication/login.html?redirect=../products/checkout.html";
+            // Placing an order needs an account; the cart is kept and the
+            // customer comes straight back to checkout after logging in
+            if (!window.FirquiAuth.isSignedIn()) {
+                window.FirquiAuth.goToLogin(window.location.pathname.replace(/cart\.html$/, "checkout.html"));
                 return;
             }
-
-            // Authenticated user -> Open existing checkout page
             window.location.href = "checkout.html";
         });
     }
 
     // Initial Load
+    updateCartBadge();
     fetchCart();
+
+    window.addEventListener("storage", function (e) {
+        if (e.key === "firquiCart") {
+            updateCartBadge();
+        }
+    });
 
 });

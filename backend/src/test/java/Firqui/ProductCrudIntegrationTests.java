@@ -75,13 +75,31 @@ public class ProductCrudIntegrationTests {
 
     @Test
     @org.junit.jupiter.api.Order(2)
-    void testCreateProduct_ValidationFailsOnMissingCategory() {
+    @Transactional
+    void testCreateProduct_SuccessWithOnlyCollectionAndNoCategory() {
         ProductDTO dto = new ProductDTO();
-        dto.setName("No Category Ring");
-        dto.setPrice(5000.0);
+        dto.setName("Pearls Rogue Solitaire");
+        dto.setCategory(null); // No category selected
+        dto.setCollection("Pearls Gone Rogue");
+        dto.setPrice(7500.0);
+        dto.setStockQuantity(5);
+        dto.setDescription("Solitaire pearl from Pearls Gone Rogue collection");
 
         ResponseEntity<?> response = adminProductController.createProduct(dto);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+
+        @SuppressWarnings("unchecked")
+        Map<String, Object> body = (Map<String, Object>) response.getBody();
+        assertEquals(true, body.get("success"));
+
+        Product created = (Product) body.get("product");
+        assertNotNull(created);
+        assertNull(created.getCategory(), "Category must be null when not selected");
+        assertEquals("Pearls Gone Rogue", created.getCollection());
+
+        // Verify it appears in collection query for the collection page
+        List<Product> collectionProducts = productService.getProductsByCollection("Pearls Gone Rogue");
+        assertTrue(collectionProducts.stream().anyMatch(p -> "Pearls Rogue Solitaire".equals(p.getName())));
     }
 
     @Test

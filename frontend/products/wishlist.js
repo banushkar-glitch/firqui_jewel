@@ -1,10 +1,38 @@
 document.addEventListener("DOMContentLoaded", function () {
 
     const wishlistContainer = document.getElementById("wishlist-items");
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
+    }
+
+    // Badge rendering lives in js/site-nav.js
+    function updateCartBadge() {
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
+    }
+
+    async function syncCartBadge() {
+        updateCartBadge();
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/cart`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Array.isArray(data.items)) {
+                    try {
+                        localStorage.setItem("firquiCart", JSON.stringify(data.items));
+                    } catch (e) {}
+                    updateCartBadge();
+                }
+            }
+        } catch (e) {
+            console.error("Cart sync error:", e);
+        }
     }
 
     function getPrice(priceText) {
@@ -230,7 +258,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (localWishlist.length > 0) {
                 renderWishlist(localWishlist);
             } else {
-                renderLoginRequired();
+                renderWishlist([]);
             }
             return;
         }
@@ -247,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 if (localWishlist.length > 0) {
                     renderWishlist(localWishlist);
                 } else {
-                    renderLoginRequired();
+                    renderWishlist([]);
                 }
                 return;
             }
@@ -321,8 +349,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             wishlistCard.innerHTML = `
                 <div class="wishlist-image">
-                    <img src="${resolvedImg}"
-                         alt="${product.name || 'Product'}"
+                    <img loading="lazy" decoding="async" src="${window.FirquiHtml.escape(resolvedImg)}"
+                         alt="${window.FirquiHtml.escape(product.name || 'Product')}"
                          style="cursor: pointer;"
                          title="View product details"
                          onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${fallbackImg}';}else{this.src='../assets/Logo Pink 1.png';}">
@@ -337,10 +365,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
 
                 <div class="wishlist-details">
-                    <h3 style="cursor: pointer;" title="View product details">${product.name || ''}</h3>
+                    <h3 style="cursor: pointer;" title="View product details">${window.FirquiHtml.escape(product.name || '')}</h3>
 
                     <p class="wishlist-description">
-                        ${product.description || ""}
+                        ${window.FirquiHtml.escape(window.FirquiHtml.text(product.description || ""))}
                     </p>
 
                     <div class="wishlist-bottom">
@@ -450,6 +478,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                     });
                                 }
                                 localStorage.setItem("firquiCart", JSON.stringify(cart));
+                                updateCartBadge();
                             } catch (e) {}
 
                             button.textContent = "Added ✓";
@@ -482,6 +511,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
 
                 localStorage.setItem("firquiCart", JSON.stringify(cart));
+                updateCartBadge();
 
                 button.textContent = "Added ✓";
                 setTimeout(function () {
@@ -517,5 +547,12 @@ document.addEventListener("DOMContentLoaded", function () {
     ========================================= */
 
     fetchWishlist();
+    syncCartBadge();
+
+    window.addEventListener("storage", function (e) {
+        if (e.key === "firquiCart") {
+            updateCartBadge();
+        }
+    });
 
 });

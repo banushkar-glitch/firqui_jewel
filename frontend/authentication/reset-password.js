@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
         // Set Loading State
         setLoading(true);
 
-        const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+        const API_BASE = window.FIRQUI_API_BASE;
 
         try {
             const response = await fetch(`${API_BASE}/api/auth/reset-password`, {

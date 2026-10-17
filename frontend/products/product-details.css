@@ -210,6 +210,7 @@ img {
 }
 
 .header-icon-btn {
+    position: relative;
     width: 32px;
     height: 32px;
 
@@ -229,7 +230,6 @@ img {
     color: var(--cream);
     transform: translateY(-2px);
 }
-
 
 /* =====================================================
    PRODUCT DETAILS SECTION
@@ -794,6 +794,54 @@ img {
 
 .details-content li {
     margin-bottom: 5px;
+}
+
+/* =====================================================
+   PRODUCT SPECIFICATIONS IN DETAILS ACCORDION
+===================================================== */
+.product-specifications-block {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(236, 158, 150, 0.3);
+}
+
+.specs-heading {
+    font-family: var(--font-inter);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    color: var(--cream);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px 18px;
+}
+
+.specs-item {
+    font-family: var(--font-imprima);
+    font-size: 13.5px;
+    color: var(--pink);
+    line-height: 1.5;
+}
+
+.specs-key {
+    font-weight: 600;
+    color: var(--cream);
+    margin-right: 6px;
+}
+
+.specs-val {
+    color: var(--pink);
+}
+
+@media (max-width: 576px) {
+    .specs-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 
@@ -2581,4 +2629,60 @@ img {
         font-size: 10px;
     }
 
+}
+/* Size shown as plain product information */
+.product-size-value {
+    margin: 0;
+    font-family: var(--font-inter);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--cream, #FAF5EE);
+}
+
+/* Until the real product has loaded, show nothing rather than placeholder data */
+.product-details-section.is-loading {
+    visibility: hidden;
+    min-height: 70vh;
+}
+
+.product-unavailable {
+    grid-column: 1 / -1;
+    padding: 80px 16px;
+    text-align: center;
+}
+
+.product-unavailable h1 {
+    margin: 0 0 20px;
+    font-size: clamp(22px, 4vw, 32px);
+    color: var(--cream, #FAF5EE);
+}
+
+.product-unavailable-link {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 999px;
+    background: var(--pink, #EC9E96);
+    color: var(--dark-teal, #0A373B);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.product-availability-note {
+    margin: 0 0 12px;
+    font-size: 14px;
+    color: var(--pink, #EC9E96);
+}
+
+.product-availability-note:empty {
+    display: none;
+}
+
+#addCartButton:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+#productDetailsDesc p,
+#productDescription p {
+    margin: 0 0 8px;
 }

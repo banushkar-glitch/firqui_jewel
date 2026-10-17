@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-auth="admin">
 
 <head>
 
     <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261017d"></script>
 
     <meta
         name="viewport"
@@ -27,9 +28,10 @@
     <!-- ORDER DETAILS CSS -->
     <link
         rel="stylesheet"
-        href="order-details.css"
+        href="order-details.css?v=20261017d"
     >
 
+    <link rel="stylesheet" href="../css/site.css?v=20261017d">
 </head>
 
 
@@ -45,7 +47,7 @@
     <!-- LOGO -->
 
     <a
-        href="../dashboard.html"
+        href="dashboard.html"
         class="header-logo-link"
     >
 
@@ -60,51 +62,83 @@
 
     <!-- NAVIGATION -->
 
-    <nav class="navigation">
-
-        <a
-            href="../dashboard.html"
-            class="nav-link"
+    <nav
+            class="navigation"
+            aria-label="Admin Navigation"
         >
-            Dashboard
-        </a>
 
-        <a
-            href="../products/products.html"
-            class="nav-link"
-        >
-            Products
-        </a>
 
-        <a
-            href="../categories/categories.html"
-            class="nav-link"
-        >
-            Categories
-        </a>
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
 
-        <a
-            href="../collections/collections.html"
-            class="nav-link"
-        >
-            Collections
-        </a>
 
-        <a
-            href="orders.html"
-            class="nav-link"
-        >
-            Orders
-        </a>
+            <span class="nav-dot"></span>
 
-        <a
-            href="cancellation-requests.html"
-            class="nav-link"
-        >
-            Cancellation Requests
-        </a>
 
-    </nav>
+            <a
+                href="products.html"
+                class="nav-link"
+            >
+                Products
+            </a>
+
+
+            
+
+
+    
+
+
+            
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link active"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellations
+            </a>
+
+
+            <span class="nav-dot"></span>
+            <a
+                href="subscribers.html"
+                class="nav-link"
+            >
+                Subscribers
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
+            </a>
+
+
+        </nav>
 
 
     <!-- HEADER ICONS -->
@@ -895,11 +929,11 @@
                     QUICK LINKS
                 </h4>
 
-                <a href="../dashboard.html">
+                <a href="dashboard.html">
                     Dashboard
                 </a>
 
-                <a href="../products/products.html">
+                <a href="products.html">
                     Products
                 </a>
 
@@ -918,11 +952,11 @@
                     MANAGEMENT
                 </h4>
 
-                <a href="../products/add-product.html">
+                <a href="product-form.html">
                     Add Product
                 </a>
 
-                <a href="../products/products.html">
+                <a href="products.html">
                     Product List
                 </a>
 
@@ -1016,9 +1050,10 @@
      JAVASCRIPT
 ========================================================= -->
 
-<script src="order-details.js"></script>
-<script src="admin-search.js"></script>
+<script src="order-details.js?v=20261017d"></script>
+<script src="admin-search.js?v=20261017d"></script>
 
+    <script src="../js/site-nav.js?v=20261017d"></script>
 </body>
 
 </html>

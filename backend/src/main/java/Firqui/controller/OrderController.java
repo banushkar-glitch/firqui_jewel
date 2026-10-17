@@ -32,7 +32,7 @@ public class OrderController {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Authentication required. Please log in to complete your checkout."));
+                    .body(new ApiResponse(false, "Please log in to place your order."));
         }
 
         try {
@@ -127,7 +127,7 @@ public class OrderController {
 
         if (user == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Authentication required. Please log in to complete your order."));
+                    .body(new ApiResponse(false, "Please log in to place your order."));
         }
 
         try {

@@ -5,10 +5,10 @@
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     function requireLogin() {
@@ -327,11 +327,17 @@ document.addEventListener("DOMContentLoaded", () => {
         new URLSearchParams(window.location.search);
 
     const paramId = params.get("id");
-    const paramName = params.get("name");
-    const paramPrice = params.get("price");
-    const paramCategory = params.get("category");
-    const paramImage = params.get("image") || params.get("img");
-    const paramDesc = params.get("description") || params.get("desc");
+    // Only the product id is taken from the link. Name, price, description etc. in the
+    // URL were shown as-is, so a crafted link could display fake prices or run script.
+    const paramName = null;
+    const paramPrice = null;
+    const paramCategory = null;
+    const paramImage = null;
+    const paramDesc = null;
+    const paramGemstone = null;
+    const paramMaterial = null;
+    const paramColor = null;
+    const paramMeasurement = null;
 
     let localProducts = [];
     try {
@@ -403,6 +409,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    // Apply URL parameters if provided
+    if (paramGemstone) product.gemstone = paramGemstone;
+    if (paramMaterial) product.material = paramMaterial;
+    if (paramColor) product.color = paramColor;
+    if (paramMeasurement) {
+        product.measurement = paramMeasurement.split(",").map(s => s.trim()).filter(Boolean);
+    }
+
     let productId =
         String(product.id || paramId || "1");
 
@@ -420,13 +434,20 @@ document.addEventListener("DOMContentLoaded", () => {
         };
     }
 
-    /* Default measurement if not already present */
-    if (!product.measurement) {
-        product.measurement = [
-            "16 inch",
-            "18 inch",
-            "20 inch"
-        ];
+
+    /* Default gemstone if not already present */
+    if (!product.gemstone) {
+        product.gemstone = (product.category && product.category.toLowerCase().includes("pearl")) ? "Freshwater Pearl" : "Moissanite";
+    }
+
+    /* Default material if not already present */
+    if (!product.material) {
+        product.material = "18K Gold Plated";
+    }
+
+    /* Default color if not already present */
+    if (!product.color && !product.productColor) {
+        product.color = "Rose Gold";
     }
 
     /* Normalize price string */
@@ -449,43 +470,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
-       DYNAMIC PRODUCT DETAILS & SIZES HELPERS
+       DYNAMIC PRODUCT DETAILS & SPECIFICATIONS HELPERS
     ===================================================== */
 
     let selectedMeasurement = "";
+    let selectedGemstone = "";
+    let selectedMaterial = "";
+    let selectedColor = "";
+
+    function parseSpecValues(val) {
+        if (!val) return [];
+        if (Array.isArray(val)) {
+            return val.map(s => String(s).trim()).filter(Boolean);
+        }
+        if (typeof val === "string") {
+            return val.split(",").map(s => s.trim()).filter(Boolean);
+        }
+        return [String(val).trim()].filter(Boolean);
+    }
 
     function renderAvailableSizes(prod) {
         const variantOptions =
             document.getElementById("variantOptions");
+        const optionGroup =
+            document.getElementById("productOptionSize");
 
         if (!variantOptions) return;
 
-        let sizes = [];
+        let sizes = parseSpecValues(prod.measurement || prod.measurements);
 
-        if (Array.isArray(prod.measurement)) {
-            sizes =
-                prod.measurement
-                    .map(s => String(s).trim())
-                    .filter(Boolean);
-        } else if (
-            typeof prod.measurement === "string" &&
-            prod.measurement.trim()
-        ) {
-            sizes =
-                prod.measurement
-                    .split(",")
-                    .map(s => s.trim())
-                    .filter(Boolean);
-        }
-
-        variantOptions.innerHTML = "";
+        variantOptions.textContent = "";
 
         if (sizes.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
             selectedMeasurement = "";
             return;
         }
 
-        sizes.forEach((size, idx) => {
+        if (optionGroup) optionGroup.style.display = "";
+
+        // The size is shown as product information; customers do not pick one
+        selectedMeasurement = sizes.join(", ");
+        variantOptions.textContent = selectedMeasurement;
+    }
+
+    function renderGemstoneOptions(prod) {
+        const container =
+            document.getElementById("gemstoneOptions");
+        const optionGroup =
+            document.getElementById("productOptionGemstone");
+
+        if (!container) return;
+
+        let items = parseSpecValues(prod.gemstone);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
+            selectedGemstone = "";
+            return;
+        }
+
+        if (optionGroup) optionGroup.style.display = "";
+
+        items.forEach((item, idx) => {
             const btn =
                 document.createElement("button");
 
@@ -496,26 +545,139 @@ document.addEventListener("DOMContentLoaded", () => {
                 "variant-btn" + (idx === 0 ? " active" : "");
 
             btn.textContent =
-                size;
+                item;
 
             btn.setAttribute(
                 "aria-label",
-                `Size ${size}`
+                `Gemstone ${item}`
             );
 
             btn.addEventListener("click", () => {
-                variantOptions
+                container
                     .querySelectorAll(".variant-btn")
                     .forEach(b => b.classList.remove("active"));
 
                 btn.classList.add("active");
-                selectedMeasurement = size;
+                selectedGemstone = item;
             });
 
-            variantOptions.appendChild(btn);
+            container.appendChild(btn);
         });
 
-        selectedMeasurement = sizes[0] || "";
+        selectedGemstone = items[0] || "";
+    }
+
+    function renderMaterialOptions(prod) {
+        const container =
+            document.getElementById("materialOptions");
+        const optionGroup =
+            document.getElementById("productOptionMaterial");
+
+        if (!container) return;
+
+        let items = parseSpecValues(prod.material);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
+            selectedMaterial = "";
+            return;
+        }
+
+        if (optionGroup) optionGroup.style.display = "";
+
+        items.forEach((item, idx) => {
+            const btn =
+                document.createElement("button");
+
+            btn.type =
+                "button";
+
+            btn.className =
+                "variant-btn" + (idx === 0 ? " active" : "");
+
+            btn.textContent =
+                item;
+
+            btn.setAttribute(
+                "aria-label",
+                `Material ${item}`
+            );
+
+            btn.addEventListener("click", () => {
+                container
+                    .querySelectorAll(".variant-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                btn.classList.add("active");
+                selectedMaterial = item;
+            });
+
+            container.appendChild(btn);
+        });
+
+        selectedMaterial = items[0] || "";
+    }
+
+    function renderColorOptions(prod) {
+        const container =
+            document.getElementById("colorOptions");
+        const optionGroup =
+            document.getElementById("productOptionColor");
+
+        if (!container) return;
+
+        let items = parseSpecValues(prod.color || prod.productColor);
+
+        container.innerHTML = "";
+
+        if (items.length === 0) {
+            if (optionGroup) optionGroup.style.display = "none";
+            selectedColor = "";
+            return;
+        }
+
+        if (optionGroup) optionGroup.style.display = "";
+
+        items.forEach((item, idx) => {
+            const btn =
+                document.createElement("button");
+
+            btn.type =
+                "button";
+
+            btn.className =
+                "variant-btn" + (idx === 0 ? " active" : "");
+
+            btn.textContent =
+                item;
+
+            btn.setAttribute(
+                "aria-label",
+                `Color ${item}`
+            );
+
+            btn.addEventListener("click", () => {
+                container
+                    .querySelectorAll(".variant-btn")
+                    .forEach(b => b.classList.remove("active"));
+
+                btn.classList.add("active");
+                selectedColor = item;
+            });
+
+            container.appendChild(btn);
+        });
+
+        selectedColor = items[0] || "";
+    }
+
+    function renderAllSpecifications(prod) {
+        renderAvailableSizes(prod);
+        renderGemstoneOptions(prod);
+        renderMaterialOptions(prod);
+        renderColorOptions(prod);
     }
 
     function renderProductDetailsAccordion(prod) {
@@ -561,19 +723,19 @@ document.addEventListener("DOMContentLoaded", () => {
             descText !== "null" &&
             descText !== "[object Object]"
         ) {
-            html += `<p id="productDetailsDesc">${descText}</p>`;
+            html += `<div id="productDetailsDesc">${safeRichText(descText)}</div>`;
         }
 
         // If highlights exist, display bullet list
         if (highlightsList.length > 0) {
             html += `<ul id="productDetailsHighlights">`;
             highlightsList.forEach(item => {
-                html += `<li>${item}</li>`;
+                html += `<li>${escapeHtml(item)}</li>`;
             });
             html += `</ul>`;
         }
 
-        // If both are empty: keep empty without broken or undefined text
+        // Set accordion content (description and highlights only)
         detailsContent.innerHTML = html;
     }
 
@@ -621,20 +783,28 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (productDescription) {
-        productDescription.textContent =
-            product.description;
+        productDescription.innerHTML =
+            safeRichText(product.description);
     }
 
-    /* Render Available Sizes & Product Details Accordion */
-    renderAvailableSizes(product);
+    /* Render Available Sizes, Gemstone, Material, Color & Details Accordion */
+    renderAllSpecifications(product);
     renderProductDetailsAccordion(product);
     loadRelatedProducts();
 
-    if (paramId || paramName) {
-        const lookup = paramId || paramName;
-        fetch(`${API_BASE}/api/products/${encodeURIComponent(lookup)}`)
+    const detailsSection = document.querySelector(".product-details-section");
+    if (detailsSection) detailsSection.classList.add("is-loading");
+
+    if (!paramId) {
+        showProductUnavailable("We couldn't find that product.");
+    } else {
+        fetch(`${API_BASE}/api/products/${encodeURIComponent(paramId)}`)
             .then(res => res.ok ? res.json() : null)
             .then(apiData => {
+                if (!apiData || apiData.active === false) {
+                    showProductUnavailable("This piece is no longer available.");
+                    return;
+                }
                 if (apiData) {
                     if (apiData.id) {
                         productId = String(apiData.id);
@@ -655,7 +825,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     if (apiData.description) {
                         product.description = apiData.description;
-                        if (productDescription) productDescription.textContent = product.description;
+                        if (productDescription) productDescription.innerHTML = safeRichText(product.description);
                     }
                     const dynamicImgs = [];
                     if (apiData.mainImage) dynamicImgs.push(resolveImage(apiData.mainImage));
@@ -675,25 +845,86 @@ document.addEventListener("DOMContentLoaded", () => {
                         product.images = dynamicImgs;
                         createThumbnails();
                     }
+                    if (apiData.gemstone) {
+                        product.gemstone = apiData.gemstone;
+                    }
+                    if (apiData.material) {
+                        product.material = apiData.material;
+                    }
+                    if (apiData.color || apiData.productColor) {
+                        product.color = apiData.color || apiData.productColor;
+                    }
                     if (apiData.measurement && apiData.measurement.length > 0) {
                         product.measurement = apiData.measurement;
-                        renderAvailableSizes(product);
                     } else if (apiData.measurements) {
-                        product.measurement = apiData.measurements.split(",").map(s => s.trim()).filter(Boolean);
-                        renderAvailableSizes(product);
+                        product.measurement = Array.isArray(apiData.measurements) ? apiData.measurements : apiData.measurements.split(",").map(s => s.trim()).filter(Boolean);
                     }
                     if (apiData.productDetailsDescription || (apiData.productDetailsHighlights && apiData.productDetailsHighlights.length > 0)) {
                         product.productDetails = {
                             description: apiData.productDetailsDescription,
                             highlights: apiData.productDetailsHighlights
                         };
-                        renderProductDetailsAccordion(product);
                     }
+                    renderAllSpecifications(product);
+                    renderProductDetailsAccordion(product);
+                    applyAvailability(apiData);
                     syncProductWishlist();
                     loadRelatedProducts();
+                    if (detailsSection) detailsSection.classList.remove("is-loading");
                 }
             })
-            .catch(() => {});
+            .catch(() => {
+                showProductUnavailable("We couldn't load this product. Please check your connection and refresh.");
+            });
+    }
+
+    function safeRichText(html) {
+        if (!html) return "";
+        return window.FirquiHtml ? window.FirquiHtml.sanitize(html) : escapeHtml(html);
+    }
+
+    function showProductUnavailable(message) {
+        if (!detailsSection) return;
+        detailsSection.classList.remove("is-loading");
+        detailsSection.innerHTML = `
+            <div class="product-unavailable">
+                <h1>${escapeHtml(message)}</h1>
+                <a href="../index.html#categories" class="product-unavailable-link">Browse the collection</a>
+            </div>`;
+    }
+
+    // In Stock / pre-order / sold out, from the server
+    function applyAvailability(data) {
+        const button = document.getElementById("addCartButton");
+        const label = button ? button.querySelector("span") : null;
+        const stock = Number(data.stockQuantity || 0);
+        const availability = String(data.availability || (stock > 0 ? "In Stock" : "Out of Stock"));
+        let note = document.getElementById("productAvailabilityNote");
+        if (!note && button) {
+            note = document.createElement("p");
+            note.id = "productAvailabilityNote";
+            note.className = "product-availability-note";
+            button.closest(".product-actions").insertAdjacentElement("beforebegin", note);
+        }
+
+        product.availability = availability;
+        if (availability === "Out of Stock" || (availability === "In Stock" && stock <= 0)) {
+            if (button) {
+                button.disabled = true;
+                if (label) label.textContent = "Out of Stock";
+            }
+            if (note) note.textContent = "Currently sold out.";
+        } else if (availability === "Arriving Soon") {
+            if (label) label.textContent = "Pre-order";
+            if (note) {
+                const when = data.restockDate ? new Date(data.restockDate + "T00:00:00") : null;
+                note.textContent = when && !isNaN(when)
+                    ? "Pre-order: ships after " + when.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) + "."
+                    : "Pre-order: ships as soon as it arrives.";
+            }
+        } else if (note) {
+            note.textContent = stock > 0 && stock <= 3 ? "Only " + stock + " left." : "";
+        }
     }
 
 
@@ -781,15 +1012,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (isVid) {
                 thumbnail.innerHTML = `
                     <div style="position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
-                        <video src="${image}#t=0.1" preload="metadata" muted playsinline style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;"></video>
+                        <video src="${escapeHtml(image)}#t=0.1" preload="metadata" muted playsinline style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;"></video>
                         <span style="position: absolute; bottom: 3px; right: 3px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; border-radius: 3px; padding: 1px 4px; z-index: 2;"><i class="fa-solid fa-video"></i></span>
                     </div>
                 `;
             } else {
                 thumbnail.innerHTML = `
                     <img
-                        src="${image}"
-                        alt="${product.name} image ${index + 1}"
+                        src="${escapeHtml(image)}"
+                        alt="${escapeHtml(product.name)} image ${index + 1}"
                     >
                 `;
             }
@@ -939,33 +1170,35 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Local wishlist cache error:", e);
         }
 
-        if (willBeActive) {
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        productId: String(productId),
-                        name: product.name,
-                        description: product.description,
-                        price: product.price,
-                        image: (product.images && product.images[0]) || ""
-                    })
-                });
-            } catch (e) {
-                console.error("Add wishlist error:", e);
-            }
-        } else {
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(product.name)}`, {
-                    method: "DELETE",
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-            } catch (e) {
-                console.error("Remove wishlist error:", e);
+        if (token) {
+            if (willBeActive) {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            productId: String(productId),
+                            name: product.name,
+                            description: product.description,
+                            price: product.price,
+                            image: (product.images && product.images[0]) || ""
+                        })
+                    });
+                } catch (e) {
+                    console.error("Add wishlist error:", e);
+                }
+            } else {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(product.name)}`, {
+                        method: "DELETE",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                } catch (e) {
+                    console.error("Remove wishlist error:", e);
+                }
             }
         }
     }
@@ -1060,6 +1293,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     /* =====================================================
+       CART BADGE COUNTER
+    ===================================================== */
+
+    // Badge rendering lives in js/site-nav.js
+    function updateCartBadge() {
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
+    }
+
+    async function syncCartBadge() {
+        updateCartBadge();
+
+        const token = getToken();
+        if (!token) return;
+
+        try {
+            const res = await fetch(`${API_BASE}/api/cart`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data && Array.isArray(data.items)) {
+                    try {
+                        localStorage.setItem("firquiCart", JSON.stringify(data.items));
+                    } catch (err) {}
+                    updateCartBadge();
+                }
+            }
+        } catch (err) {
+            // Keep local count on fetch error
+        }
+    }
+
+    syncCartBadge();
+
+    window.addEventListener("storage", (e) => {
+        if (e.key === "firquiCart") {
+            updateCartBadge();
+        }
+    });
+
+    /* =====================================================
        ADD TO CART BACKEND INTEGRATION
     ===================================================== */
 
@@ -1075,17 +1352,15 @@ document.addEventListener("DOMContentLoaded", () => {
             "click",
             async () => {
 
-                const token = getToken();
-                if (!token) {
-                    requireLogin();
-                    return;
-                }
-
+                // Save to local cart cache and update badge immediately
                 try {
                     let localC = JSON.parse(localStorage.getItem("firquiCart") || "[]");
                     const existing = localC.find(i =>
                         i.name === product.name &&
-                        (i.measurement || i.size || "") === (selectedMeasurement || "")
+                        (i.measurement || i.size || "") === (selectedMeasurement || "") &&
+                        (i.gemstone || "") === (selectedGemstone || "") &&
+                        (i.material || "") === (selectedMaterial || "") &&
+                        (i.color || "") === (selectedColor || "")
                     );
                     if (existing) {
                         existing.quantity = (existing.quantity || 1) + quantity;
@@ -1097,33 +1372,47 @@ document.addEventListener("DOMContentLoaded", () => {
                             description: product.description,
                             measurement: selectedMeasurement || "",
                             size: selectedMeasurement || "",
+                            gemstone: selectedGemstone || "",
+                            material: selectedMaterial || "",
+                            color: selectedColor || "",
                             image: (product.images && product.images[0]) || "",
                             quantity: quantity
                         });
                     }
                     localStorage.setItem("firquiCart", JSON.stringify(localC));
+                    updateCartBadge();
                 } catch (e) {
                     console.error("Local cart cache error:", e);
                 }
 
-                try {
-                    await fetch(`${API_BASE}/api/cart/items`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${token}`
-                        },
-                        body: JSON.stringify({
-                            productId: String(productId),
-                            name: product.name,
-                            description: product.description + (selectedMeasurement ? ` (Size: ${selectedMeasurement})` : ""),
-                            price: product.price,
-                            image: (product.images && product.images[0]) || "",
-                            quantity: quantity
-                        })
-                    });
-                } catch (e) {
-                    console.error("Add to cart error:", e);
+                const token = getToken();
+                if (token) {
+                    try {
+                        let descDetails = [];
+                        if (selectedMeasurement) descDetails.push(`Size: ${selectedMeasurement}`);
+                        if (selectedGemstone) descDetails.push(`Gemstone: ${selectedGemstone}`);
+                        if (selectedMaterial) descDetails.push(`Material: ${selectedMaterial}`);
+                        if (selectedColor) descDetails.push(`Color: ${selectedColor}`);
+                        const fullDesc = product.description + (descDetails.length > 0 ? ` (${descDetails.join(", ")})` : "");
+
+                        await fetch(`${API_BASE}/api/cart/items`, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "Authorization": `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                productId: String(productId),
+                                name: product.name,
+                                description: fullDesc,
+                                price: product.price,
+                                image: (product.images && product.images[0]) || "",
+                                quantity: quantity
+                            })
+                        });
+                    } catch (e) {
+                        console.error("Add to cart error:", e);
+                    }
                 }
 
                 const originalHTML =
@@ -1454,12 +1743,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon.classList.remove("fa-solid");
                 icon.classList.add("fa-regular");
             }
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(relName)}`, {
-                    method: "DELETE",
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-            } catch (_) {}
+            if (token) {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(relName)}`, {
+                        method: "DELETE",
+                        headers: { "Authorization": `Bearer ${token}` }
+                    });
+                } catch (_) {}
+            }
         } else {
             localW.push({
                 id: relId,
@@ -1475,22 +1766,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 icon.classList.remove("fa-regular");
                 icon.classList.add("fa-solid");
             }
-            try {
-                await fetch(`${API_BASE}/api/wishlist/items`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify({
-                        productId: relId,
-                        name: relName,
-                        description: relDesc,
-                        price: relPrice,
-                        image: relImg
-                    })
-                });
-            } catch (_) {}
+            if (token) {
+                try {
+                    await fetch(`${API_BASE}/api/wishlist/items`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            productId: relId,
+                            name: relName,
+                            description: relDesc,
+                            price: relPrice,
+                            image: relImg
+                        })
+                    });
+                } catch (_) {}
+            }
         }
     }
 
@@ -1519,7 +1812,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (isVid) {
                     mediaHtml = `<video src="${imgSrc}" autoplay muted loop playsinline onerror="this.style.display='none';" style="width:100%;height:100%;object-fit:cover;"></video>`;
                 } else {
-                    mediaHtml = `<img src="${imgSrc}" alt="${escapeHtml(relName)}" onerror="this.style.display='none';">`;
+                    mediaHtml = `<img loading="lazy" decoding="async" src="${imgSrc}" alt="${escapeHtml(relName)}" onerror="this.style.display='none';">`;
                 }
             }
 

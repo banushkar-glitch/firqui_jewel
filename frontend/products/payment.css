@@ -1120,3 +1120,68 @@ body {
         text-align: center;
     }
 }
+
+/* =========================================================
+   DYNAMIC UPI QR (amount fixed by the server)
+========================================================= */
+
+.qr-amount {
+    margin: 0 0 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0A373B;
+    text-align: center;
+}
+
+.qr-image[hidden],
+.qr-status[hidden],
+.upi-app-btn[hidden] {
+    display: none !important;
+}
+
+.qr-status {
+    padding: 0 12px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: #4A5656;
+    text-align: center;
+}
+
+.qr-status.is-error {
+    color: #C0392B;
+}
+
+.upi-id-box .upi-id-label {
+    margin: 0;
+    text-transform: none;
+    letter-spacing: 0;
+    text-align: center;
+}
+
+.upi-id-box .upi-id-text {
+    padding: 2px 8px;
+    font-size: 0.95rem;
+}
+
+/* Opening a UPI app from a link only works on phones */
+.upi-app-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 50px;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    background: #0A373B;
+    color: #FAF5EE;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .upi-app-btn {
+        display: inline-flex;
+    }
+}

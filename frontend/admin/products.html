@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-auth="admin">
 
 <head>
 
     <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261017d"></script>
 
     <meta
         name="viewport"
@@ -48,7 +49,7 @@
 
     <link
         rel="stylesheet"
-        href="dashboard.css"
+        href="dashboard.css?v=20261017d"
     >
 
 
@@ -58,9 +59,10 @@
 
     <link
         rel="stylesheet"
-        href="products.css"
+        href="products.css?v=20261017d"
     >
 
+    <link rel="stylesheet" href="../css/site.css?v=20261017d">
 </head>
 
 
@@ -124,27 +126,13 @@
             </a>
 
 
-            <span class="nav-dot"></span>
+            
 
 
-            <a
-                href="categories/categories.html"
-                class="nav-link"
-            >
-                Categories
-            </a>
+    
 
 
-            <span class="nav-dot"></span>
-
-
-            <a
-                href="collections/collections.html"
-                class="nav-link"
-            >
-                Collections
-            </a>
-
+            
 
             <span class="nav-dot"></span>
 
@@ -154,6 +142,38 @@
                 class="nav-link"
             >
                 Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellations
+            </a>
+
+
+            <span class="nav-dot"></span>
+            <a
+                href="subscribers.html"
+                class="nav-link"
+            >
+                Subscribers
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
             </a>
 
 
@@ -295,7 +315,7 @@
 
 
                     <a
-                        href="add-product.html"
+                        href="product-form.html"
                         class="add-product-btn"
                     >
 
@@ -358,8 +378,8 @@
                                 All Categories
                             </option>
 
-                            <option value="Bracelets & Cuffs">
-                                Bracelets & Cuffs
+                            <option value="Rings">
+                                Rings
                             </option>
 
                             <option value="Necklaces">
@@ -370,12 +390,12 @@
                                 Earrings
                             </option>
 
-                            <option value="Rings">
-                                Rings
+                            <option value="Brooches">
+                                Brooches
                             </option>
 
-                            <option value="Bangles">
-                                Bangles
+                            <option value="Bracelets & Cuffs">
+                                Bracelets & Cuffs
                             </option>
 
                         </select>
@@ -398,20 +418,8 @@
                                 All Collections
                             </option>
 
-                            <option value="Signature">
-                                Signature
-                            </option>
-
-                            <option value="Pearl Collection">
-                                Pearl Collection
-                            </option>
-
-                            <option value="Rose Collection">
-                                Rose Collection
-                            </option>
-
-                            <option value="Classic Collection">
-                                Classic Collection
+                            <option value="Pearls Gone Rogue">
+                                Pearls Gone Rogue
                             </option>
 
                         </select>
@@ -606,7 +614,7 @@
                         <!-- ADD PRODUCT -->
 
                         <a
-                            href="add-product.html"
+                            href="product-form.html"
                             class="quick-action-card"
                         >
 
@@ -637,7 +645,7 @@
                         <!-- CATEGORIES -->
 
                         <a
-                            href="categories/categories.html"
+                            href="products.html"
                             class="quick-action-card"
                         >
 
@@ -654,7 +662,7 @@
                                 </h3>
 
                                 <p>
-                                    Manage product categories
+                                    Browse products by category
                                 </p>
 
                             </div>
@@ -668,7 +676,7 @@
                         <!-- COLLECTIONS -->
 
                         <a
-                            href="collections/collections.html"
+                            href="products.html"
                             class="quick-action-card"
                         >
 
@@ -685,7 +693,7 @@
                                 </h3>
 
                                 <p>
-                                    Manage jewellery collections
+                                    Browse products by collection
                                 </p>
 
                             </div>
@@ -1014,10 +1022,11 @@
      PRODUCTS JAVASCRIPT
 ====================================================== -->
 
-<script src="products.js"></script>
-<script src="admin-search.js"></script>
+<script src="products.js?v=20261017d"></script>
+<script src="admin-search.js?v=20261017d"></script>
 
 
+    <script src="../js/site-nav.js?v=20261017d"></script>
 </body>
 
 </html>

@@ -1,15 +1,17 @@
+
 /* =====================================================
    FIRQUI JEWELS - EARRINGS PAGE
    DYNAMIC POSTGRESQL PRODUCT INTEGRATION
+   TWO-LINE DESCRIPTION + READ MORE
 ===================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
     const CATEGORY = "EARRINGS";
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     function requireLogin() {
@@ -27,28 +29,62 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/'/g, "&#039;");
     }
 
+    // Strip HTML tags and decode HTML entities so only pure admin text is shown
+    // Plain text of the admin description; parsed in an inert document so nothing in it can run
+    function cleanProductDescription(description) {
+        return description ? window.FirquiHtml.text(description) : "";
+    }
+
     function resolveImage(img) {
         if (!img) return "../assets/FE1007 Ice Cream Earrings.png";
-        if (img.startsWith("data:") || img.startsWith("http://") || img.startsWith("https://")) return img;
-        if (img.startsWith("/uploads/")) return API_BASE ? (API_BASE + img) : img;
-        if (img.startsWith("uploads/")) return API_BASE ? (API_BASE + "/" + img) : ("/" + img);
-        if (img.startsWith("../assets/")) return img;
-        if (img.startsWith("../../assets/")) return img.substring(3);
-        if (img.startsWith("assets/")) return "../" + img;
-        if (img.startsWith("/assets/")) return ".." + img;
-        return img;
+        let clean = String(img).trim().replace(/\\/g, "/");
+        if (clean.startsWith("data:") || clean.startsWith("http://") || clean.startsWith("https://")) return clean;
+        if (clean.startsWith("/uploads/")) return API_BASE ? (API_BASE + clean) : clean;
+        if (clean.startsWith("uploads/")) return API_BASE ? (API_BASE + "/" + clean) : ("/" + clean);
+        if (clean.startsWith("../assets/")) return clean;
+        if (clean.startsWith("../../assets/")) return clean.substring(3);
+        if (clean.startsWith("assets/")) return "../" + clean;
+        if (clean.startsWith("/assets/")) return ".." + clean;
+        return clean;
     }
 
     function detectMediaType(url) {
         if (!url) return "image";
         const clean = url.trim().toLowerCase();
-        if (clean.includes(".mp4") || clean.includes(".webm") || clean.startsWith("data:video/") || clean.includes("video/mp4") || clean.includes("video/webm")) {
+
+        if (
+            clean.includes(".mp4") ||
+            clean.includes(".webm") ||
+            clean.startsWith("data:video/") ||
+            clean.includes("video/mp4") ||
+            clean.includes("video/webm")
+        ) {
             return "video";
         }
+
         return "image";
     }
 
     const grid = document.querySelector(".products-grid");
+
+    // Capture any static card customizations from earrings.html before API fetch/rendering
+    const staticCardOverrides = new Map();
+    document.querySelectorAll(".product-card").forEach((card, index) => {
+        const h3 = card.querySelector("h3")?.textContent.trim();
+        const imgEl = card.querySelector("img");
+        const rawSrc = imgEl?.getAttribute("src")?.trim();
+        const descEl = card.querySelector(".product-description, .description, p");
+        const rawDesc = descEl?.textContent?.trim();
+
+        if (h3) {
+            const data = {
+                src: rawSrc ? rawSrc.replace(/\\/g, "/") : "",
+                desc: rawDesc || ""
+            };
+            staticCardOverrides.set(h3.toLowerCase(), data);
+            staticCardOverrides.set(`earring-${index + 1}`, data);
+        }
+    });
 
     /* =====================================================
        RENDER DYNAMIC PRODUCT CARDS
@@ -65,25 +101,54 @@ document.addEventListener("DOMContentLoaded", () => {
             card.dataset.id = product.id || product.legacyId || `earring-${index + 1}`;
             card.style.cursor = "pointer";
 
-            const imgSrc = resolveImage(product.mainImage || (product.images && product.images[0]));
+            const prodName = (product.name || "").trim().toLowerCase();
+            const legacyKey = String(product.legacyId || product.id || `earring-${index + 1}`).toLowerCase();
+            const override = staticCardOverrides.get(prodName) || staticCardOverrides.get(legacyKey);
+
+            let mainImage = product.mainImage || (product.images && product.images[0]);
+            let description = cleanProductDescription(product.description);
+
+            // If earrings.html has a customized image or description for this card, prioritize it!
+            if (override && override.src) {
+                mainImage = override.src;
+            }
+            if (override && override.desc && override.desc.length > 20) {
+                description = cleanProductDescription(override.desc);
+            }
+
+            const imgSrc = resolveImage(mainImage);
+
             const priceFormatted = Number(product.price || 0).toLocaleString("en-IN");
-            const isVid = (product.mainMediaType === "video") || (detectMediaType(imgSrc) === "video");
+            const isVid =
+                product.mainMediaType === "video" ||
+                detectMediaType(imgSrc) === "video";
 
             const mediaHtml = isVid
-                ? `<video src="${imgSrc}" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
-                : `<img src="${imgSrc}" alt="${escapeHtml(product.name)}" onerror="this.src='../assets/FE1007 Ice Cream Earrings.png'">`;
+                ? `<video src="${escapeHtml(imgSrc)}" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
+                : `<img loading="lazy" decoding="async" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(product.name)}" onerror="this.onerror=null;this.src='../assets/FE1007 Ice Cream Earrings.png'">`;
 
             card.innerHTML = `
                 <div class="product-image">
                     ${mediaHtml}
-                    ${isVid ? '<span style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.65);color:#fff;font-size:11px;padding:2px 6px;border-radius:4px;z-index:2;"><i class="fa-solid fa-video"></i></span>' : ''}
+
+                    ${isVid ? `
+                        <span style="position:absolute;bottom:8px;left:8px;background:rgba(0,0,0,0.65);color:#fff;font-size:11px;padding:2px 6px;border-radius:4px;z-index:2;">
+                            <i class="fa-solid fa-video"></i>
+                        </span>
+                    ` : ""}
+
                     <button class="wishlist-btn" aria-label="Add ${escapeHtml(product.name)} to wishlist">
                         <i class="fa-regular fa-heart"></i>
                     </button>
                 </div>
+
                 <div class="product-info">
                     <h3>${escapeHtml(product.name)}</h3>
-                    <p>${escapeHtml(product.description || "")}</p>
+
+                    <p class="product-description">${escapeHtml(description)}</p>
+
+                    ${description ? `<a href="#" class="read-more-link">Read more</a>` : ""}
+
                     <div class="product-bottom">
                         <span class="price">₹${priceFormatted}</span>
                         <button class="add-cart">Add to Cart</button>
@@ -91,7 +156,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 </div>
             `;
 
-            attachCardListeners(card, product);
+            attachCardListeners(card, {
+                ...product,
+                mainImage: imgSrc,
+                description: description
+            });
             grid.appendChild(card);
         });
 
@@ -106,16 +175,18 @@ document.addEventListener("DOMContentLoaded", () => {
     function attachCardListeners(card, product) {
         const pId = String(product.id || product.legacyId || "");
         const pName = product.name || "Product";
-        const pPrice = product.price !== undefined ? `₹${Number(product.price).toLocaleString("en-IN")}` : "₹0";
-        const pDesc = product.description || "";
-        const pImg = resolveImage(product.mainImage || (product.images && product.images[0]));
 
-        // Card navigation to details
-        card.addEventListener("click", (e) => {
-            if (e.target.closest(".wishlist-btn") || e.target.closest(".add-cart") || e.target.closest("button")) {
-                return;
-            }
+        const pPrice = product.price !== undefined
+            ? `₹${Number(product.price).toLocaleString("en-IN")}`
+            : "₹0";
 
+        const pDesc = cleanProductDescription(product.description);
+        const pImg = resolveImage(
+            product.mainImage || (product.images && product.images[0])
+        );
+
+        // Open the existing product details page
+        function openProductDetails() {
             const query = new URLSearchParams({
                 id: pId,
                 name: pName,
@@ -126,19 +197,47 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             window.location.href = `product-details.html?${query.toString()}`;
+        }
+
+        // Clicking the card opens product details
+        card.addEventListener("click", (e) => {
+            if (
+                e.target.closest(".wishlist-btn") ||
+                e.target.closest(".add-cart") ||
+                e.target.closest(".read-more-link") ||
+                e.target.closest("button")
+            ) {
+                return;
+            }
+
+            openProductDetails();
         });
+
+        // Read more opens product details with the full description
+        const readMoreLink = card.querySelector(".read-more-link");
+
+        if (readMoreLink) {
+            readMoreLink.addEventListener("click", (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                openProductDetails();
+            });
+        }
 
         // Wishlist button
         const wishlistBtn = card.querySelector(".wishlist-btn");
+
         if (wishlistBtn) {
             wishlistBtn.addEventListener("click", async (e) => {
                 e.stopPropagation();
+
                 const token = getToken();
                 const willBeActive = !wishlistBtn.classList.contains("active");
                 const icon = wishlistBtn.querySelector("i");
 
                 if (willBeActive) {
                     wishlistBtn.classList.add("active");
+
                     if (icon) {
                         icon.classList.remove("fa-regular");
                         icon.classList.add("fa-solid");
@@ -165,13 +264,27 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     }
 
-                    let wishlist = JSON.parse(localStorage.getItem("firquiWishlist")) || [];
+                    let wishlist = JSON.parse(
+                        localStorage.getItem("firquiWishlist") || "[]"
+                    );
+
                     if (!wishlist.some(item => item.name === pName)) {
-                        wishlist.push({ productId: pId, name: pName, description: pDesc, price: pPrice, image: pImg });
-                        try { localStorage.setItem("firquiWishlist", JSON.stringify(wishlist)); } catch (e) {}
+                        wishlist.push({
+                            productId: pId,
+                            name: pName,
+                            description: pDesc,
+                            price: pPrice,
+                            image: pImg
+                        });
+
+                        try {
+                            localStorage.setItem("firquiWishlist", JSON.stringify(wishlist));
+                        } catch (err) {}
                     }
+
                 } else {
                     wishlistBtn.classList.remove("active");
+
                     if (icon) {
                         icon.classList.remove("fa-solid");
                         icon.classList.add("fa-regular");
@@ -179,27 +292,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (token) {
                         try {
-                            await fetch(`${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(pName)}`, {
-                                method: "DELETE",
-                                headers: { "Authorization": `Bearer ${token}` }
-                            });
+                            await fetch(
+                                `${API_BASE}/api/wishlist/items/by-name?name=${encodeURIComponent(pName)}`,
+                                {
+                                    method: "DELETE",
+                                    headers: {
+                                        "Authorization": `Bearer ${token}`
+                                    }
+                                }
+                            );
                         } catch (err) {
                             console.error("Remove wishlist error:", err);
                         }
                     }
 
-                    let wishlist = JSON.parse(localStorage.getItem("firquiWishlist")) || [];
+                    let wishlist = JSON.parse(
+                        localStorage.getItem("firquiWishlist") || "[]"
+                    );
+
                     wishlist = wishlist.filter(item => item.name !== pName);
-                    try { localStorage.setItem("firquiWishlist", JSON.stringify(wishlist)); } catch (e) {}
+
+                    try {
+                        localStorage.setItem("firquiWishlist", JSON.stringify(wishlist));
+                    } catch (err) {}
                 }
             });
         }
 
         // Add to Cart button
         const cartBtn = card.querySelector(".add-cart");
+
         if (cartBtn) {
             cartBtn.addEventListener("click", async (e) => {
                 e.stopPropagation();
+
                 const token = getToken();
 
                 if (token) {
@@ -224,8 +350,16 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
 
-                let localCart = JSON.parse(localStorage.getItem("firquiCart")) || [];
-                const existing = localCart.find(i => (pId && String(i.productId) === pId) || i.name === pName);
+                let localCart = JSON.parse(
+                    localStorage.getItem("firquiCart") || "[]"
+                );
+
+                const existing = localCart.find(
+                    item =>
+                        (pId && String(item.productId) === pId) ||
+                        item.name === pName
+                );
+
                 if (existing) {
                     existing.quantity = (existing.quantity || 1) + 1;
                 } else {
@@ -238,9 +372,14 @@ document.addEventListener("DOMContentLoaded", () => {
                         quantity: 1
                     });
                 }
-                try { localStorage.setItem("firquiCart", JSON.stringify(localCart)); } catch (e) {}
+
+                try {
+                    localStorage.setItem("firquiCart", JSON.stringify(localCart));
+                    updateCartBadge();
+                } catch (err) {}
 
                 cartBtn.textContent = "Added ✓";
+
                 setTimeout(() => {
                     cartBtn.textContent = "Add to Cart";
                 }, 1500);
@@ -254,26 +393,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function syncWishlist() {
         const token = getToken();
-        let items = JSON.parse(localStorage.getItem("firquiWishlist")) || [];
+        let items = JSON.parse(
+            localStorage.getItem("firquiWishlist") || "[]"
+        );
 
         if (token) {
             try {
                 const res = await fetch(`${API_BASE}/api/wishlist`, {
-                    headers: { "Authorization": `Bearer ${token}` }
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
                 });
+
                 if (res.ok) {
                     const data = await res.json();
+
                     if (data && Array.isArray(data.items)) {
                         items = data.items;
-                        try { localStorage.setItem("firquiWishlist", JSON.stringify(items)); } catch (e) {}
+
+                        try {
+                            localStorage.setItem("firquiWishlist", JSON.stringify(items));
+                        } catch (err) {}
                     }
                 }
-            } catch (e) {
-                console.error("Wishlist sync error:", e);
+            } catch (err) {
+                console.error("Wishlist sync error:", err);
             }
         }
 
-        document.querySelectorAll(".wishlist-btn").forEach((button) => {
+        document.querySelectorAll(".wishlist-btn").forEach(button => {
             const card = button.closest(".product-card");
             const name = card?.querySelector("h3")?.textContent.trim();
             const icon = button.querySelector("i");
@@ -281,12 +429,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (isIn) {
                 button.classList.add("active");
+
                 if (icon) {
                     icon.classList.remove("fa-regular");
                     icon.classList.add("fa-solid");
                 }
             } else {
                 button.classList.remove("active");
+
                 if (icon) {
                     icon.classList.remove("fa-solid");
                     icon.classList.add("fa-regular");
@@ -295,22 +445,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    // Badge rendering lives in js/site-nav.js
+    function updateCartBadge() {
+        if (window.FirquiCartBadge) window.FirquiCartBadge.update();
+    }
+
     async function syncCart() {
+        updateCartBadge();
         const token = getToken();
         if (!token) return;
 
         try {
             const res = await fetch(`${API_BASE}/api/cart`, {
-                headers: { "Authorization": `Bearer ${token}` }
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
             });
+
             if (res.ok) {
                 const data = await res.json();
+
                 if (data && Array.isArray(data.items)) {
-                    try { localStorage.setItem("firquiCart", JSON.stringify(data.items)); } catch (e) {}
+                    try {
+                        localStorage.setItem("firquiCart", JSON.stringify(data.items));
+                    } catch (err) {}
+                    updateCartBadge();
                 }
             }
-        } catch (e) {
-            console.error("Cart sync error:", e);
+        } catch (err) {
+            console.error("Cart sync error:", err);
         }
     }
 
@@ -320,37 +483,78 @@ document.addEventListener("DOMContentLoaded", () => {
 
     async function loadProducts() {
         try {
-            let res = await fetch(`${API_BASE}/api/products/category/${CATEGORY}`);
+            let res = await fetch(
+                `${API_BASE}/api/products/category/${CATEGORY}`
+            );
+
             if (res.ok) {
                 const list = await res.json();
+
                 if (Array.isArray(list) && list.length > 0) {
                     renderProducts(list);
                     return;
                 }
             }
 
-            // Fallback: fetch all and filter
-            let allRes = await fetch(`${API_BASE}/api/products`);
+            // Fallback: fetch all products and filter earrings
+            const allRes = await fetch(`${API_BASE}/api/products`);
+
             if (allRes.ok) {
                 const allList = await allRes.json();
+
                 if (Array.isArray(allList) && allList.length > 0) {
-                    const filtered = allList.filter(p => (p.category || "").toUpperCase().includes("EARRING"));
+                    const filtered = allList.filter(
+                        product =>
+                            (product.category || "").toUpperCase().includes("EARRING")
+                    );
+
                     if (filtered.length > 0) {
                         renderProducts(filtered);
                         return;
                     }
                 }
             }
-        } catch (e) {
-            console.warn("Backend products fetch offline, falling back to existing cards:", e);
+        } catch (err) {
+            console.warn(
+                "Backend products fetch offline, using existing cards:",
+                err
+            );
         }
 
-        // Fallback: wire existing static cards if API is unavailable
+        // Fallback: use existing static HTML product cards
         document.querySelectorAll(".product-card").forEach((card, index) => {
-            const name = card.querySelector("h3")?.textContent.trim() || "Earrings";
-            const price = card.querySelector(".price")?.textContent.trim() || "₹1,499";
-            const desc = card.querySelector(".product-description, .description, p")?.textContent.trim() || "";
-            const img = card.querySelector("img")?.getAttribute("src") || "";
+            const name =
+                card.querySelector("h3")?.textContent.trim() || "Earrings";
+
+            const price =
+                card.querySelector(".price")?.textContent.trim() || "₹1,499";
+
+            const descEl = card.querySelector(
+                ".product-description, .description, p"
+            );
+
+            const desc = cleanProductDescription(descEl?.textContent || "");
+
+            if (descEl) {
+                descEl.className = "product-description";
+                descEl.textContent = desc;
+
+                if (desc && !card.querySelector(".read-more-link")) {
+                    const readMore = document.createElement("a");
+                    readMore.href = "#";
+                    readMore.className = "read-more-link";
+                    readMore.textContent = "Read more";
+                    descEl.after(readMore);
+                }
+            }
+
+            const img =
+                card.querySelector("img")?.getAttribute("src") || "";
+
+            // Avoid adding duplicate listeners if fallback runs again
+            if (card.dataset.listenersAttached === "true") return;
+
+            card.dataset.listenersAttached = "true";
 
             attachCardListeners(card, {
                 id: `earring-${index + 1}`,
@@ -363,7 +567,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
         syncWishlist();
         syncCart();
+        updateCartBadge();
     }
+
+    window.addEventListener("storage", (e) => {
+        if (e.key === "firquiCart") {
+            updateCartBadge();
+        }
+    });
 
     loadProducts();
 
@@ -371,14 +582,18 @@ document.addEventListener("DOMContentLoaded", () => {
        HEADER / NAV INTERACTIONS
     ===================================================== */
 
-    const wishlistHeaderButton = document.getElementById("wishlistHeaderButton");
+    const wishlistHeaderButton =
+        document.getElementById("wishlistHeaderButton");
+
     if (wishlistHeaderButton) {
         wishlistHeaderButton.addEventListener("click", () => {
             window.location.href = "wishlist.html";
         });
     }
 
-    const cartHeaderButton = document.getElementById("cartHeaderButton");
+    const cartHeaderButton =
+        document.getElementById("cartHeaderButton");
+
     if (cartHeaderButton) {
         cartHeaderButton.addEventListener("click", () => {
             window.location.href = "cart.html";
@@ -386,9 +601,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const searchButton = document.getElementById("searchButton");
+
     if (searchButton) {
-        searchButton.addEventListener("click", (e) => {
+        searchButton.addEventListener("click", e => {
             e.preventDefault();
+
             if (window.FirquiSearch) {
                 window.FirquiSearch.open();
             }
@@ -396,16 +613,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const newsletterForm = document.getElementById("newsletterForm");
-    const newsletterEmail = document.getElementById("newsletterEmail");
+    const newsletterEmail =
+        document.getElementById("newsletterEmail") ||
+        document.querySelector(".newsletter-input");
+
     const newsletterMsg = document.getElementById("newsletterMsg");
+
     if (newsletterForm) {
-        newsletterForm.addEventListener("submit", (event) => {
+        newsletterForm.addEventListener("submit", event => {
             event.preventDefault();
-            if (!newsletterEmail.value.trim()) return;
-            newsletterMsg.textContent = "Thank you for subscribing!";
+
+            if (!newsletterEmail || !newsletterEmail.value.trim()) return;
+
+            if (newsletterMsg) {
+                newsletterMsg.textContent = "Thank you for subscribing!";
+            }
+
             newsletterEmail.value = "";
+
             setTimeout(() => {
-                newsletterMsg.textContent = "";
+                if (newsletterMsg) newsletterMsg.textContent = "";
             }, 3000);
         });
     }

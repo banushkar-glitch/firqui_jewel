@@ -222,7 +222,13 @@ document.addEventListener("DOMContentLoaded", () => {
             `translateX(-${step}px)`;
 
 
-        const handleTransitionEnd = () => {
+        let finished = false;
+
+        const handleTransitionEnd = (e) => {
+
+            // transitionend bubbles up from the slides' own transitions; only the track's counts
+            if (finished || (e && e.target !== track)) return;
+            finished = true;
 
             track.removeEventListener(
                 "transitionend",
@@ -258,21 +264,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         track.addEventListener(
             "transitionend",
-            handleTransitionEnd,
-            { once: true }
+            handleTransitionEnd
         );
 
 
         // Fallback in case transitionend does not fire
-        setTimeout(() => {
-
-            if (isAnimating) {
-
-                handleTransitionEnd();
-
-            }
-
-        }, 700);
+        setTimeout(() => handleTransitionEnd(), 700);
     }
 
 
@@ -326,7 +323,13 @@ document.addEventListener("DOMContentLoaded", () => {
         track.style.transform = "translateX(0)";
 
 
-        const handleTransitionEnd = () => {
+        let finished = false;
+
+        const handleTransitionEnd = (e) => {
+
+            // transitionend bubbles up from the slides' own transitions; only the track's counts
+            if (finished || (e && e.target !== track)) return;
+            finished = true;
 
             track.removeEventListener(
                 "transitionend",
@@ -351,21 +354,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         track.addEventListener(
             "transitionend",
-            handleTransitionEnd,
-            { once: true }
+            handleTransitionEnd
         );
 
 
         // Fallback
-        setTimeout(() => {
-
-            if (isAnimating) {
-
-                handleTransitionEnd();
-
-            }
-
-        }, 700);
+        setTimeout(() => handleTransitionEnd(), 700);
     }
 
 
@@ -899,7 +893,7 @@ document.addEventListener(
 
                 event.preventDefault();
 
-                const token = localStorage.getItem("firqui_token");
+                const token = window.FirquiAuth.token();
 
                 // If already logged in, navigate directly to profile
                 if (token) {
@@ -1033,7 +1027,7 @@ document.addEventListener(
         );
 
         /* =====================================================
-           CART & WISHLIST NAVIGATION
+           CART & WISHLIST NAVIGATION & BADGE
         ====================================================== */
         const headerWishlistBtn = document.querySelector('.header-icons [aria-label="Wishlist"]');
         if (headerWishlistBtn) {
@@ -1060,6 +1054,9 @@ document.addEventListener(
 window.addEventListener(
     "message",
     function (event) {
+
+        // Only the site's own login/register pages may switch the pop-up
+        if (event.origin !== window.location.origin) return;
 
         if (
             event.data &&
@@ -1092,6 +1089,9 @@ window.addEventListener(
 window.addEventListener(
     "message",
     function (event) {
+
+        // Only the site's own login/register pages may switch the pop-up
+        if (event.origin !== window.location.origin) return;
 
         if (
             event.data &&

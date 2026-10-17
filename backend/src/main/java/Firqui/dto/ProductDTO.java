@@ -40,6 +40,7 @@ public class ProductDTO {
     private Double discount;
     private String productName;
     private Boolean active = true;
+    private String status;
     private Boolean featured = false;
     private Boolean newArrival = false;
 
@@ -349,5 +350,13 @@ public class ProductDTO {
 
     public void setReferenceMediaType4(String referenceMediaType4) {
         this.referenceMediaType4 = referenceMediaType4;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

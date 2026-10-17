@@ -1,23 +1,15 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     /* =========================================
-       AUTHENTICATION CHECK
+       AUTHENTICATION CHECK (LOGIN OPTIONAL)
     ========================================= */
     const token = getToken();
-    if (!token) {
-        try {
-            sessionStorage.setItem("firqui_redirect", "checkout.html");
-        } catch (e) {}
-        alert("Please log in to proceed with checkout.");
-        window.location.href = "../authentication/login.html?redirect=../products/checkout.html";
-        return;
-    }
 
     /* =========================================
        DOM ELEMENTS
@@ -68,20 +60,22 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (e) {}
 
-        // 2. Fetch fresh profile from Spring Boot backend (GET /api/users/me)
-        try {
-            const response = await fetch(`${API_BASE}/api/users/me`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
+        // 2. Fetch fresh profile from Spring Boot backend if logged in
+        if (token) {
+            try {
+                const response = await fetch(`${API_BASE}/api/users/me`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
 
-            if (response.ok) {
-                const profile = await response.json();
-                fillFormFields(profile);
+                if (response.ok) {
+                    const profile = await response.json();
+                    fillFormFields(profile);
+                }
+            } catch (err) {
+                console.warn("Unable to fetch user profile for checkout prefill:", err);
             }
-        } catch (err) {
-            console.warn("Unable to fetch user profile for checkout prefill:", err);
         }
     }
 
@@ -113,24 +107,26 @@ document.addEventListener("DOMContentLoaded", function () {
        LOAD CART DATA
     ========================================= */
     async function loadCartData() {
-        try {
-            // First try fetching live cart from authenticated user backend
-            const response = await fetch(`${API_BASE}/api/cart`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
-            });
+        if (token) {
+            try {
+                // First try fetching live cart from authenticated user backend
+                const response = await fetch(`${API_BASE}/api/cart`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.items && data.items.length > 0) {
-                    cart = data.items;
-                    renderCartSummary(cart);
-                    return;
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.items && data.items.length > 0) {
+                        cart = data.items;
+                        renderCartSummary(cart);
+                        return;
+                    }
                 }
+            } catch (err) {
+                console.warn("Backend cart fetch error, falling back to local cart:", err);
             }
-        } catch (err) {
-            console.warn("Backend cart fetch error, falling back to local cart:", err);
         }
 
         // Fallback to localStorage if backend cart is not populated yet
@@ -179,19 +175,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             item.innerHTML = `
                 <img
-                    src="${resolveImage(product.image)}"
-                    alt="${product.name || 'Product'}"
+                    src="${window.FirquiHtml.escape(resolveImage(product.image))}"
+                    alt="${window.FirquiHtml.escape(product.name || 'Product')}"
                     onerror="this.src='../assets/Logo Pink 1.png'"
                 >
 
                 <div>
                     <div class="checkout-product-name">
-                        ${product.name || ''}
+                        ${window.FirquiHtml.escape(product.name || '')}
                     </div>
 
                     ${selectedSize ? `
                     <div class="checkout-product-variant" style="font-size: 0.85rem; color: #555; margin: 2px 0;">
-                        Size: ${selectedSize}
+                        Size: ${window.FirquiHtml.escape(selectedSize)}
                     </div>` : ""}
 
                     <div class="checkout-product-quantity">

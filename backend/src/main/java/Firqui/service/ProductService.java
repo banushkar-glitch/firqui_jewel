@@ -61,22 +61,25 @@ public class ProductService {
     }
 
     public static String normalizeCategory(String cat) {
-        if (cat == null) return "GENERAL";
+        if (cat == null) return null;
         String clean = cat.trim().toLowerCase();
+        if (clean.isEmpty() || clean.equals("none") || clean.equals("select category")) return null;
         if (clean.contains("earring")) return "EARRINGS";
         if (clean.contains("ring")) return "RINGS";
         if (clean.contains("necklace")) return "NECKLACES";
         if (clean.contains("bracelet") || clean.contains("cuff") || clean.contains("bangle")) return "BRACELETS & CUFFS";
         if (clean.contains("brooch")) return "BROOCHES";
-        if (clean.contains("pearl")) return "PEARLS GONE ROGUE";
         return cat.trim().toUpperCase();
     }
 
     public List<Product> getProductsByCategory(String category) {
-        if (category == null || category.trim().isEmpty()) {
+        if (category == null || category.trim().isEmpty() || category.equalsIgnoreCase("all")) {
             return productRepository.findByActiveTrue();
         }
         String normalized = normalizeCategory(category);
+        if (normalized == null) {
+            return java.util.Collections.emptyList();
+        }
         List<Product> matches = new ArrayList<>(productRepository.findByCategoryIgnoreCase(normalized));
         if (!normalized.equalsIgnoreCase(category.trim())) {
             List<Product> rawMatches = productRepository.findByCategoryIgnoreCase(category.trim());
@@ -110,17 +113,21 @@ public class ProductService {
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Product name is required.");
         }
-        if (dto.getCategory() == null || dto.getCategory().trim().isEmpty()) {
-            throw new IllegalArgumentException("Category is required.");
-        }
-        if (dto.getPrice() == null) {
-            throw new IllegalArgumentException("Price is required.");
-        }
         Product product = new Product();
         mapDtoToEntity(dto, product);
+        ProductRules.normalizeAndValidate(product);
+        ensureSkuIsFree(product);
         Product saved = productRepository.save(product);
+        boolean changed = false;
         if (saved.getLegacyId() == null || saved.getLegacyId().trim().isEmpty()) {
             saved.setLegacyId(String.valueOf(saved.getId()));
+            changed = true;
+        }
+        if (saved.getSku() == null) {
+            saved.setSku(freeGeneratedSku(saved));
+            changed = true;
+        }
+        if (changed) {
             saved = productRepository.save(saved);
         }
         return saved;
@@ -184,6 +191,11 @@ public class ProductService {
         if (product.getReferenceImage4() != null) previousMediaUrls.add(product.getReferenceImage4());
 
         mapDtoToEntity(dto, product);
+        ProductRules.normalizeAndValidate(product);
+        ensureSkuIsFree(product);
+        if (product.getSku() == null) {
+            product.setSku(freeGeneratedSku(product));
+        }
         if (product.getLegacyId() == null || product.getLegacyId().trim().isEmpty()) {
             product.setLegacyId(String.valueOf(product.getId()));
         }
@@ -241,6 +253,97 @@ public class ProductService {
         }
     }
 
+    /* =====================================================
+       STATUS, DUPLICATE, QUICK EDIT
+    ====================================================== */
+
+    /** Draft -> Published (full checks), Published -> Archived, Archived -> Published / Draft. */
+    @Transactional
+    public Product changeStatus(String identifier, String status) {
+        Product product = getProductByIdOrLegacyId(identifier);
+        product.setStatus(ProductRules.normalizeStatus(status));
+        ProductRules.normalizeAndValidate(product);
+        ensureSkuIsFree(product);
+        if (product.getSku() == null) product.setSku(freeGeneratedSku(product));
+        return productRepository.save(product);
+    }
+
+    /** Copy as a new draft (same photos, details and price; new SKU). */
+    @Transactional
+    public Product duplicateProduct(String identifier) {
+        Product src = getProductByIdOrLegacyId(identifier);
+        Product copy = new Product();
+        String name = "Copy of " + src.getName();
+        copy.setName(name.length() > 150 ? name.substring(0, 150) : name);
+        copy.setDescription(src.getDescription());
+        copy.setPrice(src.getPrice());
+        copy.setComparePrice(src.getComparePrice());
+        copy.setStockQuantity(src.getStockQuantity());
+        copy.setCategory(src.getCategory());
+        copy.setCollection(src.getCollection());
+        copy.setGemstone(src.getGemstone());
+        copy.setMaterial(src.getMaterial());
+        copy.setColor(src.getColor());
+        copy.setAvailability(src.getAvailability());
+        copy.setRestockDate(src.getRestockDate());
+        copy.setMainImage(src.getMainImage());
+        copy.setReferenceImage1(src.getReferenceImage1());
+        copy.setReferenceImage2(src.getReferenceImage2());
+        copy.setReferenceImage3(src.getReferenceImage3());
+        copy.setReferenceImage4(src.getReferenceImage4());
+        copy.setMainMediaType(src.getMainMediaType());
+        copy.setReferenceMediaType1(src.getReferenceMediaType1());
+        copy.setReferenceMediaType2(src.getReferenceMediaType2());
+        copy.setReferenceMediaType3(src.getReferenceMediaType3());
+        copy.setReferenceMediaType4(src.getReferenceMediaType4());
+        copy.setImages(new ArrayList<>(src.getImages()));
+        copy.setMeasurement(new ArrayList<>(src.getMeasurement()));
+        copy.setProductDetailsDescription(src.getProductDetailsDescription());
+        copy.setProductDetailsHighlights(new ArrayList<>(src.getProductDetailsHighlights()));
+        copy.setTags(src.getTags());
+        copy.setStatus(ProductRules.DRAFT);
+        ProductRules.normalizeAndValidate(copy);
+        Product saved = productRepository.save(copy);
+        saved.setLegacyId(String.valueOf(saved.getId()));
+        saved.setSku(freeGeneratedSku(saved));
+        return productRepository.save(saved);
+    }
+
+    /** Price / stock / availability from the products list, with the same rules as the form. */
+    @Transactional
+    public Product updateInventory(String identifier, Double price, Double comparePrice, boolean clearComparePrice,
+                                   Integer stockQuantity, String availability, String restockDate) {
+        Product product = getProductByIdOrLegacyId(identifier);
+        if (price != null) product.setPrice(price);
+        if (clearComparePrice) product.setComparePrice(null);
+        else if (comparePrice != null) product.setComparePrice(comparePrice);
+        if (stockQuantity != null) product.setStockQuantity(stockQuantity);
+        if (availability != null) product.setAvailability(availability);
+        if (restockDate != null) product.setRestockDate(restockDate.isBlank() ? null : restockDate);
+        ProductRules.normalizeAndValidate(product);
+        return productRepository.save(product);
+    }
+
+    private void ensureSkuIsFree(Product product) {
+        String sku = product.getSku();
+        if (sku == null) return;
+        boolean taken = product.getId() == null
+                ? productRepository.existsBySkuIgnoreCase(sku)
+                : productRepository.existsBySkuIgnoreCaseAndIdNot(sku, product.getId());
+        if (taken) {
+            throw new IllegalArgumentException("SKU " + sku + " is already used by another product. Leave it empty to generate one.");
+        }
+    }
+
+    private String freeGeneratedSku(Product product) {
+        String base = ProductRules.generateSku(product.getCategory(), product.getId());
+        String sku = base;
+        for (int n = 2; productRepository.existsBySkuIgnoreCase(sku); n++) {
+            sku = base + "-" + n;
+        }
+        return sku;
+    }
+
     private void mapDtoToEntity(ProductDTO dto, Product product) {
         String name = dto.getName() != null && !dto.getName().trim().isEmpty() ? dto.getName().trim() : dto.getProductName();
         if (name != null) product.setName(name);
@@ -251,7 +354,16 @@ public class ProductService {
         if (dto.getComparePrice() != null) product.setComparePrice(dto.getComparePrice());
         if (dto.getDiscount() != null) product.setDiscount(dto.getDiscount());
         if (dto.getStockQuantity() != null) product.setStockQuantity(dto.getStockQuantity());
-        if (dto.getCategory() != null) product.setCategory(normalizeCategory(dto.getCategory()));
+        if (dto.getCategory() != null) {
+            String cat = dto.getCategory().trim();
+            if (cat.isEmpty() || cat.equalsIgnoreCase("none") || cat.equalsIgnoreCase("select category")) {
+                product.setCategory(null);
+            } else {
+                product.setCategory(normalizeCategory(cat));
+            }
+        } else {
+            product.setCategory(null);
+        }
 
         if (dto.getCollection() != null) {
             String col = dto.getCollection().trim();
@@ -338,7 +450,12 @@ public class ProductService {
         if (dto.getProductDetailsDescription() != null) product.setProductDetailsDescription(dto.getProductDetailsDescription());
         if (dto.getProductDetailsHighlights() != null) product.setProductDetailsHighlights(dto.getProductDetailsHighlights());
         if (dto.getTags() != null) product.setTags(dto.getTags());
-        if (dto.getActive() != null) product.setActive(dto.getActive());
+        if (dto.getStatus() != null && !dto.getStatus().isBlank()) {
+            product.setStatus(dto.getStatus());
+        } else if (dto.getActive() != null) {
+            // Older clients only send "active"
+            product.setStatus(dto.getActive() ? ProductRules.PUBLISHED : ProductRules.ARCHIVED);
+        }
         if (dto.getFeatured() != null) product.setFeatured(dto.getFeatured());
         if (dto.getNewArrival() != null) product.setNewArrival(dto.getNewArrival());
     }

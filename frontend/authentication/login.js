@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ================================================= */
 
     const loginButton = loginForm.querySelector(".login-button");
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     loginForm.addEventListener("submit", async (event) => {
 
@@ -102,31 +102,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 );
             }
 
-            // Save JWT token & user info
-            if (data.token) {
-                try {
-                    localStorage.setItem("firqui_token", data.token);
-                    localStorage.setItem("firqui_user", JSON.stringify({
-                        name: data.name,
-                        email: data.email,
-                        role: data.role || "USER"
-                    }));
-                } catch (e) {
-                    console.warn("localStorage not accessible", e);
-                }
-            }
+            // The session itself is an HttpOnly cookie set by the server;
+            // only the name and role are kept for the header
+            window.FirquiAuth.setUser({ name: data.name, email: data.email, role: data.role || "USER" });
 
             // Sync existing guest cart into authenticated user cart
             try {
                 const localCart = JSON.parse(localStorage.getItem("firquiCart")) || [];
-                if (localCart.length > 0 && data.token) {
+                if (localCart.length > 0) {
                     for (const item of localCart) {
                         try {
                             await fetch(`${API_BASE}/api/cart/items`, {
                                 method: "POST",
                                 headers: {
-                                    "Content-Type": "application/json",
-                                    "Authorization": `Bearer ${data.token}`
+                                    "Content-Type": "application/json"
                                 },
                                 body: JSON.stringify({
                                     productId: item.productId || item.id,
@@ -151,19 +140,23 @@ document.addEventListener("DOMContentLoaded", () => {
             const roleStr = String(data.role || "").toUpperCase();
             const isAdmin = roleStr === "ADMIN" || roleStr === "ROLE_ADMIN";
 
-            // Check for redirect return URL (e.g. checkout page)
+            // Return to the page that asked for login; only pages on this site are allowed
             const urlParams = new URLSearchParams(window.location.search);
-            const redirectParam = urlParams.get("redirect") || sessionStorage.getItem("firqui_redirect");
+            let redirectParam = urlParams.get("next") || urlParams.get("redirect") || sessionStorage.getItem("firqui_redirect");
             try { sessionStorage.removeItem("firqui_redirect"); } catch (e) {}
+            if (redirectParam && !/^(\/|\.\.?\/|[a-z]+:)/i.test(redirectParam)) {
+                // Older links used "checkout.html" relative to /products/
+                redirectParam = "../products/" + redirectParam;
+            }
+            const safeTarget = window.FirquiAuth.safeNext(redirectParam);
+            const adminTarget = safeTarget && safeTarget.indexOf("/admin/") !== -1;
 
             let targetUrl = isAdmin ? "../admin/dashboard.html" : "../index.html";
             let redirectLabel = isAdmin ? "Admin Dashboard" : "FIRQUI JEWELS";
 
-            if (!isAdmin && redirectParam) {
-                targetUrl = redirectParam;
-                if (redirectParam.includes("checkout")) {
-                    redirectLabel = "Checkout";
-                }
+            if (safeTarget && (isAdmin || !adminTarget)) {
+                targetUrl = safeTarget;
+                redirectLabel = safeTarget.includes("checkout") ? "Checkout" : "your page";
             }
 
             loginMessage.textContent = `Login successful! Redirecting to ${redirectLabel}...`;
@@ -206,13 +199,24 @@ if (openRegister) {
 
         event.preventDefault();
 
-        window.parent.postMessage(
-            {
-                type: "openRegister"
-            },
-            "*"
-        );
+        // Inside the home page pop-up, let the page swap to the register form
+        if (window.self !== window.top) {
+            window.parent.postMessage({ type: "openRegister" }, window.location.origin);
+            return;
+        }
+        // Standalone page: go to register, keeping where to return afterwards
+        window.location.href = "register.html" + window.location.search;
 
     });
 
+}
+/* =====================================================
+   ALREADY SIGNED IN: skip the form
+===================================================== */
+if (window.self === window.top && window.FirquiAuth) {
+    window.FirquiAuth.refresh().then(function (user) {
+        if (!user) return;
+        const next = window.FirquiAuth.safeNext(new URLSearchParams(window.location.search).get("next"));
+        window.location.replace(next || (window.FirquiAuth.isAdminRole(user.role) ? "../admin/dashboard.html" : "../index.html"));
+    });
 }

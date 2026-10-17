@@ -1116,3 +1116,109 @@
     }
 
 }
+/* =====================================================
+   PRODUCTS LIST: status, quick edit, toast
+===================================================== */
+.products-table .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.pl-status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pl-status.is-published { background: #DDF3E7; color: #17643F; }
+.pl-status.is-draft { background: #FFF1D6; color: #8A5A00; }
+.pl-status.is-archived { background: #ECECEC; color: #555; }
+
+.pl-row.is-archived td { opacity: 0.7; }
+.pl-compare { color: #999; font-size: 12px; }
+
+.pl-actions { white-space: nowrap; }
+.pl-actions .table-action { display: inline-flex; align-items: center; justify-content: center; }
+
+.pl-quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 12px;
+    padding: 6px 0;
+}
+
+.pl-quick-name {
+    width: 100%;
+    color: #0A373B;
+}
+
+.pl-quick label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #4A5656;
+}
+
+.pl-quick label[hidden] { display: none; }
+
+.pl-quick input,
+.pl-quick select {
+    min-width: 120px;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid rgba(10, 55, 59, 0.25);
+    border-radius: 10px;
+    font: inherit;
+    font-size: 14px;
+}
+
+.pl-quick-buttons { display: flex; gap: 8px; }
+
+.pl-quick-save,
+.pl-quick-cancel {
+    height: 40px;
+    padding: 0 18px;
+    border-radius: 999px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.pl-quick-save { border: 0; background: #0A373B; color: #FAF5EE; }
+.pl-quick-cancel { border: 1px solid #0A373B; background: transparent; color: #0A373B; }
+
+.pl-quick-error {
+    width: 100%;
+    margin: 0;
+    color: #C0392B;
+    font-size: 13px;
+}
+
+.pl-quick-error:empty { display: none; }
+
+.pl-toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 3000;
+    max-width: min(560px, calc(100% - 32px));
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: #0A373B;
+    color: #FAF5EE;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, 140%);
+    transition: transform 0.25s ease;
+}
+
+.pl-toast.show { transform: translate(-50%, 0); }
+.pl-toast.is-error { background: #8A1F14; }

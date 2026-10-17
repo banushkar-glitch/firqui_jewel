@@ -2,39 +2,21 @@
    FIRQUI JEWELS — MANUAL UPI PAYMENT CONTROLLER
    ========================================================================== */
 
-/* ==========================================================================
-   CONFIGURATION: ENTER YOUR ACTUAL UPI DETAILS HERE
-   --------------------------------------------------------------------------
-   Please add your real UPI ID and UPI QR code image path below:
-   ========================================================================== */
-const UPI_CONFIG = {
-    // Actual UPI ID configured for FIRQUI JEWELS manual payments:
-    upiId: "nehaa067@icici",
-
-    // Actual UPI QR code image path:
-    qrCodeImagePath: "../assets/QR Code.jpeg"
-};
+/* The UPI ID and the amount come from the backend (POST /api/payments/upi),
+   which prices the cart from the database. The QR encodes that exact amount. */
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     /* =====================================================
        1. AUTHENTICATION & ORDER NUMBER VALIDATION
     ====================================================== */
     const token = getToken();
-    if (!token) {
-        alert("Please log in to access your payment page.");
-        try {
-            sessionStorage.setItem("firqui_redirect", window.location.pathname + window.location.search);
-        } catch (e) {}
-        window.location.href = "../authentication/login.html";
-        return;
-    }
 
     const urlParams = new URLSearchParams(window.location.search);
     const orderNumber = urlParams.get("orderNumber") || urlParams.get("id") || urlParams.get("orderId");
@@ -65,9 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // QR & UPI ID
     const upiQrImage = document.getElementById("upi-qr-image");
     const upiIdDisplay = document.getElementById("upi-id-display");
-    const copyUpiBtn = document.getElementById("copy-upi-btn");
-    const copyBtnText = document.getElementById("copy-btn-text");
-    const copyToast = document.getElementById("copy-toast");
 
     // Form & Upload
     const paymentForm = document.getElementById("upi-payment-form");
@@ -101,13 +80,72 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedFile = null;
 
     /* =====================================================
-       3. INITIALIZE CONFIGURED UPI ID & QR IMAGE
+       3. UPI QR WITH A FIXED AMOUNT
     ====================================================== */
-    if (upiIdDisplay) {
-        upiIdDisplay.textContent = UPI_CONFIG.upiId;
+    const qrAmount = document.getElementById("qr-amount");
+    const qrStatus = document.getElementById("qr-status");
+    const upiAppLink = document.getElementById("upi-app-link");
+    const upiAppText = document.getElementById("upi-app-text");
+    let payableAmount = null;
+
+    function rupees(amount) {
+        return "₹" + Number(amount).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
-    if (upiQrImage && UPI_CONFIG.qrCodeImagePath) {
-        upiQrImage.src = UPI_CONFIG.qrCodeImagePath;
+
+    function showQrError(message) {
+        if (upiQrImage) upiQrImage.hidden = true;
+        if (upiAppLink) upiAppLink.hidden = true;
+        if (qrAmount) qrAmount.textContent = "";
+        if (qrStatus) {
+            qrStatus.hidden = false;
+            qrStatus.classList.add("is-error");
+            qrStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + message;
+        }
+        if (submitBtn) submitBtn.disabled = true;
+    }
+
+    // body: { items: [...] } for a new order, or { orderNumber } for an existing one
+    async function loadUpiPayment(body) {
+        try {
+            const headers = { "Content-Type": "application/json" };
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+            const res = await fetch(`${API_BASE}/api/payments/upi`, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+            const data = await res.json().catch(function () { return {}; });
+            if (!res.ok || !data.upiUri) {
+                throw new Error(data.message || "Could not prepare the payment QR.");
+            }
+
+            payableAmount = data.amount;
+            const qr = qrcode(0, "M");
+            qr.addData(data.upiUri);
+            qr.make();
+            upiQrImage.src = qr.createDataURL(8, 2);
+            upiQrImage.hidden = false;
+            if (qrStatus) qrStatus.hidden = true;
+
+            if (qrAmount) qrAmount.textContent = "Amount to pay: " + rupees(data.amount);
+            if (upiIdDisplay) upiIdDisplay.textContent = data.upiId;
+            if (upiAppLink) {
+                upiAppLink.href = data.upiUri;
+                upiAppLink.hidden = false;
+            }
+            if (upiAppText) upiAppText.textContent = "Pay " + rupees(data.amount) + " in UPI app";
+
+            // The summary shows exactly what the QR charges
+            [displayOrderAmount, displayTotalAmount, displaySubtotal].forEach(function (el) {
+                if (el) el.textContent = rupees(data.amount);
+            });
+        } catch (err) {
+            console.warn("UPI QR error:", err);
+            const msg = err && err.message && !/fetch|network/i.test(err.message)
+                ? err.message
+                : "Could not reach the server. Please check your connection and refresh this page.";
+            showQrError(msg);
+        }
     }
 
     /* =====================================================
@@ -148,13 +186,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const pName = p.name || p.productName || "Jewellery Item";
                     const pQty = p.quantity || 1;
-                    const pSize = p.selectedSize ? ` • Size: ${p.selectedSize}` : "";
+                    const pSize = p.selectedSize ? ` • Size: ${window.FirquiHtml.escape(p.selectedSize)}` : "";
                     const pPrice = "₹" + Math.round(Number(p.unitPrice || p.price || 0) * pQty).toLocaleString("en-IN");
 
                     row.innerHTML = `
-                        <img src="${imgUrl}" alt="${pName}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
+                        <img src="${window.FirquiHtml.escape(imgUrl)}" alt="${window.FirquiHtml.escape(pName)}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
                         <div class="summary-item-info">
-                            <div class="summary-item-name">${pName}</div>
+                            <div class="summary-item-name">${window.FirquiHtml.escape(pName)}</div>
                             <div class="summary-item-sub">Qty: ${pQty}${pSize}</div>
                         </div>
                         <div class="summary-item-price">${pPrice}</div>
@@ -167,13 +205,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
     async function fetchOrderDetails() {
         try {
+            const headers = {};
+            if (token) {
+                headers["Authorization"] = `Bearer ${token}`;
+            }
             const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderNumber)}`, {
-                headers: {
-                    "Authorization": `Bearer ${token}`
-                }
+                headers: headers
             });
 
-            if (response.status === 401 || response.status === 403) {
+            if ((response.status === 401 || response.status === 403) && token) {
                 alert("Session expired. Please log in again.");
                 window.location.href = "../authentication/login.html";
                 return;
@@ -240,13 +280,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const pName = p.name || p.productName || "Jewellery Item";
                     const pQty = p.quantity || 1;
-                    const pSize = p.selectedSize ? ` • Size: ${p.selectedSize}` : "";
+                    const pSize = p.selectedSize ? ` • Size: ${window.FirquiHtml.escape(p.selectedSize)}` : "";
                     const pPrice = "₹" + Math.round(Number(p.unitPrice || p.price || 0) * pQty).toLocaleString("en-IN");
 
                     row.innerHTML = `
-                        <img src="${imgUrl}" alt="${pName}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
+                        <img src="${window.FirquiHtml.escape(imgUrl)}" alt="${window.FirquiHtml.escape(pName)}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
                         <div class="summary-item-info">
-                            <div class="summary-item-name">${pName}</div>
+                            <div class="summary-item-name">${window.FirquiHtml.escape(pName)}</div>
                             <div class="summary-item-sub">Qty: ${pQty}${pSize}</div>
                         </div>
                         <div class="summary-item-price">${pPrice}</div>
@@ -270,38 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    /* =====================================================
-       5. COPY UPI ID TO CLIPBOARD
-    ====================================================== */
-    if (copyUpiBtn) {
-        copyUpiBtn.addEventListener("click", async function () {
-            const upiId = UPI_CONFIG.upiId;
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(upiId);
-                } else {
-                    const tempInput = document.createElement("input");
-                    tempInput.value = upiId;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(tempInput);
-                }
-
-                if (copyBtnText) copyBtnText.textContent = "Copied!";
-                if (copyToast) copyToast.style.display = "flex";
-
-                setTimeout(function () {
-                    if (copyBtnText) copyBtnText.textContent = "Copy UPI ID";
-                    if (copyToast) copyToast.style.display = "none";
-                }, 2500);
-
-            } catch (err) {
-                console.warn("Clipboard write failed:", err);
-                alert("UPI ID: " + upiId);
-            }
-        });
-    }
 
     /* =====================================================
        6. SCREENSHOT SELECTION & PREVIEW MANAGEMENT
@@ -336,8 +344,19 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function handleFileSelection(file) {
+    let previewUrl = null;
+    let selectionToken = 0;
+
+    async function handleFileSelection(picked) {
         clearScreenshotError();
+        const token = ++selectionToken;
+
+        // Large phone screenshots are shrunk first so the preview and upload stay quick
+        let file = picked;
+        if (picked && window.FirquiImage) {
+            file = await window.FirquiImage.compress(picked, { maxDimension: 2400, quality: 0.9, output: "jpeg" });
+            if (token !== selectionToken) return; // a newer file was chosen meanwhile
+        }
 
         if (!file) {
             selectedFile = null;
@@ -368,22 +387,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
         selectedFile = file;
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            if (previewImg) previewImg.src = e.target.result;
-            if (previewFilename) previewFilename.textContent = file.name;
-            if (previewFilesize) previewFilesize.textContent = formatBytes(file.size);
+        // An object URL avoids building a multi-megabyte base64 string on the main thread
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+        previewUrl = URL.createObjectURL(file);
+        if (previewImg) previewImg.src = previewUrl;
+        if (previewFilename) previewFilename.textContent = picked.name;
+        if (previewFilesize) previewFilesize.textContent = formatBytes(file.size);
 
-            if (uploadDropzone) uploadDropzone.style.display = "none";
-            if (previewContainer) previewContainer.style.display = "flex";
-        };
-        reader.readAsDataURL(file);
+        if (uploadDropzone) uploadDropzone.style.display = "none";
+        if (previewContainer) previewContainer.style.display = "flex";
     }
 
     function hidePreview() {
         if (previewContainer) previewContainer.style.display = "none";
         if (uploadDropzone) uploadDropzone.style.display = "block";
-        if (previewImg) previewImg.src = "";
+        if (previewImg) previewImg.removeAttribute("src");
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
     }
 
     if (replaceFileBtn) {
@@ -459,11 +481,13 @@ document.addEventListener("DOMContentLoaded", function () {
                 formData.append("screenshot", selectedFile);
 
                 try {
+                    const headers = {};
+                    if (token) {
+                        headers["Authorization"] = `Bearer ${token}`;
+                    }
                     const response = await fetch(`${API_BASE}/api/orders/place-payment`, {
                         method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}`
-                        },
+                        headers: headers,
                         body: formData
                     });
 
@@ -503,11 +527,13 @@ document.addEventListener("DOMContentLoaded", function () {
             formData.append("screenshot", selectedFile);
 
             try {
+                const headers = {};
+                if (token) {
+                    headers["Authorization"] = `Bearer ${token}`;
+                }
                 const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderNumber)}/payment`, {
                     method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    },
+                    headers: headers,
                     body: formData
                 });
 
@@ -558,9 +584,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initialize Page
     if (orderNumber) {
-        fetchOrderDetails();
+        fetchOrderDetails().then(function () {
+            const status = currentOrder ? String(currentOrder.paymentStatus || currentOrder.payment || "").toUpperCase() : "";
+            if (!currentOrder) return;
+            if (status === "PAID" || status === "PENDING_VERIFICATION") {
+                showQrError("Payment for this order has already been submitted.");
+                return;
+            }
+            loadUpiPayment({ orderNumber: currentOrder.orderNumber || orderNumber });
+        });
     } else if (pendingCheckout) {
         renderPendingCheckout(pendingCheckout);
+        loadUpiPayment({ items: pendingCheckout.items || [] });
     }
 
 });

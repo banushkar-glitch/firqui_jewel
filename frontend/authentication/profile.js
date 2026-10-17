@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     /* =========================================
        PROFILE ELEMENTS
@@ -40,13 +40,13 @@ document.addEventListener("DOMContentLoaded", function () {
     ========================================= */
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     function checkAuth() {
         const token = getToken();
         if (!token) {
-            window.location.href = "login.html";
+            window.FirquiAuth.goToLogin();
             return false;
         }
         return true;
@@ -123,11 +123,9 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (response.status === 401 || response.status === 403) {
-                // Expired or invalid token
-                localStorage.removeItem("firqui_token");
-                localStorage.removeItem("firqui_user");
-                alert("Your session has expired. Please log in again.");
-                window.location.href = "login.html";
+                // Session expired or ended elsewhere
+                window.FirquiAuth.clear();
+                window.FirquiAuth.goToLogin();
                 return;
             }
 
@@ -373,11 +371,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.warn("Delete API error:", err);
             }
 
-            // Invalidate session and redirect
-            localStorage.removeItem("firqui_token");
-            localStorage.removeItem("firqui_user");
-            localStorage.removeItem("firquiCustomer");
-            window.location.href = "login.html";
+            // The server has already cleared the session cookie
+            window.FirquiAuth.clear();
+            window.location.href = "../index.html";
         });
     }
 
@@ -390,10 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
             const confirmed = confirm("Are you sure you want to log out?");
             if (!confirmed) return;
 
-            localStorage.removeItem("firqui_token");
-            localStorage.removeItem("firqui_user");
-            localStorage.removeItem("firquiCustomer");
-            window.location.href = "login.html";
+            window.FirquiAuth.logout();
         });
     }
 
@@ -605,8 +598,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span style="${payStatusBadgeStyle}">
                         ${payStatusText}
                     </span>
-                    ${order.transactionId ? `<br><small style="color: #666; font-size: 0.75rem;">Ref: ${order.transactionId}</small>` : ""}
-                    ${order.rejectionReason ? `<br><small style="color: #D32F2F; font-size: 0.75rem;">Reason: ${order.rejectionReason}</small>` : ""}
+                    ${order.transactionId ? `<br><small style="color: #666; font-size: 0.75rem;">Ref: ${window.FirquiHtml.escape(order.transactionId)}</small>` : ""}
+                    ${order.rejectionReason ? `<br><small style="color: #D32F2F; font-size: 0.75rem;">Reason: ${window.FirquiHtml.escape(order.rejectionReason)}</small>` : ""}
                 </span>
             `;
 

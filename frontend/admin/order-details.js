@@ -9,314 +9,25 @@
    TEMPORARY FRONTEND DATA
 ========================================================= */
 
-const orders = {
-
-    FJ1001: {
-
-        id: "FJ1001",
-
-        customer: {
-            name: "Rahul Sharma",
-            email: "rahul@example.com",
-            phone: "+91 98765 43210"
-        },
-
-        date: "01 Oct 2026",
-
-        payment: {
-            status: "Paid",
-            method: "Razorpay",
-            transactionId: "TXN-FJ1001-78452"
-        },
-
-        shippingAddress: [
-            "Rahul Sharma",
-            "Flat No. 204, Green Residency",
-            "Sinhgad Road",
-            "Pune, Maharashtra - 411041",
-            "India"
-        ],
-
-        products: [
-
-            {
-                name: "Golden Grace",
-                category: "Bracelets & Cuffs",
-                quantity: 1,
-                price: 1499,
-                image: "../../assets/products/golden-grace.jpg"
-            },
-
-            {
-                name: "Pearl Drop",
-                category: "Earrings",
-                quantity: 1,
-                price: 1499,
-                image: "../../assets/products/pearl-drop.jpg"
-            }
-
-        ],
-
-        shipping: 0,
-
-        discount: 0,
-
-        status: "Processing"
-
-    },
-
-
-    FJ1002: {
-
-        id: "FJ1002",
-
-        customer: {
-            name: "Priya Patil",
-            email: "priya@example.com",
-            phone: "+91 98234 56789"
-        },
-
-        date: "30 Sep 2026",
-
-        payment: {
-            status: "Paid",
-            method: "Razorpay",
-            transactionId: "TXN-FJ1002-63921"
-        },
-
-        shippingAddress: [
-            "Priya Patil",
-            "B-304, Sunshine Apartments",
-            "Kothrud",
-            "Pune, Maharashtra - 411038",
-            "India"
-        ],
-
-        products: [
-
-            {
-                name: "Golden Grace",
-                category: "Bracelets & Cuffs",
-                quantity: 1,
-                price: 1499,
-                image: "../../assets/products/golden-grace.jpg"
-            }
-
-        ],
-
-        shipping: 0,
-
-        discount: 0,
-
-        status: "Shipped"
-
-    },
-
-
-    FJ1003: {
-
-        id: "FJ1003",
-
-        customer: {
-            name: "Sneha Kulkarni",
-            email: "sneha@example.com",
-            phone: "+91 97654 32109"
-        },
-
-        date: "29 Sep 2026",
-
-        payment: {
-            status: "Paid",
-            method: "Credit Card",
-            transactionId: "TXN-FJ1003-51287"
-        },
-
-        shippingAddress: [
-            "Sneha Kulkarni",
-            "Flat No. 506, Pearl Heights",
-            "Baner",
-            "Pune, Maharashtra - 411045",
-            "India"
-        ],
-
-        products: [
-
-            {
-                name: "Golden Grace",
-                category: "Bracelets & Cuffs",
-                quantity: 1,
-                price: 1499,
-                image: "../../assets/products/golden-grace.jpg"
-            },
-
-            {
-                name: "Pearl Drop",
-                category: "Earrings",
-                quantity: 1,
-                price: 999,
-                image: "../../assets/products/pearl-drop.jpg"
-            },
-
-            {
-                name: "Rose Charm",
-                category: "Necklaces",
-                quantity: 1,
-                price: 1001,
-                image: "../../assets/products/rose-charm.jpg"
-            }
-
-        ],
-
-        shipping: 0,
-
-        discount: 0,
-
-        status: "Delivered"
-
-    },
-
-
-    FJ1004: {
-
-        id: "FJ1004",
-
-        customer: {
-            name: "Amit Joshi",
-            email: "amit@example.com",
-            phone: "+91 98712 34567"
-        },
-
-        date: "28 Sep 2026",
-
-        payment: {
-            status: "Pending",
-            method: "Cash on Delivery",
-            transactionId: "COD-FJ1004"
-        },
-
-        shippingAddress: [
-            "Amit Joshi",
-            "House No. 12, Shivaji Nagar",
-            "Pune, Maharashtra - 411005",
-            "India"
-        ],
-
-        products: [
-
-            {
-                name: "Classic Ring",
-                category: "Rings",
-                quantity: 1,
-                price: 1899,
-                image: "../../assets/products/classic-ring.jpg"
-            }
-
-        ],
-
-        shipping: 0,
-
-        discount: 0,
-
-        status: "Pending"
-
-    },
-
-
-    FJ1005: {
-
-        id: "FJ1005",
-
-        customer: {
-            name: "Neha Deshmukh",
-            email: "neha@example.com",
-            phone: "+91 98123 45678"
-        },
-
-        date: "27 Sep 2026",
-
-        payment: {
-            status: "Paid",
-            method: "UPI",
-            transactionId: "TXN-FJ1005-89743"
-        },
-
-        shippingAddress: [
-            "Neha Deshmukh",
-            "A-202, Rose Residency",
-            "Viman Nagar",
-            "Pune, Maharashtra - 411014",
-            "India"
-        ],
-
-        products: [
-
-            {
-                name: "Rose Charm",
-                category: "Necklaces",
-                quantity: 1,
-                price: 2199,
-                image: "../../assets/products/rose-charm.jpg"
-            },
-
-            {
-                name: "Classic Ring",
-                category: "Rings",
-                quantity: 1,
-                price: 2099,
-                image: "../../assets/products/classic-ring.jpg"
-            }
-
-        ],
-
-        shipping: 0,
-
-        discount: 0,
-
-        status: "Confirmed"
-
-    }
-
-};
+// Filled from the backend for the order in the URL
+const orders = {};
 
 
 /* =========================================================
    DEFAULT FALLBACK ORDER
 ========================================================= */
 
+// Shown until the real order arrives (or if it cannot be found)
 const defaultOrder = {
-
-    id: "FJ1001",
-
-    customer: {
-        name: "Rahul Sharma",
-        email: "rahul@example.com",
-        phone: "+91 98765 43210"
-    },
-
-    date: "01 Oct 2026",
-
-    payment: {
-        status: "Paid",
-        method: "Razorpay",
-        transactionId: "TXN-FJ1001-78452"
-    },
-
-    shippingAddress: [
-        "Rahul Sharma",
-        "Flat No. 204, Green Residency",
-        "Sinhgad Road",
-        "Pune, Maharashtra - 411041",
-        "India"
-    ],
-
+    id: "Loading...",
+    customer: { name: "-", email: "-", phone: "-" },
+    date: "",
+    payment: { status: "Pending", method: "-", transactionId: "-" },
+    shippingAddress: [],
     products: [],
-
     shipping: 0,
-
     discount: 0,
-
-    status: "Processing"
-
+    status: "Pending"
 };
 
 
@@ -347,7 +58,7 @@ function getCurrentOrder() {
 
     if (!order) {
 
-        order = orders.FJ1001 || defaultOrder;
+        order = defaultOrder;
 
     }
 
@@ -411,8 +122,9 @@ function loadOrder() {
        SHIPPING ADDRESS
     --------------------------------------------- */
 
+    // Typed by the customer: escape each line before joining
     document.getElementById("shippingAddress").innerHTML =
-        order.shippingAddress.join("<br>");
+        order.shippingAddress.map(line => window.FirquiHtml.escape(line)).join("<br>");
 
 
     /* ---------------------------------------------
@@ -608,11 +320,11 @@ function renderProducts(order) {
         productInfo.innerHTML = `
 
             <h4>
-                ${product.name}
+                ${window.FirquiHtml.escape(product.name)}
             </h4>
 
             <p>
-                ${product.category}
+                ${window.FirquiHtml.escape(product.category)}
             </p>
 
             <div class="product-quantity">
@@ -793,8 +505,8 @@ async function updateOrderStatus() {
     const newStatus =
         document.getElementById("orderStatus").value;
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
-    const token = localStorage.getItem("firqui_token");
+    const API_BASE = window.FIRQUI_API_BASE;
+    const token = window.FirquiAuth.token();
 
     if (token && orderId) {
         try {
@@ -1079,16 +791,26 @@ document.addEventListener(
 
         setupHeaderButtons();
 
-        const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
-        const token = localStorage.getItem("firqui_token");
+        const API_BASE = window.FIRQUI_API_BASE;
+        const token = window.FirquiAuth.token();
         const orderId = getOrderIdFromURL();
 
         if (token && orderId) {
             fetch(`${API_BASE}/api/admin/orders/${orderId}`, {
                 headers: { "Authorization": `Bearer ${token}` }
             })
-            .then(res => res.ok ? res.json() : null)
+            .then(res => {
+                if (res.status === 401 || res.status === 403) {
+                    window.location.href = "../authentication/login.html";
+                    return null;
+                }
+                return res.ok ? res.json() : null;
+            })
             .then(data => {
+                if (!data) {
+                    document.getElementById("orderId").textContent = "Order not found";
+                    return;
+                }
                 if (data) {
                     orders[orderId] = {
                         id: data.orderNumber || data.orderId,
@@ -1153,7 +875,10 @@ document.addEventListener(
                     }
                 }
             })
-            .catch(err => console.warn("Live order details fetch error:", err));
+            .catch(err => {
+                console.warn("Live order details fetch error:", err);
+                document.getElementById("orderId").textContent = "Could not load order";
+            });
         }
 
         /* ---------------------------------------------
@@ -1194,7 +919,7 @@ document.addEventListener(
                     if (screenshotLoading) screenshotLoading.style.display = "none";
                 } catch (err) {
                     if (screenshotLoading) {
-                        screenshotLoading.innerHTML = `<p style="color: #D32F2F;"><i class="fa-solid fa-triangle-exclamation"></i> ${err.message}</p>`;
+                        screenshotLoading.innerHTML = `<p style="color: #D32F2F;"><i class="fa-solid fa-triangle-exclamation"></i> ${window.FirquiHtml.escape(err.message)}</p>`;
                     }
                 }
             });

@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-auth="admin">
 
 <head>
 
     <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261017d"></script>
 
     <meta
         name="viewport"
@@ -39,9 +40,10 @@
 
     <link
         rel="stylesheet"
-        href="orders.css"
+        href="orders.css?v=20261017d"
     >
 
+    <link rel="stylesheet" href="../css/site.css?v=20261017d">
 </head>
 
 
@@ -60,7 +62,7 @@
         <!-- LOGO -->
 
         <a
-            href="../dashboard.html"
+            href="dashboard.html"
             class="header-logo"
         >
 
@@ -78,6 +80,7 @@
             class="navigation"
             aria-label="Admin Navigation"
         >
+
 
             <a
                 href="dashboard.html"
@@ -98,27 +101,13 @@
             </a>
 
 
-            <span class="nav-dot"></span>
+            
 
 
-            <a
-                href="../categories/categories.html"
-                class="nav-link"
-            >
-                Categories
-            </a>
+    
 
 
-            <span class="nav-dot"></span>
-
-
-            <a
-                href="../collections/collections.html"
-                class="nav-link"
-            >
-                Collections
-            </a>
-
+            
 
             <span class="nav-dot"></span>
 
@@ -138,8 +127,30 @@
                 href="cancellation-requests.html"
                 class="nav-link"
             >
-                Cancellation Requests
+                Cancellations
             </a>
+
+
+            <span class="nav-dot"></span>
+            <a
+                href="subscribers.html"
+                class="nav-link"
+            >
+                Subscribers
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
+            </a>
+
 
         </nav>
 
@@ -642,13 +653,13 @@
                         <ul>
 
                             <li>
-                                <a href="../dashboard.html">
+                                <a href="dashboard.html">
                                     Dashboard
                                 </a>
                             </li>
 
                             <li>
-                                <a href="../products/products.html">
+                                <a href="products.html">
                                     Products
                                 </a>
                             </li>
@@ -676,25 +687,25 @@
                         <ul>
 
                             <li>
-                                <a href="../products/products.html">
+                                <a href="products.html">
                                     Rings
                                 </a>
                             </li>
 
                             <li>
-                                <a href="../products/products.html">
+                                <a href="products.html">
                                     Necklaces
                                 </a>
                             </li>
 
                             <li>
-                                <a href="../products/products.html">
+                                <a href="products.html">
                                     Earrings
                                 </a>
                             </li>
 
                             <li>
-                                <a href="../products/products.html">
+                                <a href="products.html">
                                     Bracelets
                                 </a>
                             </li>
@@ -829,9 +840,10 @@
      ORDERS JAVASCRIPT
 ====================================================== -->
 
-<script src="orders.js"></script>
-<script src="admin-search.js"></script>
+<script src="orders.js?v=20261017d"></script>
+<script src="admin-search.js?v=20261017d"></script>
 
+    <script src="../js/site-nav.js?v=20261017d"></script>
 </body>
 
 </html>

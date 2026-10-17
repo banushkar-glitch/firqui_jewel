@@ -34,6 +34,10 @@ public class User {
 
     private Boolean active = true;
 
+    // Bumped when the password changes; login sessions issued before that stop working
+    @Column(name = "token_version")
+    private Integer tokenVersion = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -158,6 +162,14 @@ public class User {
 
     public void setAddress2(String address2) {
         this.address2 = address2;
+    }
+
+    public int getTokenVersion() {
+        return tokenVersion != null ? tokenVersion : 0;
+    }
+
+    public void bumpTokenVersion() {
+        this.tokenVersion = getTokenVersion() + 1;
     }
 
     public Boolean getActive() {

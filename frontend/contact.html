@@ -4,6 +4,7 @@
 <head>
 
     <meta charset="UTF-8">
+    <script src="js/auth.js?v=20261017d"></script>
 
     <meta
         name="viewport"
@@ -47,9 +48,10 @@
 
     <link
         rel="stylesheet"
-        href="contact.css"
+        href="contact.css?v=20261017d"
     >
 
+    <link rel="stylesheet" href="css/site.css?v=20261017d">
 </head>
 
 
@@ -312,29 +314,6 @@
 
 
 
-                    <!-- PHONE -->
-
-                    <div class="contact-item">
-
-
-                        <div class="contact-icon">
-
-                            <i class="fa-solid fa-phone"></i>
-
-                        </div>
-
-
-                        <div class="contact-text">
-
-                            +91 9975522067
-
-                        </div>
-
-
-                    </div>
-
-
-
                     <!-- EMAIL -->
 
                     <div class="contact-item">
@@ -382,6 +361,7 @@
                             <input
                                 type="text"
                                 id="contactName"
+                                aria-label="Your name"
                                 name="name"
                                 class="contact-input"
                                 placeholder="Your Name"
@@ -392,16 +372,39 @@
                             <input
                                 type="email"
                                 id="contactEmail"
+                                aria-label="Your email"
                                 name="email"
                                 class="contact-input"
                                 placeholder="Your Email"
                                 required
                             >
 
+                            <!-- PHONE (optional) -->
+                            <input
+                                type="tel"
+                                id="contactPhone"
+                                aria-label="Phone number (optional)"
+                                name="phone"
+                                class="contact-input"
+                                placeholder="Phone (optional)"
+                                autocomplete="tel"
+                                maxlength="30"
+                            >
+                            <!-- Left empty by people; bots fill every field -->
+                            <input
+                                type="text"
+                                id="contactWebsite"
+                                name="website"
+                                class="contact-honeypot"
+                                tabindex="-1"
+                                autocomplete="off"
+                                aria-hidden="true"
+                            >
                             <!-- SUBJECT -->
                             <input
                                 type="text"
                                 id="contactSubject"
+                                aria-label="Subject"
                                 name="subject"
                                 class="contact-input"
                                 placeholder="Subject"
@@ -411,6 +414,7 @@
                             <!-- MESSAGE -->
                             <textarea
                                 id="contactMessage"
+                                aria-label="Your message"
                                 name="message"
                                 class="contact-textarea"
                                 placeholder="Your Message"
@@ -854,44 +858,100 @@
 
         if (contactForm) {
 
-            contactForm.addEventListener("submit", function (event) {
+            const API_BASE = window.FIRQUI_API_BASE;
+
+            contactForm.addEventListener("submit", async function (event) {
 
                 event.preventDefault();
 
+                const sendBtn = contactForm.querySelector(".send-message-btn");
+                const nameInput = document.getElementById("contactName");
+                const emailInput = document.getElementById("contactEmail");
+                const subjectInput = document.getElementById("contactSubject");
+                const messageInput = document.getElementById("contactMessage");
+                const phoneInput = document.getElementById("contactPhone");
+                const websiteInput = document.getElementById("contactWebsite");
 
-                const name =
-                    document.getElementById("contactName").value.trim();
+                const name = nameInput ? nameInput.value.trim() : "";
+                const email = emailInput ? emailInput.value.trim() : "";
+                const subject = subjectInput ? subjectInput.value.trim() : "";
+                const message = messageInput ? messageInput.value.trim() : "";
 
-                const email =
-                    document.getElementById("contactEmail").value.trim();
-
-                const subject =
-                    document.getElementById("contactSubject").value.trim();
-
-                const message =
-                    document.getElementById("contactMessage").value.trim();
-
+                contactFormMessage.textContent = "";
+                contactFormMessage.className = "contact-form-message";
+                contactFormMessage.style.color = "";
 
                 if (!name || !email || !subject || !message) {
-
-                    contactFormMessage.textContent =
-                        "Please fill in all fields.";
-
-                    contactFormMessage.classList.remove("success");
-
+                    contactFormMessage.textContent = "Please fill in all required fields.";
+                    contactFormMessage.style.color = "#ff6b6b";
                     return;
-
                 }
 
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailPattern.test(email)) {
+                    contactFormMessage.textContent = "Please enter a valid email address.";
+                    contactFormMessage.style.color = "#ff6b6b";
+                    return;
+                }
 
-                contactFormMessage.textContent =
-                    "Thank you! Your message has been received.";
+                if (message.length < 5) {
+                    contactFormMessage.textContent = "Please enter a message of at least 5 characters.";
+                    contactFormMessage.style.color = "#ff6b6b";
+                    return;
+                }
 
-                contactFormMessage.classList.add("success");
+                const originalBtnText = sendBtn ? sendBtn.innerHTML : "Send Message";
+                if (sendBtn) {
+                    sendBtn.disabled = true;
+                    sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+                }
 
+                try {
+                    const response = await fetch(`${API_BASE}/api/contact`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            name: name,
+                            email: email,
+                            subject: subject,
+                            message: message,
+                            phone: phoneInput ? phoneInput.value.trim() : "",
+                            website: websiteInput ? websiteInput.value : ""
+                        })
+                    });
 
-                contactForm.reset();
+                    let data = {};
+                    try {
+                        data = await response.json();
+                    } catch (parseErr) {
+                        // In case response is non-JSON
+                    }
 
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || "Failed to send message. Please try again later.");
+                    }
+
+                    contactFormMessage.textContent = data.message || "Thank you! Your message has been received. We will get back to you shortly.";
+                    contactFormMessage.className = "contact-form-message success";
+                    contactFormMessage.style.color = "#99FFCC";
+                    contactForm.reset();
+
+                } catch (err) {
+                    let errMsg = err.message || "";
+                    if (!errMsg || errMsg.toLowerCase().includes("failed to fetch") || errMsg.toLowerCase().includes("networkerror")) {
+                        errMsg = "We couldn't reach the server. Please check your connection and try again, or email us at info@firquijewels.com.";
+                    }
+                    contactFormMessage.textContent = errMsg;
+                    contactFormMessage.className = "contact-form-message";
+                    contactFormMessage.style.color = "#ff6b6b";
+                } finally {
+                    if (sendBtn) {
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = originalBtnText;
+                    }
+                }
             });
 
         }
@@ -1000,9 +1060,9 @@
                             const row = document.createElement("div");
                             row.style.cssText = "display: flex; align-items: center; gap: 10px; padding: 6px 0;";
                             row.innerHTML = `
-                                <img src="${pImg}" alt="${pName}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(250, 245, 238, 0.2);" onerror="this.src='assets/Logo Pink 1.png';">
+                                <img src="${window.FirquiHtml.escape(pImg)}" alt="${window.FirquiHtml.escape(pName)}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(250, 245, 238, 0.2);" onerror="this.src='assets/Logo Pink 1.png';">
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pName}</div>
+                                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.FirquiHtml.escape(pName)}</div>
                                     <div style="font-size: 0.76rem; color: var(--pink);">Qty: ${pQty} • ${pPrice}</div>
                                 </div>
                             `;
@@ -1017,8 +1077,8 @@
             }
 
             // Also fetch fresh from API if token exists
-            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
-            const token = localStorage.getItem("firqui_token");
+            const API_BASE = window.FIRQUI_API_BASE;
+            const token = window.FirquiAuth.token();
             if (token) {
                 fetch(`${API_BASE}/api/orders/${cleanOrderNum}`, {
                     headers: { "Authorization": `Bearer ${token}` }
@@ -1115,8 +1175,9 @@
     });
 
 </script>
-<script src="js/search.js"></script>
+<script src="js/search.js?v=20261017d"></script>
 
+    <script src="js/site-nav.js?v=20261017d"></script>
 </body>
 
 </html>

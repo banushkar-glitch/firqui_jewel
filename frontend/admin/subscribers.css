@@ -1,0 +1,55 @@
+/* Subscribers page: reuses orders.css, plus the header buttons */
+
+.subscriber-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.subscriber-export {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 16px;
+    border: 1px solid #0A373B;
+    border-radius: 999px;
+    background: #0A373B;
+    color: #FAF5EE;
+    font-family: "Inter", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.subscriber-export:hover {
+    background: #EC9E96;
+    border-color: #EC9E96;
+    color: #0A373B;
+}
+
+.subscriber-email {
+    font-weight: 600;
+    color: #0A373B;
+    word-break: break-all;
+}
+
+.subscriber-source {
+    color: #7B6B69;
+    font-size: 13px;
+}
+
+.subscriber-remove {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(192, 57, 43, 0.08);
+    color: #C0392B;
+    cursor: pointer;
+}
+
+.subscriber-remove:hover {
+    background: rgba(192, 57, 43, 0.18);
+}

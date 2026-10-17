@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-auth="admin">
 
 <head>
 
     <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261017d"></script>
 
     <meta
         name="viewport"
@@ -47,9 +48,10 @@
 
     <link
         rel="stylesheet"
-        href="dashboard.css"
+        href="dashboard.css?v=20261017d"
     >
 
+    <link rel="stylesheet" href="../css/site.css?v=20261017d">
 </head>
 
 
@@ -139,7 +141,16 @@
                 href="cancellation-requests.html"
                 class="nav-link"
             >
-                Cancellation Requests
+                Cancellations
+            </a>
+
+
+            <span class="nav-dot"></span>
+            <a
+                href="subscribers.html"
+                class="nav-link"
+            >
+                Subscribers
             </a>
 
 
@@ -292,7 +303,7 @@
 
 
                     <a
-                        href="add-product.html"
+                        href="product-form.html"
                         class="add-product-btn"
                     >
 
@@ -509,218 +520,8 @@
                             </thead>
 
 
-                            <tbody>
-
-
-                                <!-- PRODUCT 1 -->
-
-                                <tr>
-
-                                    <td>
-
-                                        <div class="product-info">
-
-                                            <div class="product-image">
-                                                <i class="fa-solid fa-gem"></i>
-                                            </div>
-
-                                            <div>
-
-                                                <strong>
-                                                    Golden Grace
-                                                </strong>
-
-                                                <small>
-                                                    Product #001
-                                                </small>
-
-                                            </div>
-
-                                        </div>
-
-                                    </td>
-
-
-                                    <td>
-                                        Bracelets
-                                    </td>
-
-
-                                    <td>
-                                        Signature
-                                    </td>
-
-
-                                    <td>
-                                        ₹1,499
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="status active">
-                                            Active
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <button
-                                            class="table-action edit-btn"
-                                            data-product="Golden Grace"
-                                        >
-
-                                            <i class="fa-regular fa-pen-to-square"></i>
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-
-
-                                <!-- PRODUCT 2 -->
-
-                                <tr>
-
-                                    <td>
-
-                                        <div class="product-info">
-
-                                            <div class="product-image">
-                                                <i class="fa-solid fa-ring"></i>
-                                            </div>
-
-                                            <div>
-
-                                                <strong>
-                                                    Pearl Shine
-                                                </strong>
-
-                                                <small>
-                                                    Product #002
-                                                </small>
-
-                                            </div>
-
-                                        </div>
-
-                                    </td>
-
-
-                                    <td>
-                                        Necklaces
-                                    </td>
-
-
-                                    <td>
-                                        Pearl Collection
-                                    </td>
-
-
-                                    <td>
-                                        ₹1,899
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="status active">
-                                            Active
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <button
-                                            class="table-action edit-btn"
-                                            data-product="Pearl Shine"
-                                        >
-
-                                            <i class="fa-regular fa-pen-to-square"></i>
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-
-
-                                <!-- PRODUCT 3 -->
-
-                                <tr>
-
-                                    <td>
-
-                                        <div class="product-info">
-
-                                            <div class="product-image">
-                                                <i class="fa-solid fa-star"></i>
-                                            </div>
-
-                                            <div>
-
-                                                <strong>
-                                                    Rose Charm
-                                                </strong>
-
-                                                <small>
-                                                    Product #003
-                                                </small>
-
-                                            </div>
-
-                                        </div>
-
-                                    </td>
-
-
-                                    <td>
-                                        Earrings
-                                    </td>
-
-
-                                    <td>
-                                        Rose Collection
-                                    </td>
-
-
-                                    <td>
-                                        ₹999
-                                    </td>
-
-
-                                    <td>
-
-                                        <span class="status active">
-                                            Active
-                                        </span>
-
-                                    </td>
-
-
-                                    <td>
-
-                                        <button
-                                            class="table-action edit-btn"
-                                            data-product="Rose Charm"
-                                        >
-
-                                            <i class="fa-regular fa-pen-to-square"></i>
-
-                                        </button>
-
-                                    </td>
-
-                                </tr>
-
-
+                            <tbody id="recentProductsBody">
+                                <tr><td colspan="6">Loading products...</td></tr>
                             </tbody>
 
                         </table>
@@ -758,7 +559,7 @@
                         <!-- ADD PRODUCT -->
 
                         <a
-                            href="products/add-product.html"
+                            href="product-form.html"
                             class="quick-action-card"
                         >
 
@@ -789,7 +590,7 @@
                         <!-- CATEGORIES -->
 
                         <a
-                            href="categories/categories.html"
+                            href="products.html"
                             class="quick-action-card"
                         >
 
@@ -806,7 +607,7 @@
                                 </h3>
 
                                 <p>
-                                    Manage product categories
+                                    Browse products by category
                                 </p>
 
                             </div>
@@ -820,7 +621,7 @@
                         <!-- COLLECTIONS -->
 
                         <a
-                            href="collections/collections.html"
+                            href="products.html"
                             class="quick-action-card"
                         >
 
@@ -837,7 +638,7 @@
                                 </h3>
 
                                 <p>
-                                    Manage jewellery collections
+                                    Browse products by collection
                                 </p>
 
                             </div>
@@ -1167,10 +968,11 @@
      DASHBOARD JAVASCRIPT
 ====================================================== -->
 
-<script src="dashboard.js"></script>
-<script src="admin-search.js"></script>
+<script src="dashboard.js?v=20261017d"></script>
+<script src="admin-search.js?v=20261017d"></script>
 
 
+    <script src="../js/site-nav.js?v=20261017d"></script>
 </body>
 
 </html>

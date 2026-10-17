@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en" data-auth="admin">
+
+<head>
+
+    <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261017d"></script>
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Firqui Jewels | Product</title>
+
+
+    <!-- =====================================================
+         GOOGLE FONTS
+    ====================================================== -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600;700&family=Caveat:wght@400;500;600&family=Hurricane&family=Imprima&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <!-- =====================================================
+         FONT AWESOME
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+
+
+    <!-- =====================================================
+         SAME ADMIN BASE DESIGN
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="dashboard.css?v=20261017d"
+    >
+
+
+    <!-- =====================================================
+         ADD PRODUCT CSS
+    ====================================================== -->
+
+    <link
+        rel="stylesheet"
+        href="product-form.css?v=20261017d"
+    >
+
+    <link rel="stylesheet" href="../css/site.css?v=20261017d">
+</head>
+
+
+<body>
+
+
+<div class="page">
+
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <header class="header">
+
+
+        <!-- LOGO -->
+
+        <a
+            href="dashboard.html"
+            class="header-logo"
+            aria-label="FIRQUI JEWELS Dashboard"
+        >
+
+            <img
+                src="../assets/Logo Pink 1.png"
+                alt="Firqui Jewels"
+            >
+
+        </a>
+
+
+
+        <!-- NAVIGATION -->
+
+        <nav
+            class="navigation"
+            aria-label="Admin Navigation"
+        >
+
+
+            <a
+                href="dashboard.html"
+                class="nav-link"
+            >
+                Dashboard
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="products.html"
+                class="nav-link active"
+            >
+                Products
+            </a>
+
+
+            
+
+
+    
+
+
+            
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="orders.html"
+                class="nav-link"
+            >
+                Orders
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="cancellation-requests.html"
+                class="nav-link"
+            >
+                Cancellations
+            </a>
+
+
+            <span class="nav-dot"></span>
+            <a
+                href="subscribers.html"
+                class="nav-link"
+            >
+                Subscribers
+            </a>
+
+
+            <span class="nav-dot"></span>
+
+
+            <a
+                href="../index.html"
+                class="nav-link"
+                title="Open live customer store"
+            >
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:0.75em;margin-right:3px;"></i> View Store
+            </a>
+
+
+        </nav>
+
+
+
+        <!-- HEADER ICONS -->
+
+        <div class="header-icons">
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="adminButton"
+                aria-label="Admin"
+            >
+
+                <i class="fa-regular fa-user"></i>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="searchButton"
+                aria-label="Search"
+            >
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="notificationButton"
+                aria-label="Notifications"
+            >
+
+                <i class="fa-regular fa-bell"></i>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="header-icon-btn"
+                id="logoutButton"
+                aria-label="Logout"
+            >
+
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+
+            </button>
+
+
+        </div>
+
+
+    </header>
+
+
+
+    <!-- =====================================================
+         MAIN
+    ====================================================== -->
+
+    <main>
+
+        <section class="add-product-section">
+
+            <div class="add-product-heading">
+                <a href="products.html" class="pf-back"><i class="fa-solid fa-arrow-left"></i> All products</a>
+                <h1 id="pfTitle">Add Product</h1>
+                <p id="pfSubtitle">Drafts save automatically. Publish when the listing is ready.</p>
+            </div>
+
+            <div class="pf-banner" id="pfBanner" role="alert" hidden></div>
+
+            <form id="productForm" class="add-product-form" novalidate>
+
+                <!-- =================================================
+                     LEFT COLUMN
+                ================================================== -->
+                <div class="form-left-column">
+
+                    <!-- BASICS -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">BASIC INFORMATION</span>
+                                <h2>Product Details</h2>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="productName">JEWELRY TITLE <span>*</span></label>
+                            <input type="text" id="productName" maxlength="150" placeholder="e.g., Rogue Pearl Drop Earrings" autocomplete="off">
+                            <p class="pf-error" data-error-for="productName"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="descriptionEditor">DESCRIPTION</label>
+                            <div class="editor-toolbar">
+                                <button type="button" data-command="bold" title="Bold"><strong>B</strong></button>
+                                <span>/</span>
+                                <button type="button" data-command="italic" title="Italic"><em>I</em></button>
+                                <span>/</span>
+                                <button type="button" data-command="underline" title="Underline"><u>U</u></button>
+                            </div>
+                            <div class="description-editor" id="descriptionEditor" contenteditable="true" role="textbox" aria-multiline="true"
+                                 data-placeholder="Tell customers about the design, inspiration and craftsmanship..."></div>
+                        </div>
+                    </div>
+
+                    <!-- MEDIA -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">MEDIA</span>
+                                <h2>Photos &amp; Videos</h2>
+                            </div>
+                            <span class="pf-media-count" id="pfMediaCount">0 / 5</span>
+                        </div>
+
+                        <div class="pf-media-grid" id="pfMediaGrid" aria-live="polite"></div>
+
+                        <label class="pf-dropzone" id="pfDropzone" for="pfMediaInput">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <strong>Drop photos or videos here, or click to choose</strong>
+                            <small>Up to 5 files. JPG, PNG, WEBP, GIF (large photos are resized) or MP4, WEBM up to 50 MB.
+                                The first one is the main photo; drag to reorder.</small>
+                            <input type="file" id="pfMediaInput" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm" multiple hidden>
+                        </label>
+                        <p class="pf-error" data-error-for="media"></p>
+                    </div>
+
+                    <!-- SPECIFICATIONS -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">PRODUCT INFORMATION</span>
+                                <h2>Specifications</h2>
+                            </div>
+                        </div>
+                        <div class="two-column-fields">
+                            <div class="form-group">
+                                <label for="measurement">SIZE</label>
+                                <input type="text" id="measurement" placeholder="e.g., 16 inch, adjustable">
+                                <small class="field-help">Separate several sizes with commas.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="gemstone">GEMSTONE</label>
+                                <input type="text" id="gemstone" placeholder="e.g., Freshwater pearl">
+                            </div>
+                            <div class="form-group">
+                                <label for="material">MATERIAL</label>
+                                <input type="text" id="material" placeholder="e.g., 18K gold plated brass">
+                            </div>
+                            <div class="form-group">
+                                <label for="productColor">COLOR</label>
+                                <input type="text" id="productColor" placeholder="e.g., Gold">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DETAILS -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">PRODUCT PAGE</span>
+                                <h2>Details &amp; Highlights</h2>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="productDetailsDescription">DETAILS (shown under "Product details")</label>
+                            <textarea id="productDetailsDescription" class="product-details-textarea" rows="4"
+                                      placeholder="Care instructions, dimensions, packaging..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>HIGHLIGHTS</label>
+                            <div class="highlights-list" id="highlightsList"></div>
+                            <button type="button" class="add-highlight-btn" id="addHighlight"><i class="fa-solid fa-plus"></i> Add highlight</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================
+                     RIGHT COLUMN
+                ================================================== -->
+                <div class="form-right-column">
+
+                    <!-- STATUS -->
+                    <div class="form-card pf-status-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">VISIBILITY</span>
+                                <h2>Status</h2>
+                            </div>
+                            <span class="pf-status-badge" id="pfStatusBadge">New</span>
+                        </div>
+                        <p class="pf-status-help" id="pfStatusHelp">Not saved yet.</p>
+                        <p class="pf-saved" id="pfSaved" aria-live="polite"></p>
+                    </div>
+
+                    <!-- PREVIEW -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">LIVE PREVIEW</span>
+                                <h2>In the shop</h2>
+                            </div>
+                        </div>
+                        <article class="pf-preview" aria-label="Shop card preview">
+                            <div class="pf-preview-media" id="pfPreviewMedia"><i class="fa-regular fa-image"></i></div>
+                            <div class="pf-preview-info">
+                                <span class="pf-preview-cat" id="pfPreviewCat"></span>
+                                <h3 id="pfPreviewName">Product title</h3>
+                                <p id="pfPreviewDesc"></p>
+                                <div class="pf-preview-price">
+                                    <strong id="pfPreviewPrice">₹0</strong>
+                                    <s id="pfPreviewCompare"></s>
+                                </div>
+                                <span class="pf-preview-stock" id="pfPreviewStock"></span>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- AVAILABILITY -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">INVENTORY</span>
+                                <h2>Availability</h2>
+                            </div>
+                        </div>
+                        <label class="availability-option selected">
+                            <input type="radio" name="availability" value="In Stock" checked>
+                            <span class="custom-radio"></span>
+                            <div><strong>In Stock</strong><small>Ready to dispatch</small></div>
+                        </label>
+                        <label class="availability-option">
+                            <input type="radio" name="availability" value="Arriving Soon">
+                            <span class="custom-radio"></span>
+                            <div><strong>Arriving Soon (Pre-order)</strong><small>Take orders before stock arrives</small></div>
+                        </label>
+                        <label class="availability-option">
+                            <input type="radio" name="availability" value="Out of Stock">
+                            <span class="custom-radio"></span>
+                            <div><strong>Out of Stock</strong><small>Shown, but cannot be bought</small></div>
+                        </label>
+                        <div class="form-group" id="restockGroup" hidden>
+                            <label for="restockDate">EXPECTED RESTOCK DATE <span>*</span></label>
+                            <input type="date" id="restockDate">
+                            <p class="pf-error" data-error-for="restockDate"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="stockQuantity">STOCK QUANTITY</label>
+                            <input type="number" id="stockQuantity" min="0" step="1" inputmode="numeric" placeholder="e.g., 25">
+                            <p class="pf-error" data-error-for="stockQuantity"></p>
+                        </div>
+                    </div>
+
+                    <!-- PRICING -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">PRODUCT VALUE</span>
+                                <h2>Pricing</h2>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="price">PRICE <span>*</span></label>
+                            <div class="price-input"><span>₹</span><input type="number" id="price" min="0" step="0.01" inputmode="decimal" placeholder="0.00"></div>
+                            <p class="pf-error" data-error-for="price"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="comparePrice">COMPARE-AT PRICE</label>
+                            <div class="price-input"><span>₹</span><input type="number" id="comparePrice" min="0" step="0.01" inputmode="decimal" placeholder="Optional"></div>
+                            <small class="field-help" id="discountHelp">Shown crossed out when higher than the price.</small>
+                            <p class="pf-error" data-error-for="comparePrice"></p>
+                        </div>
+                    </div>
+
+                    <!-- ORGANIZATION -->
+                    <div class="form-card">
+                        <div class="form-card-heading">
+                            <div>
+                                <span class="section-label">ORGANIZATION</span>
+                                <h2>Category &amp; SKU</h2>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="category">CATEGORY</label>
+                            <select id="category"><option value="">Select category (Optional)</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="collection">COLLECTION</label>
+                            <select id="collection"><option value="">Select collection (Optional)</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="sku">SKU</label>
+                            <input type="text" id="sku" maxlength="40" placeholder="Leave empty to create one, e.g. FQ-RIN-0042" autocomplete="off">
+                            <p class="pf-error" data-error-for="sku"></p>
+                        </div>
+                        <div class="form-group">
+                            <label for="tags">TAGS</label>
+                            <input type="text" id="tags" placeholder="e.g., pearl, gift, statement">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- =================================================
+                     ACTION BAR
+                ================================================== -->
+                <div class="pf-actions" id="pfActions">
+                    <span class="pf-actions-state" id="pfActionsState"></span>
+                    <div class="pf-actions-buttons">
+                        <button type="button" class="pf-btn pf-btn-ghost" id="pfSecondary" hidden></button>
+                        <button type="button" class="pf-btn pf-btn-outline" id="pfSaveDraft">Save draft</button>
+                        <button type="submit" class="pf-btn pf-btn-primary" id="pfPrimary">Publish</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section class="lower-section">
+
+
+            <div class="lower-card">
+
+
+                <div class="lower-brand-title">
+                    2026 - FIRQUI JEWELS
+                </div>
+
+
+                <div class="lower-columns">
+
+
+                    <!-- ABOUT -->
+
+                    <div class="lower-col col-about">
+
+                        <h4>
+                            ABOUT
+                        </h4>
+
+                        <p>
+                            Firqui Jewels creates elegant jewellery
+                            designed to celebrate your unique style.
+                        </p>
+
+                        <p>
+                            Discover pieces made to become part
+                            of your most spectacular moments.
+                        </p>
+
+                    </div>
+
+
+
+                    <!-- SUPPORT -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SUPPORT
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../contact.html">
+                                    Contact Us
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Shipping
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    Returns
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="#">
+                                    FAQ
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- SHOP -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            SHOP
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../earrings.html">
+                                    Earrings
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../necklaces.html">
+                                    Necklaces
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../bracelets.html">
+                                    Bracelets
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../rings.html">
+                                    Rings
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- EXPLORE -->
+
+                    <div class="lower-col col-links">
+
+                        <h4>
+                            EXPLORE
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="../index.html">
+                                    Home
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../index.html#collections">
+                                    Collections
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="../about.html">
+                                    About
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+
+                    <!-- NEWSLETTER -->
+
+                    <div class="lower-col col-newsletter">
+
+                        <h4>
+                            NEWSLETTER
+                        </h4>
+
+                        <p>
+                            Subscribe to receive updates about
+                            new collections and special pieces.
+                        </p>
+
+
+                        <form id="newsletterForm">
+
+                            <input
+                                type="email"
+                                id="newsletterEmail"
+                                placeholder="Your email address"
+                                required
+                            >
+
+                            <button type="submit">
+                                Subscribe
+                            </button>
+
+                        </form>
+
+
+                        <div id="newsletterMsg"></div>
+
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =====================================================
+         BOTTOM FOOTER
+    ====================================================== -->
+
+    <footer class="footer">
+
+        <div class="footer-copy">
+            2026 - FIRQUI JEWELS
+        </div>
+
+        <div class="footer-credit">
+            Powered by
+            <strong>
+                GENEXA TECH
+            </strong>
+        </div>
+
+    </footer>
+
+
+</div>
+
+
+
+<script src="../js/image-compress.js?v=20261017d"></script>
+<script src="catalog-options.js?v=20261017d"></script>
+<script src="product-form.js?v=20261017d"></script>
+<script src="admin-search.js?v=20261017d"></script>
+
+    <script src="../js/site-nav.js?v=20261017d"></script>
+</body>
+
+</html>

@@ -1,0 +1,524 @@
+/* =====================================================
+   FIRQUI JEWELS - shared site layer
+   Loaded after each page's own stylesheet. Holds what every page
+   shares: cart badge, mobile menu, image fallback and the
+   phone/tablet layout of the header and footer.
+===================================================== */
+
+:root {
+    --site-teal: #0A373B;
+    --site-teal-2: #0E474C;
+    --site-pink: #EC9E96;
+    --site-light-pink: #FFB9B3;
+    --site-cream: #FAF5EE;
+    --site-header-h: 64px;
+}
+
+/* No page should scroll sideways; clip keeps position: sticky working */
+html,
+body {
+    overflow-x: clip;
+}
+
+/* Short pages: no white strip below the footer */
+html {
+    background: var(--site-teal);
+}
+
+/* Decorative shapes on the sign-in pages hang off both edges; keep them
+   inside their page so phones don't widen the layout and zoom out */
+.login-page,
+.auth-page,
+.register-page,
+.profile-page {
+    position: relative;
+    overflow: hidden;
+}
+
+/* =====================================================
+   HEADER CART BADGE
+===================================================== */
+.header-icon-btn {
+    position: relative;
+}
+
+.cart-count-badge {
+    position: absolute;
+    top: -5px;
+    right: -7px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background-color: var(--site-pink);
+    color: var(--site-teal);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: "Inter", sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    pointer-events: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+    z-index: 10;
+}
+
+.cart-count-badge[hidden] {
+    display: none;
+}
+
+/* =====================================================
+   BROKEN IMAGE PLACEHOLDER
+===================================================== */
+img.img-fallback {
+    object-fit: contain !important;
+    padding: 18%;
+    background: var(--site-teal-2);
+    opacity: 0.9;
+}
+
+/* =====================================================
+   MOBILE MENU (drawer)
+===================================================== */
+.mobile-menu-toggle {
+    display: none !important;
+}
+
+.mobile-menu-bars {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 20px;
+}
+
+.mobile-menu-bars span {
+    display: block;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+}
+
+.mobile-menu-bars span:nth-child(2) {
+    width: 70%;
+    margin-left: auto;
+}
+
+.mobile-menu-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 22, 24, 0.55);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    z-index: 2000;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(320px, 86vw);
+    display: flex;
+    flex-direction: column;
+    background: var(--site-teal);
+    color: var(--site-cream);
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.35);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.25, 1, 0.35, 1);
+    z-index: 2001;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.mobile-menu[hidden],
+.mobile-menu-overlay[hidden] {
+    display: none;
+}
+
+.mobile-menu-open .mobile-menu {
+    transform: translateX(0);
+}
+
+.mobile-menu-open .mobile-menu-overlay {
+    opacity: 1;
+}
+
+.mobile-menu-open,
+.mobile-menu-open body {
+    overflow: hidden;
+}
+
+.mobile-menu-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px 10px 20px;
+    border-bottom: 1px solid rgba(255, 185, 179, 0.18);
+}
+
+.mobile-menu-logo {
+    height: 48px;
+    width: auto;
+}
+
+.mobile-menu-close {
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--site-light-pink);
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.mobile-menu-close:hover,
+.mobile-menu-close:focus-visible {
+    background: rgba(255, 185, 179, 0.12);
+}
+
+.mobile-menu-list,
+.mobile-menu-sub {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.mobile-menu-list {
+    padding: 8px 0;
+}
+
+.mobile-menu-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 52px;
+    padding: 0 22px;
+    border: 0;
+    background: transparent;
+    color: var(--site-cream);
+    font-family: "Inter", sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.mobile-menu-link:hover,
+.mobile-menu-link:focus-visible {
+    background: rgba(255, 185, 179, 0.08);
+    color: var(--site-light-pink);
+}
+
+.mobile-menu-link.is-current {
+    color: var(--site-pink);
+    box-shadow: inset 3px 0 0 var(--site-pink);
+}
+
+.mobile-menu-expand i {
+    font-size: 13px;
+    color: var(--site-pink);
+    transition: transform 0.2s ease;
+}
+
+.mobile-menu-expand[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.mobile-menu-sub {
+    padding: 0 0 8px;
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.mobile-menu-sub a {
+    display: flex;
+    align-items: center;
+    min-height: 46px;
+    padding: 0 22px 0 38px;
+    color: rgba(250, 245, 238, 0.85);
+    font-family: "Inter", sans-serif;
+    font-size: 15px;
+    text-decoration: none;
+}
+
+.mobile-menu-sub a:hover,
+.mobile-menu-sub a:focus-visible,
+.mobile-menu-sub a.is-current {
+    color: var(--site-pink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mobile-menu,
+    .mobile-menu-overlay {
+        transition: none;
+    }
+}
+
+/* =====================================================
+   PHONES & TABLETS: compact header with menu button
+===================================================== */
+@media (max-width: 960px) {
+
+    .header:has(.navigation) {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 8px !important;
+        height: var(--site-header-h) !important;
+        min-height: 0 !important;
+        padding: 0 8px 0 14px !important;
+        background: var(--site-teal) !important;
+        box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22) !important;
+        box-sizing: border-box !important;
+    }
+
+    .header:has(.navigation)::before,
+    .header:has(.navigation)::after {
+        display: none !important;
+    }
+
+    .header:has(.navigation) .header-logo,
+    .header:has(.navigation) .header-logo-link {
+        position: static !important;
+        display: flex !important;
+        align-items: center !important;
+        width: auto !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        transform: none !important;
+        flex-shrink: 0;
+    }
+
+    .header:has(.navigation) .header-logo img,
+    .header:has(.navigation) .header-logo-link img {
+        width: auto !important;
+        height: 50px !important;
+        max-width: none !important;
+        object-fit: contain !important;
+    }
+
+    .header .navigation {
+        display: none !important;
+    }
+
+    .header:has(.navigation) .header-icons {
+        position: static !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 2px !important;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    .header:has(.navigation) .header-icon-btn {
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 42px !important;
+        height: 42px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        font-size: 18px !important;
+        border-radius: 50%;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .header:has(.navigation) .header-icon-btn:active {
+        background: rgba(255, 185, 179, 0.14);
+    }
+
+    .header:has(.navigation) .header-icon-btn i {
+        font-size: 18px !important;
+    }
+
+    .header .mobile-menu-toggle {
+        display: inline-flex !important;
+        color: var(--site-light-pink);
+        background: transparent;
+        border: 0;
+        cursor: pointer;
+    }
+}
+
+@media (max-width: 360px) {
+    .header:has(.navigation) .header-icon-btn {
+        width: 38px !important;
+        height: 38px !important;
+    }
+
+    .header:has(.navigation) .header-logo img,
+    .header:has(.navigation) .header-logo-link img {
+        height: 42px !important;
+    }
+}
+
+/* =====================================================
+   PHONES: footer, forms, touch targets
+===================================================== */
+@media (max-width: 600px) {
+
+    /* Footer link columns side by side instead of one long list */
+    .lower-columns {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 26px 18px !important;
+    }
+
+    .lower-columns > .lower-col {
+        width: auto !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+    }
+
+    .lower-columns > .col-about,
+    .lower-columns > .col-newsletter {
+        grid-column: 1 / -1;
+    }
+
+    .lower-col li a,
+    .lower-col ul a {
+        display: inline-block;
+        padding: 3px 0;
+    }
+
+    /* Simple footer used on cart / wishlist / checkout */
+    .footer .footer-copy,
+    .footer .footer-credit {
+        display: flex !important;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: baseline;
+        gap: 6px;
+        width: 100% !important;
+        font-size: 14px !important;
+        line-height: 1.4 !important;
+        text-align: center !important;
+    }
+
+    .footer {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+    }
+
+    /* iOS zooms into inputs smaller than 16px */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* =====================================================
+   FORMS
+===================================================== */
+
+/* Spam trap on the contact form: off-screen, never seen by people */
+.contact-honeypot {
+    position: absolute !important;
+    left: -10000px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Admin media slot while a picked photo is being resized */
+.is-processing {
+    opacity: 0.6;
+    cursor: progress !important;
+    pointer-events: none;
+}
+
+/* Newsletter sign-up result under the footer form */
+.newsletter-message {
+    margin: 10px 0 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.newsletter-message.is-success {
+    color: #2E7D5B;
+}
+
+.newsletter-message.is-error {
+    color: #C0392B;
+}
+
+/* =====================================================
+   ACCOUNT MENU (header user icon when signed in)
+===================================================== */
+.header-icon-btn.is-signed-in::after {
+    content: "";
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #3DBE8B;
+    box-shadow: 0 0 0 2px var(--site-teal);
+}
+
+.account-menu {
+    position: fixed;
+    z-index: 2100;
+    min-width: 220px;
+    padding: 8px;
+    border-radius: 14px;
+    background: var(--site-cream);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+    font-family: "Inter", sans-serif;
+}
+
+.account-menu-hello {
+    padding: 10px 12px 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #7B6B69;
+    border-bottom: 1px solid rgba(10, 55, 59, 0.1);
+    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.account-menu a,
+.account-menu button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--site-teal);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.account-menu a:hover,
+.account-menu button:hover,
+.account-menu a:focus-visible,
+.account-menu button:focus-visible {
+    background: rgba(236, 158, 150, 0.18);
+}
+
+.mobile-menu-account {
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 185, 179, 0.18);
+    padding-top: 8px;
+}

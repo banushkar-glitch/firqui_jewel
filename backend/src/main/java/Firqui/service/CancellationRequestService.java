@@ -19,6 +19,9 @@ import java.util.stream.Collectors;
 @Service
 public class CancellationRequestService {
 
+    @Autowired(required = false)
+    private ShopNotificationService shopNotifications;
+
     private static final Logger logger = LoggerFactory.getLogger(CancellationRequestService.class);
 
     private static final Set<String> VALID_REASONS = new HashSet<>(Arrays.asList(
@@ -106,6 +109,7 @@ public class CancellationRequestService {
         cancellation.setCreatedAt(LocalDateTime.now());
 
         CancellationRequest saved = cancellationRequestRepository.save(cancellation);
+        if (shopNotifications != null) shopNotifications.cancellationRequested(saved);
         logger.info("Customer {} submitted cancellation request #{} for order #{}", user.getEmail(), saved.getId(), orderNum);
 
         return CancellationResponseDTO.fromEntity(saved);
