@@ -2,18 +2,8 @@
    FIRQUI JEWELS — MANUAL UPI PAYMENT CONTROLLER
    ========================================================================== */
 
-/* ==========================================================================
-   CONFIGURATION: ENTER YOUR ACTUAL UPI DETAILS HERE
-   --------------------------------------------------------------------------
-   Please add your real UPI ID and UPI QR code image path below:
-   ========================================================================== */
-const UPI_CONFIG = {
-    // Actual UPI ID configured for FIRQUI JEWELS manual payments:
-    upiId: "nehaa067@icici",
-
-    // Actual UPI QR code image path:
-    qrCodeImagePath: "../assets/QR Code.jpeg"
-};
+/* The UPI ID and the amount come from the backend (POST /api/payments/upi),
+   which prices the cart from the database. The QR encodes that exact amount. */
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -57,9 +47,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // QR & UPI ID
     const upiQrImage = document.getElementById("upi-qr-image");
     const upiIdDisplay = document.getElementById("upi-id-display");
-    const copyUpiBtn = document.getElementById("copy-upi-btn");
-    const copyBtnText = document.getElementById("copy-btn-text");
-    const copyToast = document.getElementById("copy-toast");
 
     // Form & Upload
     const paymentForm = document.getElementById("upi-payment-form");
@@ -93,13 +80,72 @@ document.addEventListener("DOMContentLoaded", function () {
     let selectedFile = null;
 
     /* =====================================================
-       3. INITIALIZE CONFIGURED UPI ID & QR IMAGE
+       3. UPI QR WITH A FIXED AMOUNT
     ====================================================== */
-    if (upiIdDisplay) {
-        upiIdDisplay.textContent = UPI_CONFIG.upiId;
+    const qrAmount = document.getElementById("qr-amount");
+    const qrStatus = document.getElementById("qr-status");
+    const upiAppLink = document.getElementById("upi-app-link");
+    const upiAppText = document.getElementById("upi-app-text");
+    let payableAmount = null;
+
+    function rupees(amount) {
+        return "₹" + Number(amount).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
-    if (upiQrImage && UPI_CONFIG.qrCodeImagePath) {
-        upiQrImage.src = UPI_CONFIG.qrCodeImagePath;
+
+    function showQrError(message) {
+        if (upiQrImage) upiQrImage.hidden = true;
+        if (upiAppLink) upiAppLink.hidden = true;
+        if (qrAmount) qrAmount.textContent = "";
+        if (qrStatus) {
+            qrStatus.hidden = false;
+            qrStatus.classList.add("is-error");
+            qrStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + message;
+        }
+        if (submitBtn) submitBtn.disabled = true;
+    }
+
+    // body: { items: [...] } for a new order, or { orderNumber } for an existing one
+    async function loadUpiPayment(body) {
+        try {
+            const headers = { "Content-Type": "application/json" };
+            if (token) headers["Authorization"] = `Bearer ${token}`;
+            const res = await fetch(`${API_BASE}/api/payments/upi`, {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+            const data = await res.json().catch(function () { return {}; });
+            if (!res.ok || !data.upiUri) {
+                throw new Error(data.message || "Could not prepare the payment QR.");
+            }
+
+            payableAmount = data.amount;
+            const qr = qrcode(0, "M");
+            qr.addData(data.upiUri);
+            qr.make();
+            upiQrImage.src = qr.createDataURL(8, 2);
+            upiQrImage.hidden = false;
+            if (qrStatus) qrStatus.hidden = true;
+
+            if (qrAmount) qrAmount.textContent = "Amount to pay: " + rupees(data.amount);
+            if (upiIdDisplay) upiIdDisplay.textContent = data.upiId;
+            if (upiAppLink) {
+                upiAppLink.href = data.upiUri;
+                upiAppLink.hidden = false;
+            }
+            if (upiAppText) upiAppText.textContent = "Pay " + rupees(data.amount) + " in UPI app";
+
+            // The summary shows exactly what the QR charges
+            [displayOrderAmount, displayTotalAmount, displaySubtotal].forEach(function (el) {
+                if (el) el.textContent = rupees(data.amount);
+            });
+        } catch (err) {
+            console.warn("UPI QR error:", err);
+            const msg = err && err.message && !/fetch|network/i.test(err.message)
+                ? err.message
+                : "Could not reach the server. Please check your connection and refresh this page.";
+            showQrError(msg);
+        }
     }
 
     /* =====================================================
@@ -264,38 +310,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    /* =====================================================
-       5. COPY UPI ID TO CLIPBOARD
-    ====================================================== */
-    if (copyUpiBtn) {
-        copyUpiBtn.addEventListener("click", async function () {
-            const upiId = UPI_CONFIG.upiId;
-            try {
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    await navigator.clipboard.writeText(upiId);
-                } else {
-                    const tempInput = document.createElement("input");
-                    tempInput.value = upiId;
-                    document.body.appendChild(tempInput);
-                    tempInput.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(tempInput);
-                }
-
-                if (copyBtnText) copyBtnText.textContent = "Copied!";
-                if (copyToast) copyToast.style.display = "flex";
-
-                setTimeout(function () {
-                    if (copyBtnText) copyBtnText.textContent = "Copy UPI ID";
-                    if (copyToast) copyToast.style.display = "none";
-                }, 2500);
-
-            } catch (err) {
-                console.warn("Clipboard write failed:", err);
-                alert("UPI ID: " + upiId);
-            }
-        });
-    }
 
     /* =====================================================
        6. SCREENSHOT SELECTION & PREVIEW MANAGEMENT
@@ -570,9 +584,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Initialize Page
     if (orderNumber) {
-        fetchOrderDetails();
+        fetchOrderDetails().then(function () {
+            const status = currentOrder ? String(currentOrder.paymentStatus || currentOrder.payment || "").toUpperCase() : "";
+            if (!currentOrder) return;
+            if (status === "PAID" || status === "PENDING_VERIFICATION") {
+                showQrError("Payment for this order has already been submitted.");
+                return;
+            }
+            loadUpiPayment({ orderNumber: currentOrder.orderNumber || orderNumber });
+        });
     } else if (pendingCheckout) {
         renderPendingCheckout(pendingCheckout);
+        loadUpiPayment({ items: pendingCheckout.items || [] });
     }
 
 });

@@ -95,34 +95,32 @@
                         <span class="amount-value" id="display-order-amount">Loading...</span>
                     </div>
 
-                    <!-- QR CODE CONTAINER -->
+                    <!-- QR CODE: generated for this cart, amount fixed by the server -->
                     <div class="qr-code-wrapper">
+                        <div class="qr-amount" id="qr-amount" aria-live="polite">Calculating amount...</div>
                         <div class="qr-image-frame" id="qr-image-container">
                             <img
                                 id="upi-qr-image"
-                                src="../assets/QR Code.jpeg"
-                                alt="FIRQUI JEWELS UPI QR Code"
+                                alt="UPI QR code for this order"
                                 class="qr-image"
+                                hidden
                             >
+                            <div class="qr-status" id="qr-status">
+                                <i class="fa-solid fa-circle-notch fa-spin"></i> Preparing your payment QR...
+                            </div>
                         </div>
                         <p class="qr-helper-text">
-                            <i class="fa-solid fa-camera"></i> Open any UPI App (Google Pay, PhonePe, Paytm, BHIM) and scan this QR code.
+                            <i class="fa-solid fa-camera"></i> Scan with any UPI app (Google Pay, PhonePe, Paytm, BHIM). The amount is filled in for you and cannot be changed.
                         </p>
                     </div>
 
-                    <!-- SECTION D: UPI ID CONTAINER WITH COPY BUTTON -->
+                    <!-- On a phone: open the UPI app directly with the same fixed amount -->
                     <div class="upi-id-box">
-                        <div class="upi-id-label">OR Pay to UPI ID:</div>
-                        <div class="upi-id-row">
-                            <code class="upi-id-text" id="upi-id-display">nehaa067@icici</code>
-                            <button type="button" class="copy-upi-btn" id="copy-upi-btn" aria-label="Copy UPI ID">
-                                <i class="fa-regular fa-copy"></i>
-                                <span id="copy-btn-text">Copy UPI ID</span>
-                            </button>
-                        </div>
-                        <div class="copy-toast" id="copy-toast" style="display: none;">
-                            <i class="fa-solid fa-check"></i> UPI ID copied to clipboard!
-                        </div>
+                        <a class="upi-app-btn" id="upi-app-link" href="#" hidden>
+                            <i class="fa-solid fa-mobile-screen-button"></i>
+                            <span id="upi-app-text">Pay in UPI app</span>
+                        </a>
+                        <div class="upi-id-label">Paying to <code class="upi-id-text" id="upi-id-display"></code></div>
                     </div>
                 </section>
 
@@ -352,6 +350,7 @@
     </footer>
 
     <!-- Scripts -->
+    <script src="../js/vendor/qrcode.min.js"></script>
     <script src="../js/image-compress.js"></script>
     <script src="payment.js"></script>
     <script src="../js/search.js"></script>

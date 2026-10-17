@@ -687,6 +687,35 @@ public class OrderService {
     }
 
     /* =====================================================
+       PRICE QUOTE (for the UPI payment QR)
+       Same product lookup and database prices as order placement,
+       but read-only: no order is created and no stock is reserved.
+    ====================================================== */
+    @Transactional(readOnly = true)
+    public double quoteTotal(List<OrderItemRequest> items) {
+        if (items == null || items.isEmpty()) {
+            throw new IllegalArgumentException("Your cart is empty. Please add items before paying.");
+        }
+        double total = 0.0;
+        for (OrderItemRequest item : items) {
+            int qty = item.getQuantity() != null ? item.getQuantity() : 0;
+            if (qty <= 0) continue;
+            Product product = findProductByIdOrLegacyOrName(item.getProductId(), item.getName());
+            if (product == null) {
+                throw new IllegalArgumentException("Product not found in catalogue: " + item.getName());
+            }
+            if (product.getStockQuantity() != null && product.getStockQuantity() < qty) {
+                throw new IllegalStateException("Only " + product.getStockQuantity() + " items are available for " + product.getName() + ".");
+            }
+            total += (product.getPrice() != null ? product.getPrice() : 0.0) * qty;
+        }
+        if (total <= 0) {
+            throw new IllegalArgumentException("Your cart is empty. Please add items before paying.");
+        }
+        return total;
+    }
+
+    /* =====================================================
        HELPERS
     ====================================================== */
     private Product findProductByIdOrLegacyOrName(String identifier, String productName) {
