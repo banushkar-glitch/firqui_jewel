@@ -327,15 +327,17 @@ document.addEventListener("DOMContentLoaded", () => {
         new URLSearchParams(window.location.search);
 
     const paramId = params.get("id");
-    const paramName = params.get("name");
-    const paramPrice = params.get("price");
-    const paramCategory = params.get("category");
-    const paramImage = params.get("image") || params.get("img");
-    const paramDesc = params.get("description") || params.get("desc");
-    const paramGemstone = params.get("gemstone") || params.get("gem");
-    const paramMaterial = params.get("material") || params.get("mat");
-    const paramColor = params.get("color") || params.get("productColor");
-    const paramMeasurement = params.get("measurement") || params.get("size") || params.get("measurements");
+    // Only the product id is taken from the link. Name, price, description etc. in the
+    // URL were shown as-is, so a crafted link could display fake prices or run script.
+    const paramName = null;
+    const paramPrice = null;
+    const paramCategory = null;
+    const paramImage = null;
+    const paramDesc = null;
+    const paramGemstone = null;
+    const paramMaterial = null;
+    const paramColor = null;
+    const paramMeasurement = null;
 
     let localProducts = [];
     try {
@@ -721,14 +723,14 @@ document.addEventListener("DOMContentLoaded", () => {
             descText !== "null" &&
             descText !== "[object Object]"
         ) {
-            html += `<p id="productDetailsDesc">${descText}</p>`;
+            html += `<div id="productDetailsDesc">${safeRichText(descText)}</div>`;
         }
 
         // If highlights exist, display bullet list
         if (highlightsList.length > 0) {
             html += `<ul id="productDetailsHighlights">`;
             highlightsList.forEach(item => {
-                html += `<li>${item}</li>`;
+                html += `<li>${escapeHtml(item)}</li>`;
             });
             html += `</ul>`;
         }
@@ -781,8 +783,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     if (productDescription) {
-        productDescription.textContent =
-            product.description;
+        productDescription.innerHTML =
+            safeRichText(product.description);
     }
 
     /* Render Available Sizes, Gemstone, Material, Color & Details Accordion */
@@ -790,11 +792,19 @@ document.addEventListener("DOMContentLoaded", () => {
     renderProductDetailsAccordion(product);
     loadRelatedProducts();
 
-    if (paramId || paramName) {
-        const lookup = paramId || paramName;
-        fetch(`${API_BASE}/api/products/${encodeURIComponent(lookup)}`)
+    const detailsSection = document.querySelector(".product-details-section");
+    if (detailsSection) detailsSection.classList.add("is-loading");
+
+    if (!paramId) {
+        showProductUnavailable("We couldn't find that product.");
+    } else {
+        fetch(`${API_BASE}/api/products/${encodeURIComponent(paramId)}`)
             .then(res => res.ok ? res.json() : null)
             .then(apiData => {
+                if (!apiData || apiData.active === false) {
+                    showProductUnavailable("This piece is no longer available.");
+                    return;
+                }
                 if (apiData) {
                     if (apiData.id) {
                         productId = String(apiData.id);
@@ -815,7 +825,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     if (apiData.description) {
                         product.description = apiData.description;
-                        if (productDescription) productDescription.textContent = product.description;
+                        if (productDescription) productDescription.innerHTML = safeRichText(product.description);
                     }
                     const dynamicImgs = [];
                     if (apiData.mainImage) dynamicImgs.push(resolveImage(apiData.mainImage));
@@ -857,11 +867,64 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                     renderAllSpecifications(product);
                     renderProductDetailsAccordion(product);
+                    applyAvailability(apiData);
                     syncProductWishlist();
                     loadRelatedProducts();
+                    if (detailsSection) detailsSection.classList.remove("is-loading");
                 }
             })
-            .catch(() => {});
+            .catch(() => {
+                showProductUnavailable("We couldn't load this product. Please check your connection and refresh.");
+            });
+    }
+
+    function safeRichText(html) {
+        if (!html) return "";
+        return window.FirquiHtml ? window.FirquiHtml.sanitize(html) : escapeHtml(html);
+    }
+
+    function showProductUnavailable(message) {
+        if (!detailsSection) return;
+        detailsSection.classList.remove("is-loading");
+        detailsSection.innerHTML = `
+            <div class="product-unavailable">
+                <h1>${escapeHtml(message)}</h1>
+                <a href="../index.html#categories" class="product-unavailable-link">Browse the collection</a>
+            </div>`;
+    }
+
+    // In Stock / pre-order / sold out, from the server
+    function applyAvailability(data) {
+        const button = document.getElementById("addCartButton");
+        const label = button ? button.querySelector("span") : null;
+        const stock = Number(data.stockQuantity || 0);
+        const availability = String(data.availability || (stock > 0 ? "In Stock" : "Out of Stock"));
+        let note = document.getElementById("productAvailabilityNote");
+        if (!note && button) {
+            note = document.createElement("p");
+            note.id = "productAvailabilityNote";
+            note.className = "product-availability-note";
+            button.closest(".product-actions").insertAdjacentElement("beforebegin", note);
+        }
+
+        product.availability = availability;
+        if (availability === "Out of Stock" || (availability === "In Stock" && stock <= 0)) {
+            if (button) {
+                button.disabled = true;
+                if (label) label.textContent = "Out of Stock";
+            }
+            if (note) note.textContent = "Currently sold out.";
+        } else if (availability === "Arriving Soon") {
+            if (label) label.textContent = "Pre-order";
+            if (note) {
+                const when = data.restockDate ? new Date(data.restockDate + "T00:00:00") : null;
+                note.textContent = when && !isNaN(when)
+                    ? "Pre-order: ships after " + when.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" }) + "."
+                    : "Pre-order: ships as soon as it arrives.";
+            }
+        } else if (note) {
+            note.textContent = stock > 0 && stock <= 3 ? "Only " + stock + " left." : "";
+        }
     }
 
 
@@ -949,15 +1012,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (isVid) {
                 thumbnail.innerHTML = `
                     <div style="position: relative; width: 100%; height: 100%; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
-                        <video src="${image}#t=0.1" preload="metadata" muted playsinline style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;"></video>
+                        <video src="${escapeHtml(image)}#t=0.1" preload="metadata" muted playsinline style="width: 100%; height: 100%; object-fit: cover; pointer-events: none;"></video>
                         <span style="position: absolute; bottom: 3px; right: 3px; background: rgba(0,0,0,0.7); color: #fff; font-size: 9px; border-radius: 3px; padding: 1px 4px; z-index: 2;"><i class="fa-solid fa-video"></i></span>
                     </div>
                 `;
             } else {
                 thumbnail.innerHTML = `
                     <img
-                        src="${image}"
-                        alt="${product.name} image ${index + 1}"
+                        src="${escapeHtml(image)}"
+                        alt="${escapeHtml(product.name)} image ${index + 1}"
                     >
                 `;
             }

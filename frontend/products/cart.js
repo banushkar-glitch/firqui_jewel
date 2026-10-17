@@ -333,15 +333,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
             cartItem.innerHTML = `
                 <div class="cart-product-image" style="cursor: pointer;" title="View product details">
-                    <img loading="lazy" decoding="async" src="${resolvedImg}"
-                         alt="${product.name || 'Product'}"
+                    <img loading="lazy" decoding="async" src="${window.FirquiHtml.escape(resolvedImg)}"
+                         alt="${window.FirquiHtml.escape(product.name || 'Product')}"
                          onerror="if(!this.dataset.triedFallback){this.dataset.triedFallback='1';this.src='${fallbackImg}';}else{this.src='../assets/Logo Pink 1.png';}">
                 </div>
 
                 <div class="cart-item-details">
-                    <h3 style="cursor: pointer;" title="View product details">${product.name || ''}</h3>
+                    <h3 style="cursor: pointer;" title="View product details">${window.FirquiHtml.escape(product.name || '')}</h3>
 
-                    <p>${product.description || ""}${(product.selectedSize || product.measurement || product.size) ? ` • Size: ${product.selectedSize || product.measurement || product.size}` : ""}</p>
+                    <p>${window.FirquiHtml.escape(window.FirquiHtml.text(product.description || ""))}${(product.selectedSize || product.measurement || product.size) ? ` • Size: ${window.FirquiHtml.escape(product.selectedSize || product.measurement || product.size)}` : ""}</p>
 
                     <div class="cart-item-price">
                         ${product.formattedPrice || formatPrice(price)}

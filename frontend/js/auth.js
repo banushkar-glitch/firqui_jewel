@@ -30,6 +30,53 @@
     try { localStorage.removeItem("firqui_token"); } catch (e) {}
 
     /* =====================================================
+       SAFE HTML (shared by all page scripts)
+       escape(): any value placed inside HTML or an attribute.
+       sanitize(): admin-written descriptions; only simple formatting tags,
+                   no attributes, links, styles or scripts.
+       text(): the plain text of a description (for cards and summaries).
+       Parsing happens in an inert document, so nothing loads or runs.
+    ===================================================== */
+    var ALLOWED_TAGS = { B: 1, STRONG: 1, I: 1, EM: 1, U: 1, BR: 1, P: 1, DIV: 1, UL: 1, OL: 1, LI: 1 };
+
+    function escapeHtml(value) {
+        return String(value == null ? "" : value)
+            .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function inert(html) {
+        return new DOMParser().parseFromString("<div>" + String(html == null ? "" : html) + "</div>", "text/html").body.firstChild;
+    }
+
+    function sanitizeHtml(html) {
+        var out = document.createElement("div");
+        (function copy(from, to) {
+            Array.prototype.forEach.call(from.childNodes, function (node) {
+                if (node.nodeType === 3) {
+                    to.appendChild(document.createTextNode(node.textContent));
+                } else if (node.nodeType === 1) {
+                    if (/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|TEMPLATE|NOSCRIPT)$/.test(node.tagName)) return;
+                    if (ALLOWED_TAGS[node.tagName]) {
+                        var el = document.createElement(node.tagName.toLowerCase());
+                        copy(node, el);
+                        to.appendChild(el);
+                    } else {
+                        copy(node, to); // drop the tag, keep its text
+                    }
+                }
+            });
+        })(inert(html), out);
+        return out.innerHTML;
+    }
+
+    function plainText(html) {
+        return (inert(html).textContent || "").replace(/\s+/g, " ").trim();
+    }
+
+    window.FirquiHtml = { escape: escapeHtml, sanitize: sanitizeHtml, text: plainText };
+
+    /* =====================================================
        API REQUESTS: send the session cookie
     ===================================================== */
     function isApiUrl(url) {

@@ -175,19 +175,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
             item.innerHTML = `
                 <img
-                    src="${resolveImage(product.image)}"
-                    alt="${product.name || 'Product'}"
+                    src="${window.FirquiHtml.escape(resolveImage(product.image))}"
+                    alt="${window.FirquiHtml.escape(product.name || 'Product')}"
                     onerror="this.src='../assets/Logo Pink 1.png'"
                 >
 
                 <div>
                     <div class="checkout-product-name">
-                        ${product.name || ''}
+                        ${window.FirquiHtml.escape(product.name || '')}
                     </div>
 
                     ${selectedSize ? `
                     <div class="checkout-product-variant" style="font-size: 0.85rem; color: #555; margin: 2px 0;">
-                        Size: ${selectedSize}
+                        Size: ${window.FirquiHtml.escape(selectedSize)}
                     </div>` : ""}
 
                     <div class="checkout-product-quantity">

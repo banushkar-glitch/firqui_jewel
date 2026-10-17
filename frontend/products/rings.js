@@ -28,30 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Strip HTML tags and decode HTML entities so only pure admin text is shown
+    // Plain text of the admin description; parsed in an inert document so nothing in it can run
     function cleanProductDescription(description) {
-        if (!description) return "";
-        let text = String(description);
-
-        // 1. Decode HTML entities (handles &lt;p data-pm-slice="1 1 []"&gt;)
-        const temp = document.createElement("div");
-        temp.innerHTML = text;
-        text = temp.textContent || temp.innerText || text;
-
-        // 2. Decode again if double-encoded
-        if (text.includes("&lt;") || text.includes("&gt;")) {
-            temp.innerHTML = text;
-            text = temp.textContent || temp.innerText || text;
-        }
-
-        // 3. Strip any remaining HTML tags (<p ...>, </p>, <br>, <div>, etc.)
-        text = text.replace(/<[^>]*>/g, " ");
-
-        // 4. Decode any remaining HTML entities
-        temp.innerHTML = text;
-        text = temp.textContent || temp.innerText || text;
-
-        // 5. Clean up redundant whitespace
-        return text.replace(/\s+/g, " ").trim();
+        return description ? window.FirquiHtml.text(description) : "";
     }
 
     function resolveImage(img) {
@@ -98,8 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const description = cleanProductDescription(product.description);
 
             const mediaHtml = isVid
-                ? `<video src="${imgSrc}" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
-                : `<img loading="lazy" decoding="async" src="${imgSrc}" alt="${escapeHtml(product.name)}" onerror="this.src='../assets/Heart Pearl Ring.png'">`;
+                ? `<video src="${escapeHtml(imgSrc)}" autoplay muted loop playsinline preload="metadata" style="width:100%;height:100%;object-fit:cover;"></video>`
+                : `<img loading="lazy" decoding="async" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(product.name)}" onerror="this.src='../assets/Heart Pearl Ring.png'">`;
 
             card.innerHTML = `
                 <div class="product-image">

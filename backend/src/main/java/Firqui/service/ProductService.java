@@ -118,9 +118,19 @@ public class ProductService {
         }
         Product product = new Product();
         mapDtoToEntity(dto, product);
+        ProductRules.normalizeAndValidate(product);
+        ensureSkuIsFree(product);
         Product saved = productRepository.save(product);
+        boolean changed = false;
         if (saved.getLegacyId() == null || saved.getLegacyId().trim().isEmpty()) {
             saved.setLegacyId(String.valueOf(saved.getId()));
+            changed = true;
+        }
+        if (saved.getSku() == null) {
+            saved.setSku(freeGeneratedSku(saved));
+            changed = true;
+        }
+        if (changed) {
             saved = productRepository.save(saved);
         }
         return saved;
@@ -184,6 +194,11 @@ public class ProductService {
         if (product.getReferenceImage4() != null) previousMediaUrls.add(product.getReferenceImage4());
 
         mapDtoToEntity(dto, product);
+        ProductRules.normalizeAndValidate(product);
+        ensureSkuIsFree(product);
+        if (product.getSku() == null) {
+            product.setSku(freeGeneratedSku(product));
+        }
         if (product.getLegacyId() == null || product.getLegacyId().trim().isEmpty()) {
             product.setLegacyId(String.valueOf(product.getId()));
         }
@@ -239,6 +254,26 @@ public class ProductService {
         for (String mediaUrl : mediaToCleanup) {
             cleanupUnsharedMedia(mediaUrl, null);
         }
+    }
+
+    private void ensureSkuIsFree(Product product) {
+        String sku = product.getSku();
+        if (sku == null) return;
+        boolean taken = product.getId() == null
+                ? productRepository.existsBySkuIgnoreCase(sku)
+                : productRepository.existsBySkuIgnoreCaseAndIdNot(sku, product.getId());
+        if (taken) {
+            throw new IllegalArgumentException("SKU " + sku + " is already used by another product. Leave it empty to generate one.");
+        }
+    }
+
+    private String freeGeneratedSku(Product product) {
+        String base = ProductRules.generateSku(product.getCategory(), product.getId());
+        String sku = base;
+        for (int n = 2; productRepository.existsBySkuIgnoreCase(sku); n++) {
+            sku = base + "-" + n;
+        }
+        return sku;
     }
 
     private void mapDtoToEntity(ProductDTO dto, Product product) {

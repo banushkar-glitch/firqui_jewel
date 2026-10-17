@@ -598,8 +598,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span style="${payStatusBadgeStyle}">
                         ${payStatusText}
                     </span>
-                    ${order.transactionId ? `<br><small style="color: #666; font-size: 0.75rem;">Ref: ${order.transactionId}</small>` : ""}
-                    ${order.rejectionReason ? `<br><small style="color: #D32F2F; font-size: 0.75rem;">Reason: ${order.rejectionReason}</small>` : ""}
+                    ${order.transactionId ? `<br><small style="color: #666; font-size: 0.75rem;">Ref: ${window.FirquiHtml.escape(order.transactionId)}</small>` : ""}
+                    ${order.rejectionReason ? `<br><small style="color: #D32F2F; font-size: 0.75rem;">Reason: ${window.FirquiHtml.escape(order.rejectionReason)}</small>` : ""}
                 </span>
             `;
 

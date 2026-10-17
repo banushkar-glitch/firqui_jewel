@@ -216,9 +216,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 const moreCount = req.products.length - 1;
                 productsHtml = `
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <img src="${imgSrc}" alt="${first.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(10, 55, 59, 0.15); flex-shrink: 0;" onerror="this.src='../assets/Logo Pink 1.png';">
+                        <img src="${window.FirquiHtml.escape(imgSrc)}" alt="${window.FirquiHtml.escape(first.name)}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(10, 55, 59, 0.15); flex-shrink: 0;" onerror="this.src='../assets/Logo Pink 1.png';">
                         <div>
-                            <div style="font-size: 13px; font-weight: 600; color: #0A373B; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${first.name}</div>
+                            <div style="font-size: 13px; font-weight: 600; color: #0A373B; max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.FirquiHtml.escape(first.name)}</div>
                             <small style="color: var(--text-muted); font-size: 11px;">Qty: ${first.quantity || 1} ${moreCount > 0 ? `(+${moreCount} more)` : ""}</small>
                         </div>
                     </div>
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (statusUpper === "REJECTED") {
                 statusBadge = `<span class="status-badge-rejected"><i class="fa-solid fa-xmark"></i> Rejected</span>`;
             } else {
-                statusBadge = `<span class="reason-badge">${req.status}</span>`;
+                statusBadge = `<span class="reason-badge">${window.FirquiHtml.escape(req.status)}</span>`;
             }
 
             // Actions Column
@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 actionsHtml = `
                     <div style="font-size: 12px; color: #C92A2A;">
                         <strong>Rejected</strong>
-                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Reason: "${req.adminNotes || "N/A"}"</div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Reason: "${window.FirquiHtml.escape(req.adminNotes || "N/A")}"</div>
                     </div>
                 `;
             }
@@ -286,9 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 </td>
 
                 <td>
-                    <div style="font-weight: 600; color: var(--dark-teal); font-size: 13px;">${custName}</div>
-                    <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-imprima);">${custEmail}</div>
-                    ${custPhone ? `<div style="font-size: 11px; color: rgba(44, 44, 44, 0.45);">${custPhone}</div>` : ""}
+                    <div style="font-weight: 600; color: var(--dark-teal); font-size: 13px;">${window.FirquiHtml.escape(custName)}</div>
+                    <div style="font-size: 12px; color: var(--text-muted); font-family: var(--font-imprima);">${window.FirquiHtml.escape(custEmail)}</div>
+                    ${custPhone ? `<div style="font-size: 11px; color: rgba(44, 44, 44, 0.45);">${window.FirquiHtml.escape(custPhone)}</div>` : ""}
                 </td>
 
                 <td>
@@ -301,8 +301,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 </td>
 
                 <td>
-                    <span class="reason-badge">${req.reason || "N/A"}</span>
-                    <div class="req-details-text">"${req.additionalDetails || ""}"</div>
+                    <span class="reason-badge">${window.FirquiHtml.escape(req.reason || "N/A")}</span>
+                    <div class="req-details-text">"${window.FirquiHtml.escape(req.additionalDetails || "")}"</div>
                 </td>
 
                 <td>

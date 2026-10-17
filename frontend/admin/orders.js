@@ -194,11 +194,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td>
 
                     <span class="customer-name">
-                        ${order.customer}
+                        ${window.FirquiHtml.escape(order.customer)}
                     </span>
 
                     <span class="customer-email">
-                        ${order.email}
+                        ${window.FirquiHtml.escape(order.email)}
                     </span>
 
                 </td>

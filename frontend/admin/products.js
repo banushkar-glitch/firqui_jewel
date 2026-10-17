@@ -312,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         <div>
 
                             <strong>
-                                ${product.name}
+                                ${window.FirquiHtml.escape(product.name)}
                             </strong>
 
                             <small>
@@ -329,14 +329,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 <!-- CATEGORY -->
 
                 <td>
-                    ${product.category}
+                    ${window.FirquiHtml.escape(product.category)}
                 </td>
 
 
                 <!-- COLLECTION -->
 
                 <td>
-                    ${product.collection}
+                    ${window.FirquiHtml.escape(product.collection)}
                 </td>
 
 

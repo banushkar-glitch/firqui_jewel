@@ -613,11 +613,17 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         for (let i = 0; i < selectEl.options.length; i++) {
             const opt = selectEl.options[i];
-            if (valLower.includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(valLower)) {
+            if (opt.value && (valLower.includes(opt.value.toLowerCase()) || opt.value.toLowerCase().includes(valLower))) {
                 selectEl.value = opt.value;
                 return;
             }
         }
+        // Not in the list (e.g. a newer collection): add it rather than silently clearing it
+        const extra = document.createElement("option");
+        extra.value = value.toString().trim();
+        extra.textContent = extra.value;
+        selectEl.appendChild(extra);
+        selectEl.value = extra.value;
     }
 
     function populateProductFields(prod) {
@@ -625,7 +631,7 @@ document.addEventListener("DOMContentLoaded", () => {
         product = prod;
 
         productName.value = prod.name || prod.productName || "";
-        descriptionEditor.innerHTML = prod.description || "";
+        descriptionEditor.innerHTML = window.FirquiHtml ? window.FirquiHtml.sanitize(prod.description || "") : "";
         description.value = prod.description || "";
 
         if (Array.isArray(prod.measurement)) {
@@ -894,6 +900,45 @@ document.addEventListener("DOMContentLoaded", () => {
             description.value =
                 descriptionEditor.innerHTML;
 
+            /* ---------------------------------------------
+               LISTING CHECKS (same rules as the server)
+            --------------------------------------------- */
+            {
+                const fail = (message, field) => {
+                    alert(message);
+                    const el = field && document.getElementById(field);
+                    if (el && el.focus) el.focus();
+                    return true;
+                };
+                const availEl = document.querySelector('input[name="availability"]:checked');
+                const availValue = availEl ? availEl.value : "";
+                const priceVal = Number(document.getElementById("price").value);
+                const compareVal = Number(document.getElementById("comparePrice").value) || 0;
+                const stockRaw = document.getElementById("stockQuantity").value.trim();
+                const stockVal = stockRaw === "" ? 0 : Number(stockRaw);
+                const restockVal = (document.getElementById("restockDate") || {}).value || "";
+                const mainSlot = mediaSlots.main;
+                const hasMainPhoto = mainSlot && !mainSlot.isRemoved && (mainSlot.file || mainSlot.url);
+                const today = new Date().toISOString().slice(0, 10);
+
+                if (!document.getElementById("productName").value.trim()
+                        && fail("Please enter the product title.", "productName")) return;
+                if (!hasMainPhoto
+                        && fail("Please add a main product photo. Customers see it first on the shop page.", null)) return;
+                if (!availValue && fail("Please choose the availability.", null)) return;
+                if (!(priceVal > 0) && fail("Please enter a price above ₹0.", "price")) return;
+                if (compareVal > 0 && compareVal <= priceVal
+                        && fail("Compare-at price must be higher than the selling price (or left empty).", "comparePrice")) return;
+                if ((!Number.isInteger(stockVal) || stockVal < 0)
+                        && fail("Stock quantity must be a whole number, 0 or more.", "stockQuantity")) return;
+                if (availValue === "In Stock" && stockVal < 1
+                        && fail("An \"In Stock\" product needs a stock quantity of at least 1. Set the quantity, or choose \"Out of Stock\" or \"Arriving Soon\".", "stockQuantity")) return;
+                if (availValue === "Arriving Soon" && !restockVal
+                        && fail("Please set the expected restock date for an \"Arriving Soon\" product.", "restockDate")) return;
+                if (availValue === "Arriving Soon" && restockVal < today
+                        && fail("The restock date is in the past. Please choose a future date.", "restockDate")) return;
+            }
+
 
             const selectedAvailability =
                 document.querySelector(
@@ -1014,9 +1059,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const refMedia4Type = mediaSlots.ref4.isRemoved ? null : (mediaSlots.ref4.url ? mediaSlots.ref4.mediaType : null);
 
             let productImages = [mainMediaUrl, refMedia1Url, refMedia2Url, refMedia3Url, refMedia4Url].filter(Boolean);
-            if (productImages.length === 0) {
-                productImages.push("../assets/Logo Pink 1.png");
-            }
 
             const updatedProduct = {
                 ...(product || {}),

@@ -122,8 +122,9 @@ function loadOrder() {
        SHIPPING ADDRESS
     --------------------------------------------- */
 
+    // Typed by the customer: escape each line before joining
     document.getElementById("shippingAddress").innerHTML =
-        order.shippingAddress.join("<br>");
+        order.shippingAddress.map(line => window.FirquiHtml.escape(line)).join("<br>");
 
 
     /* ---------------------------------------------
@@ -319,11 +320,11 @@ function renderProducts(order) {
         productInfo.innerHTML = `
 
             <h4>
-                ${product.name}
+                ${window.FirquiHtml.escape(product.name)}
             </h4>
 
             <p>
-                ${product.category}
+                ${window.FirquiHtml.escape(product.category)}
             </p>
 
             <div class="product-quantity">
@@ -918,7 +919,7 @@ document.addEventListener(
                     if (screenshotLoading) screenshotLoading.style.display = "none";
                 } catch (err) {
                     if (screenshotLoading) {
-                        screenshotLoading.innerHTML = `<p style="color: #D32F2F;"><i class="fa-solid fa-triangle-exclamation"></i> ${err.message}</p>`;
+                        screenshotLoading.innerHTML = `<p style="color: #D32F2F;"><i class="fa-solid fa-triangle-exclamation"></i> ${window.FirquiHtml.escape(err.message)}</p>`;
                     }
                 }
             });

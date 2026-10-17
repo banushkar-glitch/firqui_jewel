@@ -4,7 +4,7 @@
 <head>
 
     <meta charset="UTF-8">
-    <script src="js/auth.js?v=20261017b"></script>
+    <script src="js/auth.js?v=20261017c"></script>
 
     <meta
         name="viewport"
@@ -48,10 +48,10 @@
 
     <link
         rel="stylesheet"
-        href="contact.css?v=20261017b"
+        href="contact.css?v=20261017c"
     >
 
-    <link rel="stylesheet" href="css/site.css?v=20261017b">
+    <link rel="stylesheet" href="css/site.css?v=20261017c">
 </head>
 
 
@@ -1060,9 +1060,9 @@
                             const row = document.createElement("div");
                             row.style.cssText = "display: flex; align-items: center; gap: 10px; padding: 6px 0;";
                             row.innerHTML = `
-                                <img src="${pImg}" alt="${pName}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(250, 245, 238, 0.2);" onerror="this.src='assets/Logo Pink 1.png';">
+                                <img src="${window.FirquiHtml.escape(pImg)}" alt="${window.FirquiHtml.escape(pName)}" style="width: 44px; height: 44px; object-fit: cover; border-radius: 6px; border: 1px solid rgba(250, 245, 238, 0.2);" onerror="this.src='assets/Logo Pink 1.png';">
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${pName}</div>
+                                    <div style="font-size: 0.88rem; font-weight: 600; color: var(--cream); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${window.FirquiHtml.escape(pName)}</div>
                                     <div style="font-size: 0.76rem; color: var(--pink);">Qty: ${pQty} • ${pPrice}</div>
                                 </div>
                             `;
@@ -1175,9 +1175,9 @@
     });
 
 </script>
-<script src="js/search.js?v=20261017b"></script>
+<script src="js/search.js?v=20261017c"></script>
 
-    <script src="js/site-nav.js?v=20261017b"></script>
+    <script src="js/site-nav.js?v=20261017c"></script>
 </body>
 
 </html>

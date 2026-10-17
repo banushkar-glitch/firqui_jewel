@@ -349,8 +349,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             wishlistCard.innerHTML = `
                 <div class="wishlist-image">
-                    <img loading="lazy" decoding="async" src="${resolvedImg}"
-                         alt="${product.name || 'Product'}"
+                    <img loading="lazy" decoding="async" src="${window.FirquiHtml.escape(resolvedImg)}"
+                         alt="${window.FirquiHtml.escape(product.name || 'Product')}"
                          style="cursor: pointer;"
                          title="View product details"
                          onerror="if(!this.dataset.fallback){this.dataset.fallback='1';this.src='${fallbackImg}';}else{this.src='../assets/Logo Pink 1.png';}">
@@ -365,10 +365,10 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
 
                 <div class="wishlist-details">
-                    <h3 style="cursor: pointer;" title="View product details">${product.name || ''}</h3>
+                    <h3 style="cursor: pointer;" title="View product details">${window.FirquiHtml.escape(product.name || '')}</h3>
 
                     <p class="wishlist-description">
-                        ${product.description || ""}
+                        ${window.FirquiHtml.escape(window.FirquiHtml.text(product.description || ""))}
                     </p>
 
                     <div class="wishlist-bottom">

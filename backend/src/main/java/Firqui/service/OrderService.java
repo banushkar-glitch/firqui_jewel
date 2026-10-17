@@ -153,10 +153,8 @@ public class OrderService {
 
             int requestedQty = itemData.quantity;
 
-            // Stock validation
-            if (product.getStockQuantity() != null && product.getStockQuantity() < requestedQty) {
-                throw new IllegalStateException("Only " + product.getStockQuantity() + " items are available for " + product.getName() + ".");
-            }
+            // Out of stock / pre-order / quantity rules shared with the admin form
+            ProductRules.checkCanOrder(product, requestedQty);
 
             // Price validation strictly from database product
             double unitPrice = product.getPrice() != null ? product.getPrice() : 0.0;
@@ -164,10 +162,8 @@ public class OrderService {
             calculatedSubtotal += itemSubtotal;
 
             // Deduct stock in DB
-            if (product.getStockQuantity() != null) {
-                product.setStockQuantity(Math.max(0, product.getStockQuantity() - requestedQty));
-                productRepository.save(product);
-            }
+            ProductRules.deductStock(product, requestedQty);
+            productRepository.save(product);
 
             // Create OrderItem snapshot
             String itemImage = (product.getMainImage() != null && !product.getMainImage().isEmpty())
@@ -338,17 +334,14 @@ public class OrderService {
                 throw new IllegalArgumentException("Product not found in catalogue: " + itemData.name);
             }
             int requestedQty = itemData.quantity;
-            if (product.getStockQuantity() != null && product.getStockQuantity() < requestedQty) {
-                throw new IllegalStateException("Only " + product.getStockQuantity() + " items are available for " + product.getName() + ".");
-            }
+            // Out of stock / pre-order / quantity rules shared with the admin form
+            ProductRules.checkCanOrder(product, requestedQty);
             double unitPrice = product.getPrice() != null ? product.getPrice() : 0.0;
             double itemSubtotal = unitPrice * requestedQty;
             calculatedSubtotal += itemSubtotal;
 
-            if (product.getStockQuantity() != null) {
-                product.setStockQuantity(Math.max(0, product.getStockQuantity() - requestedQty));
-                productRepository.save(product);
-            }
+            ProductRules.deductStock(product, requestedQty);
+            productRepository.save(product);
 
             String itemImage = (product.getMainImage() != null && !product.getMainImage().isEmpty())
                     ? product.getMainImage() : itemData.imageUrl;
@@ -473,6 +466,9 @@ public class OrderService {
                     Product prod = item.getProduct();
                     int currentStock = prod.getStockQuantity() != null ? prod.getStockQuantity() : 0;
                     prod.setStockQuantity(currentStock + item.getQuantity());
+                    if (ProductRules.OUT_OF_STOCK.equals(prod.getAvailability()) && prod.getStockQuantity() > 0) {
+                        prod.setAvailability(ProductRules.IN_STOCK);
+                    }
                     productRepository.save(prod);
                 }
             }
@@ -700,9 +696,7 @@ public class OrderService {
             if (product == null) {
                 throw new IllegalArgumentException("Product not found in catalogue: " + item.getName());
             }
-            if (product.getStockQuantity() != null && product.getStockQuantity() < qty) {
-                throw new IllegalStateException("Only " + product.getStockQuantity() + " items are available for " + product.getName() + ".");
-            }
+            ProductRules.checkCanOrder(product, qty);
             total += (product.getPrice() != null ? product.getPrice() : 0.0) * qty;
         }
         if (total <= 0) {

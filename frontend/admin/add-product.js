@@ -659,6 +659,45 @@ document.addEventListener("DOMContentLoaded", () => {
             descriptionInput.value =
                 descriptionEditor.innerHTML;
 
+            /* ---------------------------------------------
+               LISTING CHECKS (same rules as the server)
+            --------------------------------------------- */
+            {
+                const fail = (message, field) => {
+                    alert(message);
+                    const el = field && document.getElementById(field);
+                    if (el && el.focus) el.focus();
+                    return true;
+                };
+                const availEl = document.querySelector('input[name="availability"]:checked');
+                const availValue = availEl ? availEl.value : "";
+                const priceVal = Number(document.getElementById("price").value);
+                const compareVal = Number(document.getElementById("comparePrice").value) || 0;
+                const stockRaw = document.getElementById("stockQuantity").value.trim();
+                const stockVal = stockRaw === "" ? 0 : Number(stockRaw);
+                const restockVal = (document.getElementById("restockDate") || {}).value || "";
+                const mainSlot = mediaSlots.main;
+                const hasMainPhoto = mainSlot && !mainSlot.isRemoved && (mainSlot.file || mainSlot.url);
+                const today = new Date().toISOString().slice(0, 10);
+
+                if (!document.getElementById("productName").value.trim()
+                        && fail("Please enter the product title.", "productName")) return;
+                if (!hasMainPhoto
+                        && fail("Please add a main product photo. Customers see it first on the shop page.", null)) return;
+                if (!availValue && fail("Please choose the availability.", null)) return;
+                if (!(priceVal > 0) && fail("Please enter a price above ₹0.", "price")) return;
+                if (compareVal > 0 && compareVal <= priceVal
+                        && fail("Compare-at price must be higher than the selling price (or left empty).", "comparePrice")) return;
+                if ((!Number.isInteger(stockVal) || stockVal < 0)
+                        && fail("Stock quantity must be a whole number, 0 or more.", "stockQuantity")) return;
+                if (availValue === "In Stock" && stockVal < 1
+                        && fail("An \"In Stock\" product needs a stock quantity of at least 1. Set the quantity, or choose \"Out of Stock\" or \"Arriving Soon\".", "stockQuantity")) return;
+                if (availValue === "Arriving Soon" && !restockVal
+                        && fail("Please set the expected restock date for an \"Arriving Soon\" product.", "restockDate")) return;
+                if (availValue === "Arriving Soon" && restockVal < today
+                        && fail("The restock date is in the past. Please choose a future date.", "restockDate")) return;
+            }
+
 
             /* ---------------------------------------------
                AVAILABILITY
@@ -874,16 +913,6 @@ document.addEventListener("DOMContentLoaded", () => {
             let productImages = [mainMediaUrl, refMedia1Url, refMedia2Url, refMedia3Url, refMedia4Url].filter(Boolean);
 
             const catVal = document.getElementById("category").value || "";
-            if (productImages.length === 0) {
-                const catLower = catVal.toLowerCase();
-                if (catLower.includes("ring")) productImages.push("../assets/Heart Pearl Ring.png");
-                else if (catLower.includes("cuff") || catLower.includes("bracelet")) productImages.push("../assets/Cuffs.png");
-                else if (catLower.includes("earring")) productImages.push("../assets/FE1007 Ice Cream Earrings.png");
-                else if (catLower.includes("necklace")) productImages.push("../assets/FN1003 Ice Cream Necklace.png");
-                else if (catLower.includes("brooch")) productImages.push("../assets/page_10_image_02.png");
-                else if (catLower.includes("pearl")) productImages.push("../assets/page_06_image_02.png");
-                else productImages.push("../assets/Logo Pink 1.png");
-            }
 
             const productNameVal =
                 document

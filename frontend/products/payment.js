@@ -186,13 +186,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const pName = p.name || p.productName || "Jewellery Item";
                     const pQty = p.quantity || 1;
-                    const pSize = p.selectedSize ? ` • Size: ${p.selectedSize}` : "";
+                    const pSize = p.selectedSize ? ` • Size: ${window.FirquiHtml.escape(p.selectedSize)}` : "";
                     const pPrice = "₹" + Math.round(Number(p.unitPrice || p.price || 0) * pQty).toLocaleString("en-IN");
 
                     row.innerHTML = `
-                        <img src="${imgUrl}" alt="${pName}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
+                        <img src="${window.FirquiHtml.escape(imgUrl)}" alt="${window.FirquiHtml.escape(pName)}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
                         <div class="summary-item-info">
-                            <div class="summary-item-name">${pName}</div>
+                            <div class="summary-item-name">${window.FirquiHtml.escape(pName)}</div>
                             <div class="summary-item-sub">Qty: ${pQty}${pSize}</div>
                         </div>
                         <div class="summary-item-price">${pPrice}</div>
@@ -280,13 +280,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     const pName = p.name || p.productName || "Jewellery Item";
                     const pQty = p.quantity || 1;
-                    const pSize = p.selectedSize ? ` • Size: ${p.selectedSize}` : "";
+                    const pSize = p.selectedSize ? ` • Size: ${window.FirquiHtml.escape(p.selectedSize)}` : "";
                     const pPrice = "₹" + Math.round(Number(p.unitPrice || p.price || 0) * pQty).toLocaleString("en-IN");
 
                     row.innerHTML = `
-                        <img src="${imgUrl}" alt="${pName}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
+                        <img src="${window.FirquiHtml.escape(imgUrl)}" alt="${window.FirquiHtml.escape(pName)}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
                         <div class="summary-item-info">
-                            <div class="summary-item-name">${pName}</div>
+                            <div class="summary-item-name">${window.FirquiHtml.escape(pName)}</div>
                             <div class="summary-item-sub">Qty: ${pQty}${pSize}</div>
                         </div>
                         <div class="summary-item-price">${pPrice}</div>
