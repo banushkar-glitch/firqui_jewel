@@ -50,7 +50,8 @@ public class CorsCustomFilter implements Filter {
         response.setHeader("Vary", "Origin");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, HEAD, PATCH");
-        response.setHeader("Access-Control-Allow-Headers", "*");
+        // A "*" wildcard is ignored by browsers for requests that carry cookies, so list them
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, Authorization");
         response.setHeader("Access-Control-Allow-Private-Network", "true");
         response.setHeader("Access-Control-Max-Age", "3600");
 

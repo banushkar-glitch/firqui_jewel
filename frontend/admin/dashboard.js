@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("orderCount");
 
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
-    const token = localStorage.getItem("firqui_token");
+    const API_BASE = window.FIRQUI_API_BASE;
+    const token = window.FirquiAuth.token();
     const authHeaders = token ? { "Authorization": `Bearer ${token}` } : {};
 
     function setCount(el, value) {

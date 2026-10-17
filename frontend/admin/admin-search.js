@@ -4,7 +4,7 @@
  */
 
 (function () {
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function escapeHtml(text) {
         if (!text) return "";
@@ -370,7 +370,7 @@
     let cachedCollections = null;
 
     async function fetchAdminData() {
-        const token = localStorage.getItem("firqui_admin_token") || localStorage.getItem("firqui_token") || "";
+        const token = localStorage.getItem("firqui_admin_token") || window.FirquiAuth.token() || "";
 
         // 1. Products
         try {

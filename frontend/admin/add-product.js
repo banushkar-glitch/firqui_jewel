@@ -791,10 +791,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             }
 
-            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+            const API_BASE = window.FIRQUI_API_BASE;
 
             // Ensure valid Admin JWT token for Spring Boot API call
-            let token = localStorage.getItem("firqui_token");
+            let token = window.FirquiAuth.token();
             let userObj = null;
             try { userObj = JSON.parse(localStorage.getItem("firqui_user") || "{}"); } catch (_) {}
             const isAdmin = userObj && (userObj.role === "ADMIN" || userObj.role === "ROLE_ADMIN");

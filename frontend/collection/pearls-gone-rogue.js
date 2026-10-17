@@ -5,11 +5,11 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
     const COLLECTION_NAME = "Pearls Gone Rogue";
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     function requireLogin() {

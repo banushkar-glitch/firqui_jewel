@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ================================================= */
 
         const registerBtn = registerForm.querySelector(".register-button");
-        const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+        const API_BASE = window.FIRQUI_API_BASE;
 
         if (registerBtn) {
             registerBtn.disabled = true;
@@ -239,8 +239,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             setTimeout(() => {
 
+                // Back to login, keeping where to return afterwards (e.g. checkout)
                 window.location.href =
-                    "login.html";
+                    "login.html" + window.location.search;
 
             }, 1500);
 
@@ -278,12 +279,11 @@ if (switchToLogin) {
 
     switchToLogin.addEventListener("click", () => {
 
-        window.parent.postMessage(
-            {
-                type: "openLogin"
-            },
-            "*"
-        );
+        if (window.self !== window.top) {
+            window.parent.postMessage({ type: "openLogin" }, window.location.origin);
+            return;
+        }
+        window.location.href = "login.html" + window.location.search;
 
     });
 

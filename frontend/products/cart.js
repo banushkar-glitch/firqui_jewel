@@ -4,10 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const subtotalElement = document.getElementById("cart-subtotal");
     const totalElement = document.getElementById("cart-total");
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     function getToken() {
-        return localStorage.getItem("firqui_token");
+        return window.FirquiAuth.token();
     }
 
     // Badge rendering lives in js/site-nav.js
@@ -567,7 +567,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Navigate directly to checkout page (login is optional)
+            // Placing an order needs an account; the cart is kept and the
+            // customer comes straight back to checkout after logging in
+            if (!window.FirquiAuth.isSignedIn()) {
+                window.FirquiAuth.goToLogin(window.location.pathname.replace(/cart\.html$/, "checkout.html"));
+                return;
+            }
             window.location.href = "checkout.html";
         });
     }

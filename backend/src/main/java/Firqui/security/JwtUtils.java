@@ -1,5 +1,6 @@
 package Firqui.security;
 
+import Firqui.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,6 +26,25 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public long getExpirationMs() {
+        return jwtExpirationMs;
+    }
+
+    /** Session token for a user; "ver" ties it to the user's current password. */
+    public String generateToken(User user) {
+        Date now = new Date();
+        return Jwts.builder()
+                .subject(user.getEmail())
+                .claim("userId", user.getId())
+                .claim("name", user.getName())
+                .claim("role", user.getRole() != null ? user.getRole() : "USER")
+                .claim("ver", user.getTokenVersion())
+                .issuedAt(now)
+                .expiration(new Date(now.getTime() + jwtExpirationMs))
+                .signWith(getSigningKey())
+                .compact();
+    }
+
     public String generateToken(String subject, String name, Long userId) {
         return generateToken(subject, name, userId, "USER");
     }
@@ -44,25 +64,26 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String getSubjectFromToken(String token) {
-        Claims claims = Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    /** Verified claims, or null when the token is missing, tampered with or expired. */
+    public Claims parseClaims(String token) {
+        if (token == null || token.isBlank()) return null;
+        try {
+            return Jwts.parser()
+                    .verifyWith(getSigningKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (JwtException | IllegalArgumentException e) {
+            return null;
+        }
+    }
 
-        return claims.getSubject();
+    public String getSubjectFromToken(String token) {
+        Claims claims = parseClaims(token);
+        return claims != null ? claims.getSubject() : null;
     }
 
     public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
+        return parseClaims(token) != null;
     }
 }

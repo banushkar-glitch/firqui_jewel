@@ -4,6 +4,7 @@
 <head>
 
     <meta charset="UTF-8">
+    <script src="js/auth.js?v=20261017b"></script>
 
     <meta
         name="viewport"
@@ -47,10 +48,10 @@
 
     <link
         rel="stylesheet"
-        href="contact.css?v=20261017"
+        href="contact.css?v=20261017b"
     >
 
-    <link rel="stylesheet" href="css/site.css?v=20261017">
+    <link rel="stylesheet" href="css/site.css?v=20261017b">
 </head>
 
 
@@ -857,7 +858,7 @@
 
         if (contactForm) {
 
-            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+            const API_BASE = window.FIRQUI_API_BASE;
 
             contactForm.addEventListener("submit", async function (event) {
 
@@ -1076,8 +1077,8 @@
             }
 
             // Also fetch fresh from API if token exists
-            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
-            const token = localStorage.getItem("firqui_token");
+            const API_BASE = window.FIRQUI_API_BASE;
+            const token = window.FirquiAuth.token();
             if (token) {
                 fetch(`${API_BASE}/api/orders/${cleanOrderNum}`, {
                     headers: { "Authorization": `Bearer ${token}` }
@@ -1174,9 +1175,9 @@
     });
 
 </script>
-<script src="js/search.js?v=20261017"></script>
+<script src="js/search.js?v=20261017b"></script>
 
-    <script src="js/site-nav.js?v=20261017"></script>
+    <script src="js/site-nav.js?v=20261017b"></script>
 </body>
 
 </html>

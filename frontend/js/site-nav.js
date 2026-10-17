@@ -12,9 +12,9 @@
     const ROOT = SCRIPT_SRC ? new URL("../", SCRIPT_SRC).href : "/";
     const PLACEHOLDER = ROOT + "assets/Logo%20Pink%201.png";
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080"
-        ? "http://localhost:8080"
-        : "";
+    // Set by js/auth.js (same host as the page so the session cookie is sent)
+    const API_BASE = window.FIRQUI_API_BASE || "";
+    const Auth = window.FirquiAuth;
 
     const CATEGORIES = [
         ["Rings", "products/rings.html"],
@@ -101,12 +101,9 @@
     }
 
     async function syncCartFromServer() {
-        const token = localStorage.getItem("firqui_token");
-        if (!token) return;
+        if (!Auth || !Auth.isSignedIn()) return;
         try {
-            const res = await fetch(API_BASE + "/api/cart", {
-                headers: { "Authorization": "Bearer " + token }
-            });
+            const res = await fetch(API_BASE + "/api/cart");
             if (!res.ok) return;
             const data = await res.json();
             if (data && Array.isArray(data.items)) {
@@ -327,10 +324,142 @@
         });
     }
 
+    /* =====================================================
+       ACCOUNT: header menu, logout buttons, drawer entries
+    ===================================================== */
+    function findAccountButton() {
+        const icons = document.querySelector(".header .header-icons");
+        if (!icons) return null;
+        const icon = icons.querySelector(".fa-user, .fa-circle-user");
+        return icon ? icon.closest("a, button") : null;
+    }
+
+    function closeAccountMenu() {
+        const menu = document.getElementById("accountMenu");
+        if (menu) menu.remove();
+        const btn = findAccountButton();
+        if (btn) btn.setAttribute("aria-expanded", "false");
+    }
+
+    function openAccountMenu(btn) {
+        const user = Auth.user();
+        const menu = document.createElement("div");
+        menu.className = "account-menu";
+        menu.id = "accountMenu";
+        menu.setAttribute("role", "menu");
+
+        const hello = document.createElement("div");
+        hello.className = "account-menu-hello";
+        hello.textContent = "Hi, " + ((user && user.name) || "there");
+        menu.appendChild(hello);
+
+        const items = [["My Account", ROOT + "authentication/profile.html", "fa-regular fa-user"]];
+        if (Auth.isAdmin()) items.push(["Admin Dashboard", ROOT + "admin/dashboard.html", "fa-solid fa-gauge"]);
+        items.forEach(function (it) {
+            const a = document.createElement("a");
+            a.href = it[1];
+            a.setAttribute("role", "menuitem");
+            a.innerHTML = '<i class="' + it[2] + '" aria-hidden="true"></i> ';
+            a.appendChild(document.createTextNode(it[0]));
+            menu.appendChild(a);
+        });
+
+        const out = document.createElement("button");
+        out.type = "button";
+        out.setAttribute("role", "menuitem");
+        out.innerHTML = '<i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i> Log out';
+        out.addEventListener("click", function () { Auth.logout(); });
+        menu.appendChild(out);
+
+        document.body.appendChild(menu);
+        const r = btn.getBoundingClientRect();
+        menu.style.top = Math.round(r.bottom + 8) + "px";
+        menu.style.right = Math.max(8, Math.round(window.innerWidth - r.right)) + "px";
+        btn.setAttribute("aria-expanded", "true");
+        const first = menu.querySelector("a, button");
+        if (first) first.focus();
+    }
+
+    function setupAccount() {
+        if (!Auth) return;
+        const btn = findAccountButton();
+        if (btn) {
+            btn.setAttribute("aria-haspopup", "menu");
+            const showState = function () {
+                btn.classList.toggle("is-signed-in", Auth.isSignedIn());
+                btn.setAttribute("aria-label", Auth.isSignedIn() ? "Your account" : "Log in");
+            };
+            showState();
+            Auth.refresh().then(showState);
+
+            // Capture phase so the page's own handlers (login popup, admin alerts) don't also run
+            btn.addEventListener("click", function (e) {
+                if (Auth.isSignedIn()) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    if (document.getElementById("accountMenu")) closeAccountMenu();
+                    else openAccountMenu(btn);
+                } else if (!document.getElementById("openLoginModal") || btn.id !== "openLoginModal") {
+                    // Home page keeps its login pop-up; elsewhere go to the login page and come back here
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    Auth.goToLogin();
+                }
+            }, true);
+        }
+
+        document.addEventListener("click", function (e) {
+            const menu = document.getElementById("accountMenu");
+            if (menu && !menu.contains(e.target) && !(btn && btn.contains(e.target))) closeAccountMenu();
+        });
+        document.addEventListener("keydown", function (e) {
+            if (e.key === "Escape") closeAccountMenu();
+        });
+        window.addEventListener("resize", closeAccountMenu);
+
+        // Every page's own "logout" button: end the session on the server, not just locally
+        document.addEventListener("click", function (e) {
+            const out = e.target.closest("#logoutButton, #logoutBtn, #logout-button, [data-logout]");
+            if (!out) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            if (confirm("Are you sure you want to log out?")) Auth.logout();
+        }, true);
+    }
+
+    function addAccountToDrawer() {
+        const list = document.querySelector("#mobileMenu .mobile-menu-list");
+        if (!list || !Auth) return;
+        const li = document.createElement("li");
+        li.className = "mobile-menu-account";
+        if (Auth.isSignedIn()) {
+            const a = document.createElement("a");
+            a.className = "mobile-menu-link";
+            a.href = ROOT + "authentication/profile.html";
+            a.textContent = "My Account";
+            li.appendChild(a);
+            const out = document.createElement("button");
+            out.type = "button";
+            out.className = "mobile-menu-link";
+            out.textContent = "Log out";
+            out.addEventListener("click", function () { Auth.logout(); });
+            li.appendChild(out);
+        } else {
+            const a = document.createElement("a");
+            a.className = "mobile-menu-link";
+            a.href = Auth.loginUrl();
+            a.textContent = "Log in / Create account";
+            li.appendChild(a);
+        }
+        list.appendChild(li);
+    }
+
     function init() {
         replaceFailedImages();
         fixCategoriesLink();
         buildMobileMenu();
+        setupAccount();
+        addAccountToDrawer();
         updateCartBadge();
         syncCartFromServer();
     }

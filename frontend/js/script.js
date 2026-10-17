@@ -893,7 +893,7 @@ document.addEventListener(
 
                 event.preventDefault();
 
-                const token = localStorage.getItem("firqui_token");
+                const token = window.FirquiAuth.token();
 
                 // If already logged in, navigate directly to profile
                 if (token) {
@@ -1055,6 +1055,9 @@ window.addEventListener(
     "message",
     function (event) {
 
+        // Only the site's own login/register pages may switch the pop-up
+        if (event.origin !== window.location.origin) return;
+
         if (
             event.data &&
             event.data.type === "openLogin"
@@ -1086,6 +1089,9 @@ window.addEventListener(
 window.addEventListener(
     "message",
     function (event) {
+
+        // Only the site's own login/register pages may switch the pop-up
+        if (event.origin !== window.location.origin) return;
 
         if (
             event.data &&

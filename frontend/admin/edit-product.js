@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
        GET PRODUCT ID
     ====================================================== */
 
-    const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+    const API_BASE = window.FIRQUI_API_BASE;
 
     const urlParams =
         new URLSearchParams(
@@ -728,7 +728,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     async function loadProductData() {
-        const token = localStorage.getItem("firqui_token");
+        const token = window.FirquiAuth.token();
         let loaded = false;
         try {
             let res = await fetch(`${API_BASE}/api/admin/products/${productId}`, {
@@ -932,10 +932,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     .map(inp => inp.value.trim())
                     .filter(val => val.length > 0);
 
-            const API_BASE = ["localhost", "127.0.0.1", ""].includes(window.location.hostname) && window.location.port !== "8080" ? "http://localhost:8080" : "";
+            const API_BASE = window.FIRQUI_API_BASE;
 
             // 1. Ensure valid Admin JWT token for Spring Boot API call
-            let token = localStorage.getItem("firqui_token");
+            let token = window.FirquiAuth.token();
             let userObj = null;
             try { userObj = JSON.parse(localStorage.getItem("firqui_user") || "{}"); } catch (_) {}
             const isAdmin = userObj && (userObj.role === "ADMIN" || userObj.role === "ROLE_ADMIN");

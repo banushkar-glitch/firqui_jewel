@@ -68,10 +68,9 @@ public class OrderService {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
         }
 
-        // A guest order may only contain the items it sends; it must never read or clear
-        // the saved cart of an account that happens to share the email or phone.
-        boolean guestCheckout = user == null;
-        user = resolveOrCreateGuestUser(user, address);
+        if (user == null) {
+            throw new IllegalArgumentException("Please log in to place your order.");
+        }
 
         // Gather items to order
         List<OrderItemData> itemsToProcess = new ArrayList<>();
@@ -91,7 +90,7 @@ public class OrderService {
         }
 
         // If items were not sent directly in request body, retrieve from user's persistent cart in DB
-        if (itemsToProcess.isEmpty() && !guestCheckout) {
+        if (itemsToProcess.isEmpty()) {
             List<CartItem> dbCartItems = cartItemRepository.findByUserOrderByCreatedAtAsc(user);
             for (CartItem ci : dbCartItems) {
                 itemsToProcess.add(new OrderItemData(
@@ -201,7 +200,7 @@ public class OrderService {
         if (shopNotifications != null) shopNotifications.orderPlaced(savedOrder);
 
         // For Cash on Delivery, clear cart immediately. For "Pay Now", retain cart until payment submission succeeds
-        if (!"Pay Now".equalsIgnoreCase(paymentMethod) && !guestCheckout) {
+        if (!"Pay Now".equalsIgnoreCase(paymentMethod)) {
             cartItemRepository.deleteByUser(user);
         }
 
@@ -222,10 +221,9 @@ public class OrderService {
             throw new IllegalArgumentException("Complete delivery information (Full Name, Phone Number, Address 1, and Pincode) is required.");
         }
 
-        // A guest order may only contain the items it sends; it must never read or clear
-        // the saved cart of an account that happens to share the email or phone.
-        boolean guestCheckout = user == null;
-        user = resolveOrCreateGuestUser(user, address);
+        if (user == null) {
+            throw new IllegalArgumentException("Please log in to place your order.");
+        }
 
         // Validate Transaction ID / UTR
         if (transactionId == null || transactionId.trim().isEmpty()) {
@@ -287,7 +285,7 @@ public class OrderService {
             }
         }
 
-        if (itemsToProcess.isEmpty() && !guestCheckout) {
+        if (itemsToProcess.isEmpty()) {
             List<CartItem> dbCartItems = cartItemRepository.findByUserOrderByCreatedAtAsc(user);
             for (CartItem ci : dbCartItems) {
                 itemsToProcess.add(new OrderItemData(
@@ -380,11 +378,9 @@ public class OrderService {
         if (shopNotifications != null) shopNotifications.orderPlaced(savedOrder);
 
         // Clear user database cart now that order has been placed
-        if (!guestCheckout) {
-            try {
-                cartItemRepository.deleteByUser(user);
-            } catch (Exception ignored) {}
-        }
+        try {
+            cartItemRepository.deleteByUser(user);
+        } catch (Exception ignored) {}
 
         return OrderResponse.fromEntity(savedOrder);
     }
@@ -779,49 +775,4 @@ public class OrderService {
         }
     }
 
-    private User resolveOrCreateGuestUser(User user, ShippingAddressDTO address) {
-        if (user != null) {
-            return user;
-        }
-        if (address == null) {
-            throw new IllegalArgumentException("Delivery information is required for checkout.");
-        }
-
-        String customerEmail = address.getEmail() != null ? address.getEmail().trim().toLowerCase() : null;
-        String customerPhone = address.getPhone() != null ? address.getPhone().trim() : null;
-
-        if (customerEmail != null && !customerEmail.isEmpty()) {
-            Optional<User> existing = userRepository.findByEmail(customerEmail);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-        }
-        if (customerPhone != null && !customerPhone.isEmpty()) {
-            Optional<User> existing = userRepository.findByMobileNumber(customerPhone);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-        }
-
-        // Create guest user profile
-        String guestEmail = (customerEmail != null && !customerEmail.isEmpty())
-                ? customerEmail
-                : ("guest_" + UUID.randomUUID().toString().substring(0, 8) + "@firquijewels.com");
-        String guestPhone = (customerPhone != null && !customerPhone.isEmpty())
-                ? customerPhone
-                : ("0" + (System.currentTimeMillis() % 1000000000L));
-
-        User guestUser = new User();
-        guestUser.setName(address.getFullName() != null && !address.getFullName().trim().isEmpty() ? address.getFullName().trim() : "Guest Customer");
-        guestUser.setEmail(guestEmail);
-        guestUser.setMobileNumber(guestPhone);
-        guestUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-        guestUser.setRole("USER");
-        guestUser.setAddress1(address.getAddress1() != null ? address.getAddress1().trim() : "");
-        guestUser.setAddress2(address.getAddress2() != null ? address.getAddress2().trim() : "");
-        guestUser.setPincode(address.getPincode() != null ? address.getPincode().trim() : "");
-        guestUser.setActive(true);
-        guestUser.setCreatedAt(LocalDateTime.now());
-        return userRepository.save(guestUser);
-    }
 }

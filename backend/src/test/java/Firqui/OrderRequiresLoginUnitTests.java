@@ -19,10 +19,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * Guest checkout must never read or clear the saved cart of an account that merely
- * shares the email or phone typed into the delivery form.
+ * Orders can only be placed by a signed-in customer; an anonymous request must be
+ * refused without touching anyone's saved cart.
  */
-public class GuestCheckoutUnitTests {
+public class OrderRequiresLoginUnitTests {
 
     private OrderService orderService;
     private CartItemRepository cartItemRepository;
@@ -46,12 +46,12 @@ public class GuestCheckoutUnitTests {
     }
 
     @Test
-    @DisplayName("Guest order without items is rejected instead of using another account's cart")
-    void guestOrderDoesNotUseExistingAccountCart() {
+    @DisplayName("Anonymous order is refused and never reads or clears a saved cart")
+    void anonymousOrderIsRefused() {
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> orderService.createOrder(null, guestRequestWithoutItems()));
 
-        assertTrue(ex.getMessage().toLowerCase().contains("cart is empty"));
+        assertTrue(ex.getMessage().toLowerCase().contains("log in"));
         verify(cartItemRepository, never()).findByUserOrderByCreatedAtAsc(any());
         verify(cartItemRepository, never()).deleteByUser(any());
     }
