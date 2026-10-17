@@ -61,7 +61,6 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories", "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/collections", "/api/collections/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/admin/products", "/api/admin/products/**").permitAll()
                 // Catalogue is read-only for everyone except admins
                 .requestMatchers("/api/products", "/api/products/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")
                 .requestMatchers("/api/categories", "/api/categories/**").hasAnyAuthority("ROLE_ADMIN", "ADMIN")

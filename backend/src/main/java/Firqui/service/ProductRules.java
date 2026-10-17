@@ -22,6 +22,10 @@ public final class ProductRules {
     public static final String ARRIVING_SOON = "Arriving Soon";
     public static final String OUT_OF_STOCK = "Out of Stock";
 
+    public static final String DRAFT = "DRAFT";
+    public static final String PUBLISHED = "PUBLISHED";
+    public static final String ARCHIVED = "ARCHIVED";
+
     static final double MAX_PRICE = 10_000_000;
     static final int MAX_STOCK = 100_000;
     private static final Pattern SKU_PATTERN = Pattern.compile("^[A-Z0-9][A-Z0-9_-]{1,39}$");
@@ -77,6 +81,15 @@ public final class ProductRules {
         p.setProductDetailsHighlights(cleanList(p.getProductDetailsHighlights(), 300, "Each highlight"));
         p.setMeasurement(cleanList(p.getMeasurement(), 100, "Each size"));
 
+        String status = normalizeStatus(p.getStatus());
+        p.setStatus(status);
+        p.setActive(PUBLISHED.equals(status));
+        if (!PUBLISHED.equals(status)) {
+            // Drafts and archived listings may be incomplete; only keep the values sane
+            validateLoosely(p);
+            return;
+        }
+
         // Price
         Double price = p.getPrice();
         if (price == null || price.isNaN() || price <= 0) {
@@ -130,6 +143,54 @@ public final class ProductRules {
         }
 
         // SKU format (uniqueness is checked against the database by ProductService)
+        String sku = p.getSku() != null ? p.getSku().trim().toUpperCase(Locale.ROOT).replaceAll("\\s+", "-") : "";
+        if (sku.isEmpty()) {
+            p.setSku(null);
+        } else if (!SKU_PATTERN.matcher(sku).matches()) {
+            throw new IllegalArgumentException("SKU can use letters, numbers, \"-\" and \"_\" (2-40 characters), e.g. FQ-RNG-0042.");
+        } else {
+            p.setSku(sku);
+        }
+    }
+
+    public static String normalizeStatus(String value) {
+        if (value == null || value.isBlank()) return PUBLISHED;
+        String v = value.trim().toUpperCase(Locale.ROOT);
+        if (v.equals(DRAFT) || v.equals(PUBLISHED) || v.equals(ARCHIVED)) return v;
+        if (v.equals("ACTIVE") || v.equals("LIVE")) return PUBLISHED;
+        if (v.equals("INACTIVE") || v.equals("HIDDEN")) return ARCHIVED;
+        throw new IllegalArgumentException("Status must be Draft, Published or Archived.");
+    }
+
+    private static void validateLoosely(Product p) {
+        Double price = p.getPrice();
+        if (price == null || price.isNaN()) {
+            p.setPrice(0.0);
+        } else if (price < 0 || price > MAX_PRICE) {
+            throw new IllegalArgumentException("Price must be between ₹0 and ₹1,00,00,000.");
+        }
+        if (p.getComparePrice() != null && p.getComparePrice() <= 0) p.setComparePrice(null);
+
+        int stock = p.getStockQuantity() != null ? p.getStockQuantity() : 0;
+        if (stock < 0 || stock > MAX_STOCK) {
+            throw new IllegalArgumentException("Stock quantity must be between 0 and " + MAX_STOCK + ".");
+        }
+        p.setStockQuantity(stock);
+
+        try {
+            p.setAvailability(normalizeAvailability(p.getAvailability(), stock));
+        } catch (IllegalArgumentException e) {
+            p.setAvailability(stock > 0 ? IN_STOCK : OUT_OF_STOCK);
+        }
+        if (p.getRestockDate() != null) {
+            try {
+                LocalDate.parse(p.getRestockDate().trim());
+                p.setRestockDate(p.getRestockDate().trim());
+            } catch (DateTimeParseException e) {
+                p.setRestockDate(null);
+            }
+        }
+
         String sku = p.getSku() != null ? p.getSku().trim().toUpperCase(Locale.ROOT).replaceAll("\\s+", "-") : "";
         if (sku.isEmpty()) {
             p.setSku(null);

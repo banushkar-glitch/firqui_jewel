@@ -80,6 +80,13 @@ public class DataMigrationRunner implements CommandLineRunner {
         seedCollections();
         seedProducts();
         migratePearlsGoneRogueStoreOrganization();
+
+        // Listings from before Draft/Published/Archived existed
+        try {
+            jdbcTemplate.update("UPDATE products SET status = CASE WHEN active = false THEN 'ARCHIVED' ELSE 'PUBLISHED' END WHERE status IS NULL");
+        } catch (Exception ex) {
+            System.out.println("Product status migration skipped: " + ex.getMessage());
+        }
     }
 
     private void seedUsers() {

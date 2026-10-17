@@ -642,7 +642,7 @@
                     : `<i class="fa-regular fa-gem" style="color:#64748b;font-size:18px;"></i>`;
 
                 html += `
-                    <a href="edit-product.html?id=${encodeURIComponent(pId)}" class="admin-search-item">
+                    <a href="product-form.html?id=${encodeURIComponent(pId)}" class="admin-search-item">
                         <div class="admin-search-item-left">
                             <div class="admin-search-item-thumb">
                                 ${thumbHtml}

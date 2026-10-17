@@ -129,4 +129,37 @@ public class ProductRulesUnitTests {
         hidden.setActive(false);
         assertThrows(IllegalStateException.class, () -> ProductRules.checkCanOrder(hidden, 1));
     }
+
+    @Test
+    @DisplayName("Drafts may be incomplete; publishing applies every rule; only published is in the shop")
+    void statusRules() {
+        Product draft = new Product();
+        draft.setName("Half-finished ring");
+        draft.setPrice(null);
+        draft.setStockQuantity(0);
+        draft.setAvailability("In Stock");
+        draft.setStatus("draft");
+        ProductRules.normalizeAndValidate(draft);
+        assertEquals(ProductRules.DRAFT, draft.getStatus());
+        assertFalse(draft.getActive(), "drafts are not in the shop");
+        assertEquals(0.0, draft.getPrice());
+        assertEquals(ProductRules.IN_STOCK, draft.getAvailability(), "a draft keeps the admin's choice until it is published");
+
+        draft.setStatus(ProductRules.PUBLISHED);
+        assertThrows(IllegalArgumentException.class, () -> ProductRules.normalizeAndValidate(draft),
+                "a draft with no price cannot be published");
+
+        Product live = valid();
+        live.setStatus("published");
+        ProductRules.normalizeAndValidate(live);
+        assertTrue(live.getActive());
+
+        live.setStatus("archived");
+        ProductRules.normalizeAndValidate(live);
+        assertFalse(live.getActive());
+
+        Product weird = valid();
+        weird.setStatus("maybe");
+        assertTrue(error(weird).contains("Status"));
+    }
 }

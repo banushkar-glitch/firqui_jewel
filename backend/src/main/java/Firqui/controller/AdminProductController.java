@@ -84,4 +84,60 @@ public class AdminProductController {
                     .body(new ApiResponse(false, "Failed to delete product: " + e.getMessage()));
         }
     }
+
+    /* =====================================================
+       PATCH /{id}/status  { "status": "DRAFT" | "PUBLISHED" | "ARCHIVED" }
+    ====================================================== */
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<?> changeStatus(@PathVariable String id, @RequestBody java.util.Map<String, String> body) {
+        return respond(() -> productService.changeStatus(id, body.get("status")), "Status updated", HttpStatus.OK);
+    }
+
+    /* =====================================================
+       POST /{id}/duplicate  -> new draft copy
+    ====================================================== */
+    @PostMapping("/{id}/duplicate")
+    public ResponseEntity<?> duplicate(@PathVariable String id) {
+        return respond(() -> productService.duplicateProduct(id), "Copy saved as a draft", HttpStatus.CREATED);
+    }
+
+    /* =====================================================
+       PATCH /{id}/inventory  { price, comparePrice, stockQuantity, availability, restockDate }
+    ====================================================== */
+    @PatchMapping("/{id}/inventory")
+    public ResponseEntity<?> updateInventory(@PathVariable String id, @RequestBody java.util.Map<String, Object> body) {
+        return respond(() -> productService.updateInventory(id,
+                number(body.get("price")),
+                number(body.get("comparePrice")),
+                body.containsKey("comparePrice") && body.get("comparePrice") == null,
+                body.get("stockQuantity") != null ? (int) Math.round(number(body.get("stockQuantity"))) : null,
+                body.get("availability") != null ? String.valueOf(body.get("availability")) : null,
+                body.containsKey("restockDate") ? (body.get("restockDate") == null ? "" : String.valueOf(body.get("restockDate"))) : null),
+                "Saved", HttpStatus.OK);
+    }
+
+    private static Double number(Object value) {
+        if (value == null) return null;
+        if (value instanceof Number n) return n.doubleValue();
+        String s = String.valueOf(value).trim();
+        if (s.isEmpty()) return null;
+        try {
+            return Double.parseDouble(s);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("\"" + s + "\" is not a number.");
+        }
+    }
+
+    private ResponseEntity<?> respond(java.util.function.Supplier<Product> action, String message, HttpStatus okStatus) {
+        try {
+            Product product = action.get();
+            java.util.Map<String, Object> response = new java.util.HashMap<>();
+            response.put("success", true);
+            response.put("message", message);
+            response.put("product", product);
+            return ResponseEntity.status(okStatus).body(response);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse(false, e.getMessage()));
+        }
+    }
 }

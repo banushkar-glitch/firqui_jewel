@@ -92,6 +92,11 @@ public class Product {
 
     private String tags;
     private Boolean active = true;
+
+    // DRAFT (admin only), PUBLISHED (in the shop) or ARCHIVED (hidden, kept for order history).
+    // "active" mirrors PUBLISHED so existing shop queries keep working.
+    @Column(length = 20)
+    private String status;
     private Boolean featured = false;
     private Boolean newArrival = false;
 
@@ -437,5 +442,14 @@ public class Product {
 
     public void setReferenceMediaType4(String referenceMediaType4) {
         this.referenceMediaType4 = referenceMediaType4;
+    }
+
+    public String getStatus() {
+        if (status != null && !status.isBlank()) return status;
+        return Boolean.FALSE.equals(active) ? "ARCHIVED" : "PUBLISHED";
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

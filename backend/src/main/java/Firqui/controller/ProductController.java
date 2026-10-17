@@ -36,6 +36,11 @@ public class ProductController {
     public ResponseEntity<?> getProductById(@PathVariable String id) {
         try {
             Product product = productService.getProductByIdOrLegacyId(id);
+            // Drafts and archived listings are not part of the shop
+            if (!Boolean.TRUE.equals(product.getActive())) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new ApiResponse(false, "Product not found."));
+            }
             return ResponseEntity.ok(product);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)

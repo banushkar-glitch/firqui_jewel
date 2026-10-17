@@ -75,8 +75,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 <td>${escapeHtml(p.category || "-")}</td>
                 <td>${escapeHtml(p.collection || "-")}</td>
                 <td>&#8377;${Number(p.price || 0).toLocaleString("en-IN")}</td>
-                <td><span class="status ${p.active === false ? "inactive" : "active"}">${p.active === false ? "Inactive" : "Active"}</span></td>
-                <td><a class="table-action" href="edit-product.html?id=${encodeURIComponent(p.id)}" aria-label="Edit ${escapeHtml(p.name)}"><i class="fa-solid fa-pen"></i></a></td>
+                <td><span class="status ${(p.status || "PUBLISHED") === "PUBLISHED" ? "active" : "inactive"}">${({ DRAFT: "Draft", PUBLISHED: "Published", ARCHIVED: "Archived" })[p.status || "PUBLISHED"]}</span></td>
+                <td><a class="table-action" href="product-form.html?id=${encodeURIComponent(p.id)}" aria-label="Edit ${escapeHtml(p.name)}"><i class="fa-solid fa-pen"></i></a></td>
             </tr>`).join("");
     }
 
@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                Later this can redirect to:
 
-               products/edit-product.html?id=PRODUCT_ID
+               product-form.html?id=PRODUCT_ID
             */
 
             alert(
