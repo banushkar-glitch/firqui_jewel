@@ -18,6 +18,17 @@ document.addEventListener("DOMContentLoaded", function () {
     ====================================================== */
     const token = getToken();
 
+    // Guests have no profile page; the confirmation email has their order details
+    if (!token) {
+        const profileBtn = document.querySelector('.modal-buttons a[href*="profile.html"]');
+        if (profileBtn) {
+            profileBtn.href = "../index.html";
+            profileBtn.textContent = "Back to Home";
+        }
+        const notice = document.querySelector(".modal-notice");
+        if (notice) notice.textContent += " We have emailed your order details to you.";
+    }
+
     const urlParams = new URLSearchParams(window.location.search);
     const orderNumber = urlParams.get("orderNumber") || urlParams.get("id") || urlParams.get("orderId");
 

@@ -20,6 +20,9 @@ import java.util.List;
 public class OrderController {
 
     @Autowired
+    private Firqui.security.GuestOrderLimiter guestOrderLimiter;
+
+    @Autowired
     private OrderService orderService;
 
     /* =====================================================
@@ -28,11 +31,13 @@ public class OrderController {
     @PostMapping("/orders")
     public ResponseEntity<?> createOrder(
             @AuthenticationPrincipal User user,
-            @RequestBody CreateOrderRequest request) {
+            @RequestBody CreateOrderRequest request,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
 
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Please log in to place your order."));
+        // Guests may order without an account, within a per-address limit
+        if (user == null && !guestOrderLimiter.tryAcquire(httpRequest.getRemoteAddr())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new ApiResponse(false, "Too many orders from this connection. Please try again later or contact info@firquijewels.com."));
         }
 
         try {
@@ -123,11 +128,13 @@ public class OrderController {
             @AuthenticationPrincipal User user,
             @RequestPart("orderData") CreateOrderRequest request,
             @RequestParam("transactionId") String transactionId,
-            @RequestParam("screenshot") org.springframework.web.multipart.MultipartFile screenshot) {
+            @RequestParam("screenshot") org.springframework.web.multipart.MultipartFile screenshot,
+            jakarta.servlet.http.HttpServletRequest httpRequest) {
 
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(new ApiResponse(false, "Please log in to place your order."));
+        // Guests may order without an account, within a per-address limit
+        if (user == null && !guestOrderLimiter.tryAcquire(httpRequest.getRemoteAddr())) {
+            return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                    .body(new ApiResponse(false, "Too many orders from this connection. Please try again later or contact info@firquijewels.com."));
         }
 
         try {
