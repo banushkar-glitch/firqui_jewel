@@ -72,6 +72,8 @@ SPRING_MAIL_PORT=587
 SPRING_MAIL_USERNAME=
 SPRING_MAIL_PASSWORD=
 CONTACT_EMAIL=info@${DOMAIN}
+UPI_ID=${UPI_ID:-nehaa067@icici}
+UPI_PAYEE_NAME=FIRQUI JEWELS
 ENV
     chown root:firqui "$ENV_FILE"
     chmod 640 "$ENV_FILE"
@@ -109,4 +111,4 @@ echo
 echo "Setup finished."
 echo "  Admin login : $(grep '^ADMIN_EMAIL=' "$ENV_FILE" | cut -d= -f2)"
 echo "  Admin pass  : sudo grep ADMIN_PASSWORD $ENV_FILE"
-echo "Next: sudo bash deploy/deploy.sh"
+echo "Next: put the email/UPI values in place (sudo bash deploy/set-env.sh <file>), then: sudo bash deploy/deploy.sh"

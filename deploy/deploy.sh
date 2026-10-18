@@ -30,12 +30,6 @@ rsync -a --delete \
     --exclude 'assets/home main.png' \
     "$REPO_DIR/frontend/" /var/www/firqui/
 
-echo "==> Copying product images from the repository (existing files are kept)"
-if [ -d "$REPO_DIR/uploads" ]; then
-    rsync -a --ignore-existing "$REPO_DIR/uploads/" /var/lib/firqui/uploads/
-    chown -R firqui:firqui /var/lib/firqui/uploads
-fi
-
 echo "==> Restarting backend"
 systemctl restart firqui
 

@@ -55,6 +55,7 @@ ssh -i your-key.pem ubuntu@YOUR_ELASTIC_IP
 
 git clone https://github.com/banushkar-glitch/firqui_jewel.git
 cd firqui_jewel
+git checkout main          # or the branch being released, e.g. mobile-redesign
 sudo bash deploy/setup-server.sh firquijewels.com
 ```
 
@@ -86,18 +87,22 @@ sudo grep ADMIN_ /etc/firqui/firqui.env
 
 Log in at `https://firquijewels.com/authentication/login.html` with that email and password. The admin account is created once, on first startup; changing `ADMIN_PASSWORD` in the file later does not change the existing account.
 
-## 8. Set up email (Contact Us form and password reset)
+## 8. Set up email and payments
 
-No email is sent until SMTP details are filled in. Until then the Contact Us form tells visitors their message could not be sent, and "Forgot password" emails are not delivered.
+No email is sent until SMTP details are filled in. Until then the Contact Us form tells visitors their message could not be sent, and order and "forgot password" emails are not delivered.
+
+1. On your laptop, copy `deploy/prod-values.env.example` to a file **outside** the repository, e.g. `firqui-prod.env`, and fill it in:
+   - `SPRING_MAIL_USERNAME`: the mailbox that sends, e.g. `info@firquijewels.com`.
+   - `SPRING_MAIL_PASSWORD`: a Google **App Password** for that mailbox (Google Account → Security → 2-Step Verification → App passwords), not the normal password.
+   - `CONTACT_EMAIL`: where Contact Us messages and new-order emails arrive. Replying to them replies straight to the customer.
+   - `UPI_ID`: the UPI ID shown in the payment QR.
+2. Copy it to the server and apply it. The script updates only those settings, keeps the generated secrets, deletes the uploaded file and restarts the backend:
 
 ```bash
-sudo nano /etc/firqui/firqui.env      # SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD, CONTACT_EMAIL
-sudo systemctl restart firqui
+scp -i your-key.pem firqui-prod.env ubuntu@YOUR_ELASTIC_IP:~/
+ssh -i your-key.pem ubuntu@YOUR_ELASTIC_IP
+cd firqui_jewel && sudo bash deploy/set-env.sh ~/firqui-prod.env
 ```
-
-- `SPRING_MAIL_USERNAME` is the mailbox that sends, e.g. `info@firquijewels.com`.
-- `SPRING_MAIL_PASSWORD`: for Gmail / Google Workspace this must be an App Password (Google Account → Security → 2-Step Verification → App passwords), not the normal account password.
-- `CONTACT_EMAIL` is where Contact Us messages are delivered (defaults to `info@firquijewels.com`). Replying to one of those emails replies straight to the customer.
 
 To check it works, send a message from the Contact Us page and watch the log: `sudo journalctl -u firqui -f` shows `Contact form email sent via SMTP` on success, or the SMTP error.
 
@@ -109,7 +114,7 @@ git pull
 sudo bash deploy/deploy.sh
 ```
 
-Uploaded images, orders and settings are kept.
+Uploaded images, orders and settings are kept. The shop starts with no products, no customer accounts and only the Pearls Gone Rogue collection; add listings in the admin panel.
 
 ## Useful commands
 
