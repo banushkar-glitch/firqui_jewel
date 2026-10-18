@@ -18,6 +18,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const subtotalElement = document.getElementById("checkout-subtotal");
     const totalElement = document.getElementById("checkout-total");
     const checkoutForm = document.getElementById("checkout-form");
+
+    // Guest checkout: offer (not require) logging in
+    if (checkoutForm && window.FirquiAuth && !window.FirquiAuth.isSignedIn()) {
+        const note = document.createElement("p");
+        note.className = "guest-checkout-note";
+        note.innerHTML = 'Checking out as a guest. <a href="' + window.FirquiAuth.loginUrl() + '">Log in</a> to save your details and track orders.';
+        checkoutForm.insertAdjacentElement("afterbegin", note);
+    }
     const submitButton = checkoutForm ? checkoutForm.querySelector(".place-order-button") : null;
 
     let cart = [];
@@ -225,6 +233,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const pincode = document.getElementById("customer-pincode").value.trim();
             const address1 = document.getElementById("address-1").value.trim();
             const address2 = document.getElementById("address-2").value.trim();
+
+            // Guests have no account email, so the confirmation goes to this address
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+                alert("Please enter a valid email address. We send your order confirmation there.");
+                document.getElementById("customer-email").focus();
+                return;
+            }
 
             const selectedPayment = document.querySelector('input[name="payment"]:checked');
             if (!selectedPayment) {

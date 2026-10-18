@@ -567,12 +567,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-            // Placing an order needs an account; the cart is kept and the
-            // customer comes straight back to checkout after logging in
-            if (!window.FirquiAuth.isSignedIn()) {
-                window.FirquiAuth.goToLogin(window.location.pathname.replace(/cart\.html$/, "checkout.html"));
-                return;
-            }
+            // Guests can check out without an account
             window.location.href = "checkout.html";
         });
     }

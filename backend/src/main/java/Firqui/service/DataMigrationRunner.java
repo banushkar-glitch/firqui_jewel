@@ -45,8 +45,11 @@ public class DataMigrationRunner implements CommandLineRunner {
     @Value("${app.admin.password:Admin@123}")
     private String adminPassword;
 
-    @Value("${app.seed.demo-user:true}")
+    @Value("${app.seed.demo-user:false}")
     private boolean seedDemoUser;
+
+    @Value("${app.seed.demo-products:false}")
+    private boolean seedDemoProducts;
 
     @Override
     public void run(String... args) throws Exception {
@@ -60,6 +63,12 @@ public class DataMigrationRunner implements CommandLineRunner {
             jdbcTemplate.execute("ALTER TABLE cart_items ADD COLUMN IF NOT EXISTS product_id VARCHAR(100)");
             jdbcTemplate.execute("ALTER TABLE products ADD COLUMN IF NOT EXISTS discount DOUBLE PRECISION");
             jdbcTemplate.execute("ALTER TABLE products ALTER COLUMN main_image TYPE TEXT");
+            try {
+                // Guest orders have no account
+                jdbcTemplate.execute("ALTER TABLE orders ALTER COLUMN user_id DROP NOT NULL");
+            } catch (Exception guestOrdersEx) {
+                // Table not created yet or already nullable
+            }
             jdbcTemplate.execute("ALTER TABLE product_images ALTER COLUMN image_url TYPE TEXT");
             try {
                 jdbcTemplate.execute("ALTER TABLE products ALTER COLUMN category DROP NOT NULL");
@@ -132,16 +141,19 @@ public class DataMigrationRunner implements CommandLineRunner {
 
     private void seedCollections() {
         if (collectionRepository.count() == 0) {
-            List<ProductCollection> collections = Arrays.asList(
-                    new ProductCollection("Pearls Gone Rogue", "pearls-gone-rogue", "Unconventional, modern pearl artistry.", "../assets/page_06_image_02.png"),
-                    new ProductCollection("Firqui Originals", "firqui-originals", "Signature designs from Firqui.", "../assets/page_07_image_02.png"),
-                    new ProductCollection("Royale Heritage", "royale-heritage", "Regal inspirations and timeless motifs.", "../assets/page_08_image_02.png"),
-                    new ProductCollection("Celestial Glow", "celestial-glow", "Lustrous pieces that capture celestial radiance.", "../assets/page_09_image_02.png"),
-                    new ProductCollection("Minimal Luxe", "minimal-luxe", "Clean geometric silhouettes for modern wear.", "../assets/page_11_image_02.png"),
-                    new ProductCollection("Vintage Charm", "vintage-charm", "Old-world romance infused with contemporary sparkle.", "../assets/page_12_image_02.png")
-            );
-            collectionRepository.saveAll(collections);
-            System.out.println("✅ Seeded 6 FIRQUI collections.");
+            // The shop has a single collection for now
+            collectionRepository.save(new ProductCollection("Pearls Gone Rogue", "pearls-gone-rogue", "Unconventional, modern pearl artistry.", "../assets/page_06_image_02.png"));
+            System.out.println("✅ Seeded collection: Pearls Gone Rogue");
+        }
+        // Earlier versions seeded five placeholder collections; drop them unless a product uses one
+        for (String old : List.of("Firqui Originals", "Royale Heritage", "Celestial Glow", "Minimal Luxe", "Vintage Charm")) {
+            collectionRepository.findByNameIgnoreCase(old).ifPresent(c -> {
+                boolean used = productRepository.findByCollectionIgnoreCase(old).stream().findAny().isPresent();
+                if (!used) {
+                    collectionRepository.delete(c);
+                    System.out.println("Removed placeholder collection: " + old);
+                }
+            });
         }
     }
 
@@ -186,6 +198,10 @@ public class DataMigrationRunner implements CommandLineRunner {
     }
 
     private void seedProducts() {
+        // Placeholder products are for demos only; a real shop starts with an empty catalogue
+        if (!seedDemoProducts) {
+            return;
+        }
         if (productRepository.count() > 0) {
             System.out.println("ℹ️ Products already exist in database (" + productRepository.count() + " found). Skipping seed.");
             return;

@@ -127,8 +127,9 @@ document.addEventListener("DOMContentLoaded", () => {
             buttons.push(`<button type="button" class="table-action" data-act="archive" title="Archive (hide from shop)" aria-label="Archive ${esc(p.name)}"><i class="fa-solid fa-box-archive"></i></button>`);
         } else {
             buttons.push(`<button type="button" class="table-action" data-act="publish" title="${s === "ARCHIVED" ? "Restore to shop" : "Publish"}" aria-label="Publish ${esc(p.name)}"><i class="fa-solid fa-cloud-arrow-up"></i></button>`);
-            buttons.push(`<button type="button" class="table-action delete-btn" data-act="delete" title="Delete permanently" aria-label="Delete ${esc(p.name)}"><i class="fa-regular fa-trash-can"></i></button>`);
         }
+        // Any listing can be deleted, e.g. one published by mistake
+        buttons.push(`<button type="button" class="table-action delete-btn" data-act="delete" title="Delete permanently" aria-label="Delete ${esc(p.name)}"><i class="fa-regular fa-trash-can"></i></button>`);
         return buttons.join("");
     }
 
@@ -248,7 +249,15 @@ document.addEventListener("DOMContentLoaded", () => {
                     });
                     replaceProduct(data.product); render(); toast(`"${p.name}" is now in the shop.`);
                 } else if (act === "delete") {
-                    if (!confirm(`Delete "${p.name}" permanently? This cannot be undone.`)) return;
+                    const live = statusOf(p) === "PUBLISHED";
+                    const question = live
+                        ? `"${p.name}" is live in the shop.
+
+Delete it permanently? It disappears from the shop immediately and cannot be restored. Past orders keep their item details.
+
+(To only hide it, choose Cancel and use Archive instead.)`
+                        : `Delete "${p.name}" permanently? This cannot be undone.`;
+                    if (!confirm(question)) return;
                     await api(`/api/admin/products/${encodeURIComponent(id)}`, { method: "DELETE" });
                     products = products.filter(x => String(x.id) !== String(id));
                     render(); toast(`"${p.name}" deleted.`);
