@@ -34,7 +34,12 @@ JAR="$(ls backend/target/*.jar | grep -v original | head -n 1)"
 echo "==> Shipping $(basename "$JAR"), frontend and deploy scripts to $TARGET"
 
 # The release replaces ~/firqui_release on the server as a whole
-tar czf -     --exclude='*.bak'     --exclude='frontend/assets/image.png'     --exclude='frontend/assets/home main.png'     frontend deploy "$JAR"   | "${SSH[@]}" "$TARGET" '
+tar czf - \
+    --exclude='*.bak' \
+    --exclude='frontend/assets/image.png' \
+    --exclude='frontend/assets/home main.png' \
+    frontend deploy "$JAR" \
+  | "${SSH[@]}" "$TARGET" '
         set -e
         rm -rf ~/firqui_release.new && mkdir -p ~/firqui_release.new
         tar xzf - -C ~/firqui_release.new

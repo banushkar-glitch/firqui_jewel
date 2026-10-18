@@ -1,0 +1,97 @@
+# Deploys the live site (https://firquijewels.com) whenever main changes.
+#
+# 1. Runs the backend unit tests and builds the jar on GitHub's machine
+#    (free for public repositories; the 1 GB server is too small to build).
+# 2. Gets short-lived AWS permission through OIDC (no AWS keys stored in GitHub)
+#    and opens SSH on the server's firewall for this runner's address only.
+# 3. Ships the release with deploy/release.sh and checks the live site.
+# 4. Always closes SSH again, even if a step failed.
+#
+# One-time setup: repository secret DEPLOY_SSH_KEY = the private deploy key.
+# Run by hand: Actions tab -> "Deploy to AWS" -> Run workflow (on main).
+
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Never run two deployments at the same time
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  id-token: write   # for the AWS OIDC login
+  contents: read
+
+env:
+  AWS_REGION: ap-south-1
+  AWS_ROLE_ARN: arn:aws:iam::583329429354:role/firqui-github-deploy
+  SECURITY_GROUP_ID: sg-0d177a0e2b789d953
+  DEPLOY_HOST: 13.233.12.191
+  # The server's SSH host key, so the runner refuses to talk to an impostor
+  DEPLOY_HOST_KEY: "13.233.12.191 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPsFMPgv6GwLaJQlPr4wZyZCevJaDZhaGITa+dPASKyg"
+  SITE_URL: https://firquijewels.com
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Unit tests
+        working-directory: backend
+        run: sh ./mvnw -B test -Dtest='*UnitTests' -Dsurefire.failIfNoSpecifiedTests=false
+
+      - name: Log in to AWS (short-lived, via OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Open SSH for this runner only
+        run: |
+          RUNNER_IP="$(curl -fsS https://checkip.amazonaws.com | tr -d '\r\n')"
+          echo "RUNNER_IP=$RUNNER_IP" >> "$GITHUB_ENV"
+          aws ec2 authorize-security-group-ingress \
+            --group-id "$SECURITY_GROUP_ID" \
+            --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=${RUNNER_IP}/32,Description=github-actions-deploy}]"
+
+      - name: Deploy
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+        run: |
+          [ -n "$DEPLOY_SSH_KEY" ] || { echo "Repository secret DEPLOY_SSH_KEY is missing."; exit 1; }
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "$DEPLOY_HOST_KEY" >> ~/.ssh/known_hosts
+          bash deploy/release.sh "ubuntu@${DEPLOY_HOST}" ~/.ssh/deploy_key
+
+      - name: Check the live site
+        run: |
+          curl -fsS --retry 6 --retry-delay 5 --retry-all-errors "$SITE_URL/api/categories" > /dev/null
+          curl -fsS --retry 3 --retry-delay 5 "$SITE_URL/" > /dev/null
+          echo "Live site is up: $SITE_URL"
+
+      - name: Close SSH again
+        if: always()
+        run: |
+          if [ -n "${RUNNER_IP:-}" ]; then
+            aws ec2 revoke-security-group-ingress \
+              --group-id "$SECURITY_GROUP_ID" \
+              --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=${RUNNER_IP}/32}]" || true
+          fi
+          rm -f ~/.ssh/deploy_key

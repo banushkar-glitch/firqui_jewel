@@ -106,6 +106,37 @@ cd firqui_jewel && sudo bash deploy/set-env.sh ~/firqui-prod.env
 
 To check it works, send a message from the Contact Us page and watch the log: `sudo journalctl -u firqui -f` shows `Contact form email sent via SMTP` on success, or the SMTP error.
 
+## Automatic deployment (every push to `main`)
+
+`.github/workflows/deploy.yml` deploys the site whenever `main` changes. It runs on GitHub's machines, free for public repositories. Each run:
+
+1. runs the backend unit tests and stops if any fail;
+2. logs in to AWS through OIDC. No AWS keys are stored in GitHub: the IAM role `firqui-github-deploy` trusts only this repository's `main` branch and may only open and close SSH in the `firqui-web` security group;
+3. opens SSH for that runner's address only and runs `deploy/release.sh`, which builds the jar from the committed code, ships it with the website and runs `deploy.sh` on the server;
+4. checks that https://firquijewels.com answers, then closes SSH again (also when something failed).
+
+Watch a deployment in the repository's **Actions** tab. To deploy again without a code change, open **Actions → Deploy to AWS → Run workflow**.
+
+**One-time setup:** add the repository secret `DEPLOY_SSH_KEY` (Settings → Secrets and variables → Actions → New repository secret). Its value is the private deploy key whose public half is in the server's `~/.ssh/authorized_keys`.
+
+### Deploying by hand
+
+From a laptop whose SSH key is on the server and whose IP is allowed in the `firqui-web` security group:
+
+```bash
+bash deploy/release.sh ubuntu@13.233.12.191 ~/.ssh/firqui_admin
+```
+
+It ships the **committed** code (uncommitted local changes are left out), so commit first.
+
+If SSH is refused because your IP changed, allow the new one:
+
+```bash
+aws ec2 authorize-security-group-ingress --region ap-south-1 --group-id sg-0d177a0e2b789d953 --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=$(curl -s https://checkip.amazonaws.com)/32}]"
+```
+
+Without a key file you can still get in with EC2 Instance Connect (`aws ec2-instance-connect send-ssh-public-key ...`), which is how a new key can be installed.
+
 ## Updating the site later
 
 ```bash
