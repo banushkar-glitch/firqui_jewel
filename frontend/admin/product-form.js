@@ -371,6 +371,7 @@ document.addEventListener("DOMContentLoaded", () => {
         $("pfTitle").textContent = status === "NEW" ? "Add Product" : "Edit Product";
         document.title = "Firqui Jewels | " + (status === "NEW" ? "Add Product" : "Edit Product");
         secondary.hidden = true;
+        $("pfDelete").hidden = status === "NEW";
 
         if (status === "NEW" || status === "DRAFT") {
             help.textContent = status === "NEW"
@@ -704,6 +705,30 @@ document.addEventListener("DOMContentLoaded", () => {
             setStatusOnly("DRAFT");
         } else {
             await save("DRAFT");
+        }
+    });
+
+    $("pfDelete").addEventListener("click", async () => {
+        if (!productId) return;
+        const name = fields.name.value.trim() || "this product";
+        const question = status === "PUBLISHED"
+            ? `"${name}" is live in the shop.
+
+Delete it permanently? It disappears from the shop immediately and cannot be restored. Past orders keep their item details.
+
+(To only hide it, choose Cancel and use Unpublish or Archive.)`
+            : `Delete "${name}" permanently? This cannot be undone.`;
+        if (!confirm(question)) return;
+        clearTimeout(autosaveTimer);
+        try {
+            const res = await fetch(`${API_BASE}/api/admin/products/${encodeURIComponent(productId)}`, { method: "DELETE" });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || data.success === false) throw new Error(data.message || "Could not delete the product.");
+            baseline = snapshot();                       // nothing left to warn about
+            try { localStorage.removeItem(backupKey()); } catch (e) {}
+            window.location.href = "products.html";
+        } catch (err) {
+            banner(err.message);
         }
     });
 
