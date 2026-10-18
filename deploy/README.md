@@ -55,6 +55,7 @@ ssh -i your-key.pem ubuntu@YOUR_ELASTIC_IP
 
 git clone https://github.com/banushkar-glitch/firqui_jewel.git
 cd firqui_jewel
+git checkout main          # or the branch being released, e.g. mobile-redesign
 sudo bash deploy/setup-server.sh firquijewels.com
 ```
 
@@ -86,20 +87,55 @@ sudo grep ADMIN_ /etc/firqui/firqui.env
 
 Log in at `https://firquijewels.com/authentication/login.html` with that email and password. The admin account is created once, on first startup; changing `ADMIN_PASSWORD` in the file later does not change the existing account.
 
-## 8. Set up email (Contact Us form and password reset)
+## 8. Set up email and payments
 
-No email is sent until SMTP details are filled in. Until then the Contact Us form tells visitors their message could not be sent, and "Forgot password" emails are not delivered.
+No email is sent until SMTP details are filled in. Until then the Contact Us form tells visitors their message could not be sent, and order and "forgot password" emails are not delivered.
+
+1. On your laptop, copy `deploy/prod-values.env.example` to a file **outside** the repository, e.g. `firqui-prod.env`, and fill it in:
+   - `SPRING_MAIL_USERNAME`: the mailbox that sends, e.g. `info@firquijewels.com`.
+   - `SPRING_MAIL_PASSWORD`: a Google **App Password** for that mailbox (Google Account → Security → 2-Step Verification → App passwords), not the normal password.
+   - `CONTACT_EMAIL`: where Contact Us messages and new-order emails arrive. Replying to them replies straight to the customer.
+   - `UPI_ID`: the UPI ID shown in the payment QR.
+2. Copy it to the server and apply it. The script updates only those settings, keeps the generated secrets, deletes the uploaded file and restarts the backend:
 
 ```bash
-sudo nano /etc/firqui/firqui.env      # SPRING_MAIL_USERNAME, SPRING_MAIL_PASSWORD, CONTACT_EMAIL
-sudo systemctl restart firqui
+scp -i your-key.pem firqui-prod.env ubuntu@YOUR_ELASTIC_IP:~/
+ssh -i your-key.pem ubuntu@YOUR_ELASTIC_IP
+cd firqui_jewel && sudo bash deploy/set-env.sh ~/firqui-prod.env
 ```
 
-- `SPRING_MAIL_USERNAME` is the mailbox that sends, e.g. `info@firquijewels.com`.
-- `SPRING_MAIL_PASSWORD`: for Gmail / Google Workspace this must be an App Password (Google Account → Security → 2-Step Verification → App passwords), not the normal account password.
-- `CONTACT_EMAIL` is where Contact Us messages are delivered (defaults to `info@firquijewels.com`). Replying to one of those emails replies straight to the customer.
-
 To check it works, send a message from the Contact Us page and watch the log: `sudo journalctl -u firqui -f` shows `Contact form email sent via SMTP` on success, or the SMTP error.
+
+## Automatic deployment (every push to `main`)
+
+`.github/workflows/deploy.yml` deploys the site whenever `main` changes. It runs on GitHub's machines, free for public repositories. Each run:
+
+1. runs the backend unit tests and stops if any fail;
+2. logs in to AWS through OIDC. No AWS keys are stored in GitHub: the IAM role `firqui-github-deploy` trusts only this repository's `main` branch and may only open and close SSH in the `firqui-web` security group;
+3. opens SSH for that runner's address only and runs `deploy/release.sh`, which builds the jar from the committed code, ships it with the website and runs `deploy.sh` on the server;
+4. checks that https://firquijewels.com answers, then closes SSH again (also when something failed).
+
+Watch a deployment in the repository's **Actions** tab. To deploy again without a code change, open **Actions → Deploy to AWS → Run workflow**.
+
+**One-time setup:** add the repository secret `DEPLOY_SSH_KEY` (Settings → Secrets and variables → Actions → New repository secret). Its value is the private deploy key whose public half is in the server's `~/.ssh/authorized_keys`.
+
+### Deploying by hand
+
+From a laptop whose SSH key is on the server and whose IP is allowed in the `firqui-web` security group:
+
+```bash
+bash deploy/release.sh ubuntu@13.233.12.191 ~/.ssh/firqui_admin
+```
+
+It ships the **committed** code (uncommitted local changes are left out), so commit first.
+
+If SSH is refused because your IP changed, allow the new one:
+
+```bash
+aws ec2 authorize-security-group-ingress --region ap-south-1 --group-id sg-0d177a0e2b789d953 --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=$(curl -s https://checkip.amazonaws.com)/32}]"
+```
+
+Without a key file you can still get in with EC2 Instance Connect (`aws ec2-instance-connect send-ssh-public-key ...`), which is how a new key can be installed.
 
 ## Updating the site later
 
@@ -109,7 +145,7 @@ git pull
 sudo bash deploy/deploy.sh
 ```
 
-Uploaded images, orders and settings are kept.
+Uploaded images, orders and settings are kept. The shop starts with no products, no customer accounts and only the Pearls Gone Rogue collection; add listings in the admin panel.
 
 ## Useful commands
 

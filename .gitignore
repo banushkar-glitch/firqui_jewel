@@ -1,2 +1,7 @@
 # Runtime data created by the backend (admin product photos); never commit
 /uploads/
+
+# Secrets: real environment files and SSH keys never go into Git
+*.env
+!*.env.example
+*.pem
