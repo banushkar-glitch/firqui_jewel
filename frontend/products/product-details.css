@@ -313,7 +313,6 @@ img {
 
     border-radius: 50%;
 
-    background: var(--cream);
     color: var(--dark-teal);
 
     display: flex;
@@ -324,8 +323,6 @@ img {
 
     font-size: 15px;
 
-    box-shadow:
-        0 5px 15px rgba(0, 0, 0, 0.15);
 
     transition:
         background 0.25s ease,
@@ -366,7 +363,6 @@ img {
 
     border-radius: 50%;
 
-    background: var(--cream);
     color: var(--dark-teal);
 
     display: flex;
@@ -374,9 +370,6 @@ img {
     justify-content: center;
 
     font-size: 18px;
-
-    box-shadow:
-        0 5px 15px rgba(0, 0, 0, 0.15);
 
     transition:
         color 0.2s ease,
@@ -2685,4 +2678,16 @@ img {
 #productDetailsDesc p,
 #productDescription p {
     margin: 0 0 8px;
+}
+
+.related-product-description {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.related-product-description.expanded {
+    display: block;
+    overflow: visible;
 }

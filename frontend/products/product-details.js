@@ -1787,6 +1787,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    function cleanDescription(description) {
+    const div = document.createElement("div");
+    div.innerHTML = description || "";
+    return div.textContent || div.innerText || "";
+}
+
     function renderRelatedProducts(list) {
         const grid = document.getElementById("relatedProductsGrid") || document.querySelector(".related-grid");
         if (!grid) return;
