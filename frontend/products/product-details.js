@@ -1788,10 +1788,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function cleanDescription(description) {
-    const div = document.createElement("div");
-    div.innerHTML = description || "";
-    return div.textContent || div.innerText || "";
-}
+        if (!description) return "";
+        let str = String(description);
+        str = str.replace(/<\/(p|div|li|h[1-6]|tr|td|th)>/gi, " ")
+                 .replace(/<(br|hr)\s*[\/]?>/gi, " ");
+
+        if (window.FirquiHtml && typeof window.FirquiHtml.text === "function") {
+            str = window.FirquiHtml.text(str);
+        } else {
+            const div = document.createElement("div");
+            div.innerHTML = str;
+            str = div.textContent || div.innerText || "";
+        }
+
+        return str.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    }
 
     function renderRelatedProducts(list) {
         const grid = document.getElementById("relatedProductsGrid") || document.querySelector(".related-grid");
@@ -1806,7 +1817,8 @@ document.addEventListener("DOMContentLoaded", () => {
         list.forEach(relProd => {
             const relId = relProd.id !== undefined && relProd.id !== null ? String(relProd.id) : (relProd.legacyId || "");
             const relName = relProd.name || relProd.productName || "Product";
-            const relDesc = relProd.description || relProd.category || "";
+            const rawDesc = relProd.description || relProd.category || "";
+            const relDesc = cleanDescription(rawDesc);
             const relPrice = formatSellingPrice(relProd.price);
             const relComparePrice = formatComparePrice(relProd.comparePrice);
             const imgSrc = getProductImage(relProd);
@@ -1845,7 +1857,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     </div>
                     <div class="related-info">
                         <h3>${escapeHtml(relName)}</h3>
-                        <p>${escapeHtml(relDesc)}</p>
+                        ${relDesc ? `<p class="related-product-description">${escapeHtml(relDesc)}</p>` : ""}
+                        ${relDesc ? `<span class="related-read-more" role="button" tabindex="0">Read more</span>` : ""}
                         <strong>${relPrice}${compareHtml}</strong>
                     </div>
                 </a>
@@ -1854,6 +1867,25 @@ document.addEventListener("DOMContentLoaded", () => {
             const wishlistSpan = card.querySelector(".related-wishlist");
             if (wishlistSpan) {
                 wishlistSpan.addEventListener("click", (e) => handleRelatedWishlistClick(e, relProd));
+            }
+
+            const readMoreSpan = card.querySelector(".related-read-more");
+            if (readMoreSpan) {
+                const descP = card.querySelector(".related-product-description");
+                const handleToggle = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (!descP) return;
+                    const isExpanded = descP.classList.toggle("expanded");
+                    readMoreSpan.textContent = isExpanded ? "Read less" : "Read more";
+                    readMoreSpan.setAttribute("aria-expanded", isExpanded ? "true" : "false");
+                };
+                readMoreSpan.addEventListener("click", handleToggle);
+                readMoreSpan.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                        handleToggle(e);
+                    }
+                });
             }
 
             grid.appendChild(card);

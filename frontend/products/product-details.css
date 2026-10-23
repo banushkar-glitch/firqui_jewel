@@ -2685,9 +2685,53 @@ img {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    line-height: 1.4;
+    word-break: break-word;
 }
 
 .related-product-description.expanded {
     display: block;
+    -webkit-line-clamp: unset;
     overflow: visible;
+}
+
+.related-read-more {
+    display: inline-block;
+    margin-top: 4px;
+    color: var(--dark-teal);
+    font-family: var(--font-inter);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 0;
+    line-height: 1.3;
+    user-select: none;
+    transition: color 0.2s ease;
+}
+
+.related-read-more:hover {
+    color: var(--pink);
+}
+
+@media (max-width: 767px) {
+    .related-read-more {
+        font-size: 9px;
+        margin-top: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .related-read-more {
+        font-size: 8px;
+        margin-top: 2px;
+    }
+}
+
+@media (max-width: 360px) {
+    .related-read-more {
+        font-size: 7px;
+    }
 }
