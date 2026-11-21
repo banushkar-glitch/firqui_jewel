@@ -653,7 +653,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         <small style="color: #15803d; font-size: 0.78rem;">
                             <strong>Amount:</strong> ${order.formattedRefundAmount || totalDisplay}
                             ${order.razorpayRefundId ? `<br><strong>Refund ID:</strong> ${window.FirquiHtml.escape(order.razorpayRefundId)}` : ""}
-                            <br>Credited back to your original payment method in 5-7 bank working days.
+                            <br>Refunded instantly to your original payment method where your bank supports it (usually within minutes); otherwise within 5-7 bank working days.
                         </small>
                     </span>
                 `;
@@ -748,7 +748,7 @@ document.addEventListener("DOMContentLoaded", function () {
                                 `Refund Status: Initiated via Razorpay\n` +
                                 `Refund ID: ${data.razorpayRefundId || 'Generated'}\n` +
                                 `Amount: ${data.formattedRefundAmount || totalDisplay}\n\n` +
-                                `The amount will be credited back to your original payment source within 5-7 bank working days.`
+                                `The refund has been sent instantly to your original payment method. Most banks show it within minutes; some take up to 5-7 working days.`
                             );
                             loadOrders();
                         } catch (err) {

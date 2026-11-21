@@ -75,6 +75,16 @@ public class ShopNotificationService {
                 "The customer has submitted UPI payment details for this order. Check the screenshot and transaction ID, then verify or reject the payment in the admin panel.");
     }
 
+    /** A guest (no account) cancelled through the emailed link; refund is already handled automatically. */
+    public void guestCancelled(Order order, String reason, String details) {
+        if (order == null) return;
+        String note = "Cancelled by the customer through the emailed cancel link (guest order)."
+                + "\nReason: " + safe(reason)
+                + (details != null && !details.isBlank() ? "\nDetails: " + details.trim() : "")
+                + "\nRefund status: " + safe(order.getRefundStatus());
+        send("Order #" + order.getOrderNumber() + " cancelled by customer", "Order cancelled", order, note);
+    }
+
     public void cancellationRequested(CancellationRequest request) {
         if (request == null || request.getOrder() == null) return;
         String note = "Reason: " + safe(request.getReason())

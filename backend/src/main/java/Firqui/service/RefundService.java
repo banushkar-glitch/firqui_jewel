@@ -56,6 +56,10 @@ public class RefundService {
     @Value("${app.cancellation.window-hours:24}")
     private long cancellationWindowHours;
 
+    /** "optimum" = instant refund where Razorpay supports it (falls back to normal); "normal" = 5-7 working days. */
+    @Value("${app.refunds.speed:optimum}")
+    private String refundSpeed = "optimum";
+
     /* =====================================================
        CUSTOMER: cancel own order (refund is automatic)
     ====================================================== */
@@ -98,6 +102,46 @@ public class RefundService {
     }
 
     /* =====================================================
+       GUEST: cancel through the signed link emailed to the order's address
+       (the link itself proves ownership; see CancelLinkSigner)
+    ====================================================== */
+    @Transactional
+    public Order cancelByEmailLink(String orderNumber, String reason, String details) {
+        Order order = lockOrder(orderNumber);
+        ensureCancellable(order);
+        LocalDateTime since = order.getPaymentVerifiedAt() != null ? order.getPaymentVerifiedAt() : order.getCreatedAt();
+        if (since != null && Duration.between(since, LocalDateTime.now()).toHours() >= cancellationWindowHours) {
+            throw new IllegalStateException("Orders can only be cancelled within " + cancellationWindowHours
+                    + " hours of payment. Please contact info@firquijewels.com for help.");
+        }
+
+        String cleanReason = blankTo(reason, "Customer requested cancellation");
+        cancelOrderAndRefund(order, cleanReason, details, "CUSTOMER_EMAIL_LINK");
+
+        CancellationRequest record = null;
+        if (order.getUser() != null) {
+            // Account holders who used the email link still get an entry under Cancellation Requests
+            record = new CancellationRequest(order, order.getUser(), cleanReason, details);
+            record.setStatus("APPROVED");
+            record.setRefundStatus(order.getRefundStatus());
+            record.setReviewedAt(LocalDateTime.now());
+            record.setReviewedBy("SYSTEM_AUTO_POLICY");
+            record.setAdminNotes(refundNote(order) + " (via email link)");
+            record = cancellationRequestRepository.save(record);
+            if (shopNotifications != null) shopNotifications.cancellationRequested(record);
+        } else if (shopNotifications != null) {
+            shopNotifications.guestCancelled(order, cleanReason, details);
+        }
+
+        CancellationRequest forEmail = record;
+        afterCommit(() -> {
+            if (emailService != null) emailService.sendCancellationApprovedEmail(order, forEmail);
+        });
+        logger.info("Order #{} cancelled through email link (refund status {})", order.getOrderNumber(), order.getRefundStatus());
+        return order;
+    }
+
+    /* =====================================================
        SHARED: cancel + restore stock + refund what was paid online
        Caller must hold the order lock (lockOrder) inside a transaction.
     ====================================================== */
@@ -134,6 +178,38 @@ public class RefundService {
             throw new IllegalStateException("Order #" + order.getOrderNumber()
                     + " was not paid through Razorpay, so it has to be refunded manually.");
         }
+        if (!isWithinRefundWindow(order)) {
+            throw new IllegalStateException("Refunds can only be issued within " + cancellationWindowHours
+                    + " hours of payment. Order #" + order.getOrderNumber() + " is past that window.");
+        }
+        return refundRemainingOrAmount(order, amountPaise, reason, adminEmail);
+    }
+
+    /**
+     * Finishes a refund that was already due: a cancelled order, or a refund that failed.
+     * Allowed after the refund window, because the customer cancelled in time and is owed the money.
+     */
+    @Transactional
+    public Refund retryRefund(String orderNumber, String adminEmail) {
+        Order order = lockOrder(orderNumber);
+        if (!isPaidOnline(order)) {
+            throw new IllegalStateException("Order #" + order.getOrderNumber()
+                    + " was not paid through Razorpay, so it has to be refunded manually.");
+        }
+        if (!isCancelled(order) && !"REFUND_FAILED".equalsIgnoreCase(order.getRefundStatus())) {
+            throw new IllegalStateException("Order #" + order.getOrderNumber()
+                    + " has no cancelled or failed refund to retry.");
+        }
+        return refundRemainingOrAmount(order, null, "Refund retried by admin", adminEmail);
+    }
+
+    /** True while the order is within the refund window counted from payment. */
+    public boolean isWithinRefundWindow(Order order) {
+        LocalDateTime paidAt = order.getPaymentVerifiedAt() != null ? order.getPaymentVerifiedAt() : order.getCreatedAt();
+        return paidAt != null && Duration.between(paidAt, LocalDateTime.now()).toHours() < cancellationWindowHours;
+    }
+
+    private Refund refundRemainingOrAmount(Order order, Long amountPaise, String reason, String adminEmail) {
         syncWithGateway(order);
         long remaining = refundablePaise(order);
         long amount = amountPaise != null ? amountPaise : remaining;
@@ -208,11 +284,25 @@ public class RefundService {
         notes.put("reason", truncate(reason, 200));
 
         try {
-            JsonNode res = gateway.createRefund(paymentId, amountPaise,
-                    "rf_" + order.getOrderNumber() + "_" + refund.getId(), notes, "firqui-refund-" + refund.getId());
+            String receipt = "rf_" + order.getOrderNumber() + "_" + refund.getId();
+            String key = "firqui-refund-" + refund.getId();
+            JsonNode res;
+            try {
+                res = gateway.createRefund(paymentId, amountPaise, receipt, notes, key, refundSpeed);
+            } catch (RazorpayGateway.RazorpayException e) {
+                // "Instant refund not supported for the payment": nothing was created, so ask again at
+                // normal speed. A new idempotency key is required because the request body differs.
+                if ("normal".equals(refundSpeed) || e.getStatusCode() != 400
+                        || e.getMessage() == null || !e.getMessage().toLowerCase(Locale.ROOT).contains("instant")) {
+                    throw e;
+                }
+                logger.info("Instant refund not available for order #{}; using normal speed", order.getOrderNumber());
+                res = gateway.createRefund(paymentId, amountPaise, receipt, notes, key + "-normal", "normal");
+            }
             applyGatewayState(refund, res);
-            logger.info("Refund {} of {} paise created for order #{} (status {})",
-                    refund.getRazorpayRefundId(), amountPaise, order.getOrderNumber(), refund.getStatus());
+            logger.info("Refund {} of {} paise created for order #{} (status {}, speed {})",
+                    refund.getRazorpayRefundId(), amountPaise, order.getOrderNumber(), refund.getStatus(),
+                    res.path("speed_processed").asString(res.path("speed_requested").asString("normal")));
         } catch (RazorpayGateway.RazorpayException e) {
             if (e.isOutcomeUnknown()) {
                 // May have gone through; the next sync or the refund webhook settles it

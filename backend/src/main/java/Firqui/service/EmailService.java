@@ -33,6 +33,9 @@ public class EmailService {
     @Value("${app.contact.admin-email:info@firquijewels.com}")
     private String adminContactEmail;
 
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private CancelLinkSigner cancelLinkSigner;
+
     public void sendPasswordResetEmail(String toEmail, String resetLink) {
         boolean sent = false;
 
@@ -125,6 +128,7 @@ public class EmailService {
                 "Order Items: " + productsBuilder.toString() + "\n\n" +
                 "Total Amount: ₹" + totalStr + "\n\n" +
                 "Estimated Delivery: Within 4–6 days, depending on your delivery location and shipping conditions.\n\n" +
+                cancelLinkParagraph(order) +
                 "We appreciate your trust in FIRQUI JEWELS and hope you love your jewellery!\n\n" +
                 "Warm regards,\n" +
                 "FIRQUI JEWELS Team";
@@ -529,5 +533,55 @@ public class EmailService {
                    .replace(">", "&gt;")
                    .replace("\"", "&quot;")
                    .replace("'", "&#39;");
+    }
+
+    /** "Need to cancel?" paragraph with the signed cancel link, while the cancellation window is open. */
+    private String cancelLinkParagraph(Firqui.entity.Order order) {
+        if (cancelLinkSigner == null || order == null || !cancelLinkSigner.isWindowOpen(order)) return "";
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+        return "Need to cancel? You can cancel this order until " + cancelLinkSigner.windowEnd(order).format(fmt)
+                + " and get an instant refund:\n" + cancelLinkSigner.link(order) + "\n\n";
+    }
+
+    /**
+     * Emails the signed cancel link to the address on the order (the "cancel my order" form).
+     * Returns true only when the mail server actually accepted the message.
+     */
+    public boolean sendCancelLinkEmail(Firqui.entity.Order order) {
+        if (order == null || cancelLinkSigner == null) return false;
+        String to = order.getShippingEmail() != null && !order.getShippingEmail().isBlank()
+                ? order.getShippingEmail().trim()
+                : (order.getUser() != null ? order.getUser().getEmail() : null);
+        if (to == null || to.isBlank()) return false;
+
+        String name = order.getShippingFullName() != null && !order.getShippingFullName().isBlank()
+                ? order.getShippingFullName().trim() : "Customer";
+        java.time.format.DateTimeFormatter fmt = java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
+        String body = "Dear " + name + ",\n\n" +
+                "We received a request to cancel your FIRQUI JEWELS order #" + order.getOrderNumber() + ".\n\n" +
+                "To cancel it, open this link and confirm:\n" + cancelLinkSigner.link(order) + "\n\n" +
+                "The link works until " + cancelLinkSigner.windowEnd(order).format(fmt) + ". " +
+                "If you paid online, the amount is refunded instantly to your original payment method " +
+                "(some banks take up to 5-7 working days to show it).\n\n" +
+                "If you did not ask to cancel, you can ignore this email - your order stays active.\n\n" +
+                "Warm regards,\nFIRQUI JEWELS Team";
+
+        if (mailSender == null || mailFrom == null || mailFrom.trim().isEmpty()) {
+            logger.warn("Cancel link for order #{} not emailed: SMTP is not configured", order.getOrderNumber());
+            return false;
+        }
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(mailFrom);
+            message.setTo(to);
+            message.setSubject("Cancel your FIRQUI JEWELS order #" + order.getOrderNumber());
+            message.setText(body);
+            mailSender.send(message);
+            logger.info("Cancel link emailed for order #{}", order.getOrderNumber());
+            return true;
+        } catch (Exception e) {
+            logger.warn("Could not email cancel link for order #{}: {}", order.getOrderNumber(), e.getMessage());
+            return false;
+        }
     }
 }

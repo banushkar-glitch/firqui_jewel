@@ -43,6 +43,15 @@ public class OrderResponse {
     private String formattedRefundProcessedAt;
     private Boolean cancellationEligible = false;
     private Long cancellationHoursRemaining = 0L;
+    private Boolean refundWindowOpen = false;
+
+    public Boolean getRefundWindowOpen() {
+        return refundWindowOpen;
+    }
+
+    public void setRefundWindowOpen(Boolean refundWindowOpen) {
+        this.refundWindowOpen = refundWindowOpen;
+    }
 
     private Double subtotal = 0.0;
     private String formattedSubtotal;
@@ -249,6 +258,13 @@ public class OrderResponse {
         }
         response.setCancellationEligible(eligible);
         response.setCancellationHoursRemaining(hoursRemaining);
+
+        // Admin "Issue Razorpay Refund" is offered only within 24 hours of a Razorpay payment
+        boolean paidOnline = "PAID".equalsIgnoreCase(curPayStatus)
+                && order.getRazorpayPaymentId() != null && order.getRazorpayPaymentId().startsWith("pay_");
+        LocalDateTime paidAt = order.getPaymentVerifiedAt() != null ? order.getPaymentVerifiedAt() : order.getCreatedAt();
+        response.setRefundWindowOpen(paidOnline && paidAt != null
+                && java.time.Duration.between(paidAt, LocalDateTime.now()).toHours() < 24);
 
         return response;
     }

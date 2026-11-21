@@ -189,13 +189,13 @@ class RazorpayPaymentFlowUnitTests {
         markPaid("pay_1");
         doReturn(json("[]")).when(gateway).fetchRefundsForPayment(anyString());
         doReturn(json("{\"id\":\"rfnd_dup\",\"status\":\"processed\",\"amount\":249900}"))
-                .when(gateway).createRefund(eq("pay_2"), eq(249900L), anyString(), any(), anyString());
+                .when(gateway).createRefund(eq("pay_2"), eq(249900L), anyString(), any(), anyString(), anyString());
         doReturn(payment("pay_2", "captured", 249900)).when(gateway).fetchPayment("pay_2");
 
         RazorpayPaymentService.Outcome out = paymentService.confirmCheckout("order_ABC", "pay_2", hmac(KEY_SECRET, "order_ABC|pay_2"));
         assertTrue(out.paid());
         assertEquals("pay_1", order.getRazorpayPaymentId());
-        verify(gateway).createRefund(eq("pay_2"), eq(249900L), anyString(), any(), anyString());
+        verify(gateway).createRefund(eq("pay_2"), eq(249900L), anyString(), any(), anyString(), anyString());
         assertEquals("NONE", order.getRefundStatus(), "refund of the duplicate does not count against the order");
     }
 
@@ -205,7 +205,7 @@ class RazorpayPaymentFlowUnitTests {
         order.setCancellationStatus("CANCELLED");
         order.setPaymentStatus("EXPIRED");
         doReturn(json("{\"id\":\"rfnd_late\",\"status\":\"processed\",\"amount\":249900}"))
-                .when(gateway).createRefund(eq("pay_late"), eq(249900L), anyString(), any(), anyString());
+                .when(gateway).createRefund(eq("pay_late"), eq(249900L), anyString(), any(), anyString(), anyString());
         doReturn(payment("pay_late", "captured", 249900)).when(gateway).fetchPayment("pay_late");
 
         RazorpayPaymentService.Outcome out = paymentService.confirmCheckout("order_ABC", "pay_late", hmac(KEY_SECRET, "order_ABC|pay_late"));
@@ -265,7 +265,7 @@ class RazorpayPaymentFlowUnitTests {
         markPaid("pay_1");
         doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
         doReturn(json("{\"id\":\"rfnd_1\",\"status\":\"pending\",\"amount\":249900}"))
-                .when(gateway).createRefund(eq("pay_1"), eq(249900L), anyString(), any(), startsWith("firqui-refund-"));
+                .when(gateway).createRefund(eq("pay_1"), eq(249900L), anyString(), any(), startsWith("firqui-refund-"), anyString());
         when(cancellations.save(any())).thenAnswer(i -> i.getArgument(0));
 
         refundService.cancelByCustomer(user, "FQ123456", "Ordered by mistake", "details here");
@@ -279,7 +279,7 @@ class RazorpayPaymentFlowUnitTests {
         order.setUser(user(1L));
         markPaid("pay_1");
         assertThrows(SecurityException.class, () -> refundService.cancelByCustomer(user(2L), "FQ123456", "x", "y"));
-        verify(gateway, never()).createRefund(anyString(), anyLong(), anyString(), any(), anyString());
+        verify(gateway, never()).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
     }
 
     @Test
@@ -289,7 +289,7 @@ class RazorpayPaymentFlowUnitTests {
         markPaid("pay_1");
         doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
         doThrow(new RazorpayGateway.RazorpayException(400, "Insufficient balance"))
-                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString());
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
         when(cancellations.save(any())).thenAnswer(i -> i.getArgument(0));
 
         refundService.cancelByCustomer(user, "FQ123456", "Ordered by mistake", "details here");
@@ -302,7 +302,7 @@ class RazorpayPaymentFlowUnitTests {
         markPaid("pay_1");
         doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
         doAnswer(i -> json("{\"id\":\"rfnd_" + refundRows.size() + "\",\"status\":\"processed\",\"amount\":" + i.getArgument(1) + "}"))
-                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString());
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
 
         refundService.adminRefund("FQ123456", 200000L, "partial", "admin@x");
         assertEquals("PARTIALLY_REFUNDED", order.getRefundStatus());
@@ -318,7 +318,7 @@ class RazorpayPaymentFlowUnitTests {
         markPaid("pay_1");
         // First attempt timed out: outcome unknown
         doThrow(new RazorpayGateway.RazorpayException(0, "timeout"))
-                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString());
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
         doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
         refundService.adminRefund("FQ123456", null, "first", "admin@x");
         Refund first = refundRows.get(0);
@@ -330,7 +330,78 @@ class RazorpayPaymentFlowUnitTests {
         assertThrows(IllegalStateException.class, () -> refundService.adminRefund("FQ123456", null, "retry", "admin@x"));
         assertEquals("rfnd_real", first.getRazorpayRefundId());
         assertEquals("REFUNDED", order.getRefundStatus());
-        verify(gateway, times(1)).createRefund(anyString(), anyLong(), anyString(), any(), anyString());
+        verify(gateway, times(1)).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
+    }
+
+    /* ---------------- 24-hour refund window ---------------- */
+
+    @Test
+    void adminRefundIsBlockedAfter24HoursFromPayment() {
+        markPaid("pay_1");
+        order.setPaymentVerifiedAt(LocalDateTime.now().minusHours(25));
+        IllegalStateException e = assertThrows(IllegalStateException.class,
+                () -> refundService.adminRefund("FQ123456", null, "late", "admin@x"));
+        assertTrue(e.getMessage().contains("24 hours"));
+        verify(gateway, never()).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
+    }
+
+    @Test
+    void adminRefundIsAllowedWithin24Hours() {
+        markPaid("pay_1");
+        order.setPaymentVerifiedAt(LocalDateTime.now().minusHours(23));
+        doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
+        doReturn(json("{\"id\":\"rfnd_ok\",\"status\":\"processed\",\"amount\":249900}"))
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
+        refundService.adminRefund("FQ123456", null, "in time", "admin@x");
+        assertEquals("REFUNDED", order.getRefundStatus());
+    }
+
+    @Test
+    void retryStillWorksAfter24HoursForAnOrderCancelledInTime() {
+        markPaid("pay_1");
+        order.setPaymentVerifiedAt(LocalDateTime.now().minusHours(30));
+        order.setOrderStatus("Cancelled");
+        order.setCancellationStatus("CANCELLED");
+        order.setRefundStatus("REFUND_FAILED");
+        doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
+        doReturn(json("{\"id\":\"rfnd_retry\",\"status\":\"processed\",\"amount\":249900}"))
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
+        refundService.retryRefund("FQ123456", "admin@x");
+        assertEquals("REFUNDED", order.getRefundStatus());
+    }
+
+    @Test
+    void retryCannotBeUsedToRefundAnActiveOrderAfterTheWindow() {
+        markPaid("pay_1");
+        order.setPaymentVerifiedAt(LocalDateTime.now().minusHours(30));
+        assertThrows(IllegalStateException.class, () -> refundService.retryRefund("FQ123456", "admin@x"));
+        verify(gateway, never()).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), anyString());
+    }
+
+    /* ---------------- instant refunds ---------------- */
+
+    @Test
+    void refundsAskRazorpayForInstantSpeed() {
+        markPaid("pay_1");
+        doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
+        doReturn(json("{\"id\":\"rfnd_i\",\"status\":\"processed\",\"amount\":249900,\"speed_processed\":\"instant\"}"))
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), eq("optimum"));
+        refundService.adminRefund("FQ123456", null, "instant", "admin@x");
+        verify(gateway).createRefund(eq("pay_1"), eq(249900L), anyString(), any(), anyString(), eq("optimum"));
+        assertEquals("REFUNDED", order.getRefundStatus());
+    }
+
+    @Test
+    void instantNotSupportedFallsBackToNormalSpeedWithNewKey() {
+        markPaid("pay_1");
+        doReturn(json("[]")).when(gateway).fetchRefundsForPayment("pay_1");
+        doThrow(new RazorpayGateway.RazorpayException(400, "Instant refund not supported for the payment"))
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), anyString(), eq("optimum"));
+        doReturn(json("{\"id\":\"rfnd_n\",\"status\":\"pending\",\"amount\":249900}"))
+                .when(gateway).createRefund(anyString(), anyLong(), anyString(), any(), endsWith("-normal"), eq("normal"));
+        refundService.adminRefund("FQ123456", null, "fallback", "admin@x");
+        assertEquals("rfnd_n", order.getRazorpayRefundId());
+        assertEquals("PENDING_REFUND", order.getRefundStatus());
     }
 
     /* ---------------- helpers ---------------- */

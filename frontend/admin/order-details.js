@@ -222,7 +222,22 @@ function loadOrder() {
             && String(order.payment.razorpayPaymentId || "").startsWith("pay_");
         const refundedSoFar = Number(order.payment.refundAmount) || 0;
         const fullyRefunded = String(order.payment.refundStatus || "").toUpperCase() === "REFUNDED";
-        issueRefundBox.style.display = paidOnline && !fullyRefunded && refundedSoFar < (Number(order.payment.totalAmount) || 0) ? "block" : "none";
+        const somethingLeft = paidOnline && !fullyRefunded && refundedSoFar < (Number(order.payment.totalAmount) || 0);
+        // Refunds can only be issued within 24 hours of payment (enforced by the server too)
+        issueRefundBox.style.display = somethingLeft && order.payment.refundWindowOpen ? "block" : "none";
+        let windowNote = document.getElementById("refundWindowClosedNote");
+        if (somethingLeft && !order.payment.refundWindowOpen) {
+            if (!windowNote) {
+                windowNote = document.createElement("div");
+                windowNote.id = "refundWindowClosedNote";
+                windowNote.style.cssText = "margin: 10px 0; font-size: 0.8rem; color: #64748b;";
+                windowNote.innerHTML = '<i class="fa-solid fa-clock"></i> Refund window closed: refunds can only be issued within 24 hours of payment.';
+                issueRefundBox.parentNode.insertBefore(windowNote, issueRefundBox);
+            }
+            windowNote.style.display = "block";
+        } else if (windowNote) {
+            windowNote.style.display = "none";
+        }
     }
 
     if (refundDetailsRow && refundBadge && refundInfoText) {
@@ -572,6 +587,15 @@ async function updateOrderStatus() {
     const API_BASE = window.FIRQUI_API_BASE;
     const token = window.FirquiAuth.token();
 
+    if (newStatus === "Cancelled" && !confirm(
+        `Cancel order #${orderId}?
+
+` +
+        `If it was paid online, the full remaining amount is refunded to the customer through Razorpay right away, ` +
+        `and the items go back into stock. This cannot be undone.`)) {
+        return;
+    }
+
     if (token && orderId) {
         try {
             const response = await fetch(`${API_BASE}/api/admin/orders/${orderId}/status`, {
@@ -588,11 +612,26 @@ async function updateOrderStatus() {
                     orders[orderId].status = newStatus;
                 }
                 updateTimeline(newStatus);
+                if (newStatus === "Cancelled") {
+                    const data = await response.json().catch(function () { return {}; });
+                    alert(`Order #${orderId} cancelled.` + (data.refundStatus && data.refundStatus !== "NOT_APPLICABLE"
+                        ? `
+Refund: ${data.refundStatus}` + (data.razorpayRefundId ? ` (${data.razorpayRefundId})` : "")
+                        : ""));
+                    window.location.reload();
+                    return;
+                }
                 alert(`Order #${orderId} status successfully updated to "${newStatus}".`);
                 return;
             }
+            // The server refused (e.g. reopening a cancelled order): show why, don't fake success locally
+            const errData = await response.json().catch(function () { return {}; });
+            alert("Could not update status: " + (errData.message || ("server error " + response.status)));
+            return;
         } catch (err) {
             console.warn("Backend update order status error:", err);
+            alert("Could not reach the server to update the status. Please try again.");
+            return;
         }
     }
 
@@ -891,6 +930,7 @@ document.addEventListener(
                             razorpayOrderId: data.razorpayOrderId || null,
                             razorpayPaymentId: data.razorpayPaymentId || null,
                             totalAmount: data.totalAmount || 0,
+                            refundWindowOpen: data.refundWindowOpen === true,
                             refundStatus: data.refundStatus || null,
                             refundAmount: data.refundAmount || null,
                             formattedRefundAmount: data.formattedRefundAmount || null,
