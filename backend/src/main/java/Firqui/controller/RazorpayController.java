@@ -129,7 +129,13 @@ public class RazorpayController {
     @PostMapping("/api/admin/orders/{orderNumber}/retry-refund")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ADMIN')")
     public ResponseEntity<?> retryRefund(@PathVariable String orderNumber, @AuthenticationPrincipal User admin) {
-        return adminRefund(orderNumber, null, "Refund retried by admin", admin);
+        try {
+            return refundResponse(refundService.retryRefund(orderNumber, admin != null ? admin.getEmail() : null));
+        } catch (IllegalArgumentException e) {
+            return error(400, e.getMessage());
+        } catch (IllegalStateException e) {
+            return error(409, e.getMessage());
+        }
     }
 
     /* POST /api/admin/orders/{orderNumber}/refund  { "amount": 1500.00 (rupees, optional = full remaining), "reason": "..." } */
@@ -151,19 +157,22 @@ public class RazorpayController {
 
     private ResponseEntity<?> adminRefund(String orderNumber, Long paise, String reason, User admin) {
         try {
-            Refund r = refundService.adminRefund(orderNumber, paise, reason, admin != null ? admin.getEmail() : null);
-            Map<String, Object> res = refundToMap(r);
-            if (RefundService.REFUND_FAILED.equals(r.getStatus())) {
-                res.put("success", false);
-                res.put("message", "Razorpay rejected the refund: " + r.getErrorMessage());
-                return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(res);
-            }
-            return ResponseEntity.ok(res);
+            return refundResponse(refundService.adminRefund(orderNumber, paise, reason, admin != null ? admin.getEmail() : null));
         } catch (IllegalArgumentException e) {
             return error(400, e.getMessage());
         } catch (IllegalStateException e) {
             return error(409, e.getMessage());
         }
+    }
+
+    private ResponseEntity<?> refundResponse(Refund r) {
+        Map<String, Object> res = refundToMap(r);
+        if (RefundService.REFUND_FAILED.equals(r.getStatus())) {
+            res.put("success", false);
+            res.put("message", "Razorpay rejected the refund: " + r.getErrorMessage());
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(res);
+        }
+        return ResponseEntity.ok(res);
     }
 
     /* GET /api/admin/reconciliation - revenue vs refunds summary and orders needing attention */

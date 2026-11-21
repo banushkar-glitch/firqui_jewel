@@ -110,9 +110,18 @@ public class RazorpayGateway {
      */
     public JsonNode createRefund(String paymentId, long amountPaise, String receipt,
                                  Map<String, String> notes, String idempotencyKey) {
+        return createRefund(paymentId, amountPaise, receipt, notes, idempotencyKey, "normal");
+    }
+
+    /**
+     * speed "optimum" asks for an instant refund (credited within minutes for supported methods);
+     * Razorpay falls back to normal speed (5-7 working days) when instant is not possible.
+     */
+    public JsonNode createRefund(String paymentId, long amountPaise, String receipt,
+                                 Map<String, String> notes, String idempotencyKey, String speed) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("amount", amountPaise);
-        body.put("speed", "normal");
+        body.put("speed", speed);
         body.put("receipt", truncate(receipt, 40));
         if (notes != null && !notes.isEmpty()) body.put("notes", notes);
         return call("POST", "/payments/" + enc(paymentId) + "/refund", body, idempotencyKey);

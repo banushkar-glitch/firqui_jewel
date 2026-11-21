@@ -441,8 +441,21 @@ public class OrderService {
                 .orElseThrow(() -> new IllegalArgumentException("Order not found with number: " + orderNumber));
 
         if (request != null) {
-            if (request.getStatus() != null && !request.getStatus().trim().isEmpty()) {
-                order.setOrderStatus(request.getStatus().trim());
+            String newStatus = request.getStatus() != null ? request.getStatus().trim() : "";
+            if (RefundService.isCancelled(order) && !newStatus.isEmpty() && !"Cancelled".equalsIgnoreCase(newStatus)) {
+                // The refund and stock return have already happened; reopening would leave them inconsistent
+                throw new IllegalStateException("Order #" + cleanNum + " is cancelled and cannot be reopened. Please create a new order.");
+            }
+            if ("Cancelled".equalsIgnoreCase(newStatus)) {
+                if (!RefundService.isCancelled(order)) {
+                    // Cancelling is the same as a customer cancellation: stock back and the payment refunded
+                    Order locked = refundService.lockOrder(cleanNum);
+                    refundService.cancelOrderAndRefund(locked, "Cancelled by Firqui Jewels",
+                            "Order cancelled by the shop", "ADMIN_CANCEL");
+                    return OrderResponse.fromEntity(locked);
+                }
+            } else if (!newStatus.isEmpty()) {
+                order.setOrderStatus(newStatus);
             }
             if (request.getPaymentStatus() != null && !request.getPaymentStatus().trim().isEmpty()) {
                 order.setPaymentStatus(request.getPaymentStatus().trim());
