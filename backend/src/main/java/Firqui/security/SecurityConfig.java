@@ -67,6 +67,8 @@ public class SecurityConfig {
                         "/api/razorpay/webhook").permitAll()
                 .requestMatchers("/api/orders/*/reconcile-payment").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/razorpay/config").permitAll()
+                // Guest cancellation: every action needs the signed link emailed to the order's address
+                .requestMatchers("/api/guest-orders/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()

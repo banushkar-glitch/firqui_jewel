@@ -102,6 +102,46 @@ public class RefundService {
     }
 
     /* =====================================================
+       GUEST: cancel through the signed link emailed to the order's address
+       (the link itself proves ownership; see CancelLinkSigner)
+    ====================================================== */
+    @Transactional
+    public Order cancelByEmailLink(String orderNumber, String reason, String details) {
+        Order order = lockOrder(orderNumber);
+        ensureCancellable(order);
+        LocalDateTime since = order.getPaymentVerifiedAt() != null ? order.getPaymentVerifiedAt() : order.getCreatedAt();
+        if (since != null && Duration.between(since, LocalDateTime.now()).toHours() >= cancellationWindowHours) {
+            throw new IllegalStateException("Orders can only be cancelled within " + cancellationWindowHours
+                    + " hours of payment. Please contact info@firquijewels.com for help.");
+        }
+
+        String cleanReason = blankTo(reason, "Customer requested cancellation");
+        cancelOrderAndRefund(order, cleanReason, details, "CUSTOMER_EMAIL_LINK");
+
+        CancellationRequest record = null;
+        if (order.getUser() != null) {
+            // Account holders who used the email link still get an entry under Cancellation Requests
+            record = new CancellationRequest(order, order.getUser(), cleanReason, details);
+            record.setStatus("APPROVED");
+            record.setRefundStatus(order.getRefundStatus());
+            record.setReviewedAt(LocalDateTime.now());
+            record.setReviewedBy("SYSTEM_AUTO_POLICY");
+            record.setAdminNotes(refundNote(order) + " (via email link)");
+            record = cancellationRequestRepository.save(record);
+            if (shopNotifications != null) shopNotifications.cancellationRequested(record);
+        } else if (shopNotifications != null) {
+            shopNotifications.guestCancelled(order, cleanReason, details);
+        }
+
+        CancellationRequest forEmail = record;
+        afterCommit(() -> {
+            if (emailService != null) emailService.sendCancellationApprovedEmail(order, forEmail);
+        });
+        logger.info("Order #{} cancelled through email link (refund status {})", order.getOrderNumber(), order.getRefundStatus());
+        return order;
+    }
+
+    /* =====================================================
        SHARED: cancel + restore stock + refund what was paid online
        Caller must hold the order lock (lockOrder) inside a transaction.
     ====================================================== */

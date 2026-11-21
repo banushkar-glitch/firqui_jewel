@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="../js/auth.js?v=20261121a"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+
+    <title>Firqui Jewels | Cancel Order</title>
+
+    <link rel="stylesheet" href="reset-password.css?v=20261018a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@400;500;600&family=Hurricane&family=Imprima&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="stylesheet" href="../css/site.css?v=20261018a">
+
+    <style>
+        .cancel-summary { background: #FAF5EE; border: 1px solid #E0D7CC; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px; font-size: 0.9rem; color: #334155; }
+        .cancel-summary .row { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; }
+        .cancel-summary ul { margin: 6px 0 0; padding-left: 18px; }
+        .cancel-note { font-size: 0.8rem; color: #64748b; margin: 4px 0 14px; line-height: 1.45; }
+        .input-group select, .input-group textarea { width: 100%; box-sizing: border-box; padding: 12px 14px; border: 1px solid #d6cfc4; border-radius: 8px; font-family: inherit; font-size: 0.95rem; background: #fff; }
+        .input-group textarea { min-height: 80px; resize: vertical; }
+        .auth-button.danger { background: #b91c1c; }
+        [hidden] { display: none !important; }
+    </style>
+</head>
+
+<body>
+    <main class="auth-page">
+        <div class="auth-decoration auth-decoration-left" aria-hidden="true"></div>
+        <div class="auth-decoration auth-decoration-right" aria-hidden="true"></div>
+
+        <header class="auth-header">
+            <a href="../index.html" class="brand-logo" aria-label="Firqui Jewels Home">
+                <img src="../assets/lastfirqui.png" alt="Firqui Jewels">
+            </a>
+            <a href="../index.html" class="back-home">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>Back to Home</span>
+            </a>
+        </header>
+
+        <section class="auth-content">
+            <div class="auth-card">
+                <div class="auth-heading">
+                    <span class="auth-small-title">Firqui Jewels</span>
+                    <h2 class="auth-subheading">Cancel an Order</h2>
+                    <p class="auth-instruction" id="intro">
+                        Orders can be cancelled within 24 hours of payment, with an instant refund to your original payment method.
+                    </p>
+                </div>
+
+                <!-- STEP 1: no link yet - ask for order number + email -->
+                <form id="requestForm" class="auth-form" novalidate hidden>
+                    <div class="input-group">
+                        <label for="orderNumber">Order Number</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+                            <input type="text" id="orderNumber" placeholder="e.g. FQ123456" autocomplete="off" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email used for the order</label>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-envelope" aria-hidden="true"></i>
+                            <input type="email" id="email" placeholder="you@example.com" autocomplete="email" required>
+                        </div>
+                    </div>
+                    <p class="cancel-note">
+                        We'll email a secure cancellation link to the address on the order. Have an account?
+                        <a href="profile.html">Cancel from your profile</a> instead.
+                    </p>
+                    <button type="submit" class="auth-button" id="requestBtn">
+                        <span class="btn-text">Email me a cancellation link</span>
+                        <span class="btn-spinner" aria-hidden="true"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                    </button>
+                </form>
+
+                <!-- STEP 2: opened from the emailed link - confirm cancellation -->
+                <form id="cancelForm" class="auth-form" novalidate hidden>
+                    <div class="cancel-summary" id="orderSummary"></div>
+                    <div class="input-group">
+                        <label for="reason">Reason for cancelling</label>
+                        <select id="reason" required>
+                            <option value="Ordered by mistake">Ordered by mistake</option>
+                            <option value="Want to change the product">Want to change the product</option>
+                            <option value="Delivery is taking too long">Delivery is taking too long</option>
+                            <option value="Found a better alternative">Found a better alternative</option>
+                            <option value="Payment or pricing issue">Payment or pricing issue</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="details">Anything else? (optional)</label>
+                        <textarea id="details" maxlength="1000" placeholder="Tell us more"></textarea>
+                    </div>
+                    <button type="submit" class="auth-button danger" id="cancelBtn">
+                        <span class="btn-text">Cancel order &amp; refund</span>
+                        <span class="btn-spinner" aria-hidden="true"><i class="fa-solid fa-circle-notch fa-spin"></i></span>
+                    </button>
+                </form>
+
+                <div id="authMessage" class="auth-message" role="status" aria-live="polite"></div>
+
+                <div class="switch-section">
+                    <span>Questions?</span>
+                    <a href="../contact.html">Contact us</a>
+                </div>
+            </div>
+        </section>
+
+        <footer class="auth-footer">
+            <span>© 2026 - FIRQUI JEWELS</span>
+        </footer>
+    </main>
+
+    <script src="cancel-order.js?v=20261121a"></script>
+</body>
+</html>
