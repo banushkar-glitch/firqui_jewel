@@ -255,13 +255,16 @@ document.addEventListener("DOMContentLoaded", () => {
             } else if (statusUpper === "APPROVED") {
                 let refundStatusText = "";
                 if (req.refundStatus === "PENDING_REFUND") {
-                    refundStatusText = `<div style="font-size: 11px; color: var(--dark-teal); font-weight: 600; margin-top: 3px;"><i class="fa-solid fa-rotate"></i> Refund: Pending (Manual UPI)</div>`;
+                    refundStatusText = `<div style="font-size: 11px; color: var(--dark-teal); font-weight: 600; margin-top: 3px;"><i class="fa-solid fa-rotate"></i> Refund: Processing (Razorpay)</div>`;
                 } else if (req.refundStatus === "REFUNDED") {
-                    refundStatusText = `<div style="font-size: 11px; color: #2B8A3E; font-weight: 600; margin-top: 3px;"><i class="fa-solid fa-check"></i> Refund: Completed</div>`;
+                    const rId = req.razorpayRefundId ? ` (${req.razorpayRefundId})` : "";
+                    refundStatusText = `<div style="font-size: 11px; color: #2B8A3E; font-weight: 600; margin-top: 3px;"><i class="fa-solid fa-check"></i> Refund Processed${rId}</div>`;
+                } else if (req.refundStatus === "REFUND_FAILED") {
+                    refundStatusText = `<div style="font-size: 11px; color: #C92A2A; font-weight: 600; margin-top: 3px;"><i class="fa-solid fa-triangle-exclamation"></i> Refund Failed (Check Order)</div>`;
                 }
                 actionsHtml = `
                     <div style="font-size: 12px; color: #2B8A3E; font-weight: 600;">
-                        <i class="fa-solid fa-circle-check"></i> Order Cancelled
+                        <i class="fa-solid fa-circle-check"></i> Auto-Cancelled
                         ${refundStatusText}
                     </div>
                 `;

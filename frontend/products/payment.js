@@ -1,9 +1,6 @@
 /* ==========================================================================
-   FIRQUI JEWELS — MANUAL UPI PAYMENT CONTROLLER
+   FIRQUI JEWELS — RAZORPAY STANDARD WEB CHECKOUT CONTROLLER
    ========================================================================== */
-
-/* The UPI ID and the amount come from the backend (POST /api/payments/upi),
-   which prices the cart from the database. The QR encodes that exact amount. */
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -18,26 +15,24 @@ document.addEventListener("DOMContentLoaded", function () {
     ====================================================== */
     const token = getToken();
 
-    // Guests have no profile page; the confirmation email has their order details
+    // Guests have no profile page; the confirmation button points home
     if (!token) {
         const profileBtn = document.querySelector('.modal-buttons a[href*="profile.html"]');
         if (profileBtn) {
             profileBtn.href = "../index.html";
             profileBtn.textContent = "Back to Home";
         }
-        const notice = document.querySelector(".modal-notice");
-        if (notice) notice.textContent += " We have emailed your order details to you.";
     }
 
     const urlParams = new URLSearchParams(window.location.search);
-    const orderNumber = urlParams.get("orderNumber") || urlParams.get("id") || urlParams.get("orderId");
+    const orderNumberParam = urlParams.get("orderNumber") || urlParams.get("id") || urlParams.get("orderId");
 
     let pendingCheckout = null;
     try {
         pendingCheckout = JSON.parse(sessionStorage.getItem("firqui_pending_checkout"));
     } catch (e) {}
 
-    if (!orderNumber && !pendingCheckout) {
+    if (!orderNumberParam && !pendingCheckout) {
         alert("Please proceed to checkout to place your order.");
         window.location.href = "checkout.html";
         return;
@@ -46,7 +41,6 @@ document.addEventListener("DOMContentLoaded", function () {
     /* =====================================================
        2. DOM ELEMENTS
     ====================================================== */
-    // Order Summary
     const displayOrderNumber = document.getElementById("display-order-number");
     const displayOrderAmount = document.getElementById("display-order-amount");
     const displayTotalAmount = document.getElementById("display-total-amount");
@@ -55,558 +49,379 @@ document.addEventListener("DOMContentLoaded", function () {
     const displayPaymentStatus = document.getElementById("display-payment-status");
     const displayOrderItems = document.getElementById("display-order-items");
 
-    // QR & UPI ID
-    const upiQrImage = document.getElementById("upi-qr-image");
-    const upiIdDisplay = document.getElementById("upi-id-display");
-
-    // Form & Upload
-    const paymentForm = document.getElementById("upi-payment-form");
-    const transactionIdInput = document.getElementById("transaction-id");
-    const transactionIdError = document.getElementById("transaction-id-error");
-
-    const uploadDropzone = document.getElementById("upload-dropzone");
-    const screenshotInput = document.getElementById("screenshot-input");
-    const chooseFileBtn = document.getElementById("choose-file-btn");
-    const dropzonePrompt = document.getElementById("dropzone-prompt");
-
-    const previewContainer = document.getElementById("screenshot-preview-container");
-    const previewImg = document.getElementById("screenshot-preview-img");
-    const previewFilename = document.getElementById("preview-filename");
-    const previewFilesize = document.getElementById("preview-filesize");
-    const replaceFileBtn = document.getElementById("replace-file-btn");
-    const removeFileBtn = document.getElementById("remove-file-btn");
-    const screenshotError = document.getElementById("screenshot-error");
-
+    const payButton = document.getElementById("pay-razorpay-btn");
+    const btnText = payButton ? payButton.querySelector(".btn-text") : null;
+    const btnLoader = payButton ? payButton.querySelector(".btn-loader") : null;
     const paymentAlert = document.getElementById("payment-alert");
-    const submitBtn = document.getElementById("submit-payment-btn");
-    const btnText = submitBtn ? submitBtn.querySelector(".btn-text") : null;
-    const btnLoader = submitBtn ? submitBtn.querySelector(".btn-loader") : null;
 
-    // Confirmation Modal
     const confirmationModal = document.getElementById("confirmation-modal");
     const modalOrderNumber = document.getElementById("modal-order-number");
     const modalTxnId = document.getElementById("modal-txn-id");
 
-    let currentOrder = null;
-    let selectedFile = null;
+    let currentOrderNumber = orderNumberParam || (pendingCheckout && pendingCheckout.orderNumber ? pendingCheckout.orderNumber : null);
+    let payableAmount = 0;
+    let customerPrefill = {
+        name: "",
+        email: "",
+        contact: ""
+    };
 
-    /* =====================================================
-       3. UPI QR WITH A FIXED AMOUNT
-    ====================================================== */
-    const qrAmount = document.getElementById("qr-amount");
-    const qrStatus = document.getElementById("qr-status");
-    const upiAppLink = document.getElementById("upi-app-link");
-    const upiAppText = document.getElementById("upi-app-text");
-    let payableAmount = null;
-
-    function rupees(amount) {
-        return "₹" + Number(amount).toLocaleString("en-IN", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    /* =========================================
+       HELPER FUNCTIONS
+    ========================================= */
+    function formatPrice(amount) {
+        return "₹" + Math.round(Number(amount) || 0).toLocaleString("en-IN");
     }
 
-    function showQrError(message) {
-        if (upiQrImage) upiQrImage.hidden = true;
-        if (upiAppLink) upiAppLink.hidden = true;
-        if (qrAmount) qrAmount.textContent = "";
-        if (qrStatus) {
-            qrStatus.hidden = false;
-            qrStatus.classList.add("is-error");
-            qrStatus.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + message;
-        }
-        if (submitBtn) submitBtn.disabled = true;
-    }
-
-    // body: { items: [...] } for a new order, or { orderNumber } for an existing one
-    async function loadUpiPayment(body) {
-        try {
-            const headers = { "Content-Type": "application/json" };
-            if (token) headers["Authorization"] = `Bearer ${token}`;
-            const res = await fetch(`${API_BASE}/api/payments/upi`, {
-                method: "POST",
-                headers: headers,
-                body: JSON.stringify(body)
-            });
-            const data = await res.json().catch(function () { return {}; });
-            if (!res.ok || !data.upiUri) {
-                throw new Error(data.message || "Could not prepare the payment QR.");
-            }
-
-            payableAmount = data.amount;
-            const qr = qrcode(0, "M");
-            qr.addData(data.upiUri);
-            qr.make();
-            upiQrImage.src = qr.createDataURL(8, 2);
-            upiQrImage.hidden = false;
-            if (qrStatus) qrStatus.hidden = true;
-
-            if (qrAmount) qrAmount.textContent = "Amount to pay: " + rupees(data.amount);
-            if (upiIdDisplay) upiIdDisplay.textContent = data.upiId;
-            if (upiAppLink) {
-                upiAppLink.href = data.upiUri;
-                upiAppLink.hidden = false;
-            }
-            if (upiAppText) upiAppText.textContent = "Pay " + rupees(data.amount) + " in UPI app";
-
-            // The summary shows exactly what the QR charges
-            [displayOrderAmount, displayTotalAmount, displaySubtotal].forEach(function (el) {
-                if (el) el.textContent = rupees(data.amount);
-            });
-        } catch (err) {
-            console.warn("UPI QR error:", err);
-            const msg = err && err.message && !/fetch|network/i.test(err.message)
-                ? err.message
-                : "Could not reach the server. Please check your connection and refresh this page.";
-            showQrError(msg);
-        }
-    }
-
-    /* =====================================================
-       4. LOAD PENDING CHECKOUT OR FETCH EXISTING ORDER
-    ====================================================== */
-    function renderPendingCheckout(pending) {
-        let total = pending.total || pending.subtotal || 0;
-        if (!total && pending.items) {
-            total = pending.items.reduce(function (sum, it) {
-                return sum + (Number(it.price) || 0) * (Number(it.quantity) || 1);
-            }, 0);
-        }
-        const formattedTotal = "₹" + Math.round(total).toLocaleString("en-IN");
-
-        if (displayOrderNumber) displayOrderNumber.textContent = "Pending Payment";
-        if (displayOrderAmount) displayOrderAmount.textContent = formattedTotal;
-        if (displayTotalAmount) displayTotalAmount.textContent = formattedTotal;
-        if (displaySubtotal) displaySubtotal.textContent = formattedTotal;
-        if (displayOrderDate) displayOrderDate.textContent = "Today";
-
-        if (displayPaymentStatus) {
-            displayPaymentStatus.textContent = "PENDING_PAYMENT";
-            displayPaymentStatus.className = "payment-status-badge status-pending";
-        }
-
-        if (displayOrderItems) {
-            displayOrderItems.innerHTML = "";
-            const items = pending.items || [];
-            if (items.length === 0) {
-                displayOrderItems.innerHTML = `<div class="items-loading">FIRQUI JEWELS Jewellery</div>`;
-            } else {
-                items.forEach(function (p) {
-                    const row = document.createElement("div");
-                    row.className = "summary-item-row";
-
-                    let imgUrl = p.image || p.imageUrl || "../assets/Logo Pink 1.png";
-                    if (imgUrl.startsWith("/")) imgUrl = ".." + imgUrl;
-
-                    const pName = p.name || p.productName || "Jewellery Item";
-                    const pQty = p.quantity || 1;
-                    const pSize = p.selectedSize ? ` • Size: ${window.FirquiHtml.escape(p.selectedSize)}` : "";
-                    const pPrice = "₹" + Math.round(Number(p.unitPrice || p.price || 0) * pQty).toLocaleString("en-IN");
-
-                    row.innerHTML = `
-                        <img src="${window.FirquiHtml.escape(imgUrl)}" alt="${window.FirquiHtml.escape(pName)}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
-                        <div class="summary-item-info">
-                            <div class="summary-item-name">${window.FirquiHtml.escape(pName)}</div>
-                            <div class="summary-item-sub">Qty: ${pQty}${pSize}</div>
-                        </div>
-                        <div class="summary-item-price">${pPrice}</div>
-                    `;
-                    displayOrderItems.appendChild(row);
-                });
-            }
-        }
-    }
-
-    async function fetchOrderDetails() {
-        try {
-            const headers = {};
-            if (token) {
-                headers["Authorization"] = `Bearer ${token}`;
-            }
-            const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderNumber)}`, {
-                headers: headers
-            });
-
-            if ((response.status === 401 || response.status === 403) && token) {
-                alert("Session expired. Please log in again.");
-                window.location.href = "../authentication/login.html";
-                return;
-            }
-
-            if (!response.ok) {
-                throw new Error("Unable to locate order #" + orderNumber);
-            }
-
-            const order = await response.json();
-            currentOrder = order;
-            renderOrderData(order);
-
-        } catch (error) {
-            console.error("Order loading error:", error);
-            showAlert("Could not load order details: " + error.message, "error");
-            if (displayOrderAmount) displayOrderAmount.textContent = "Error";
-            if (displayOrderItems) {
-                displayOrderItems.innerHTML = `<div class="items-loading" style="color: #D32F2F;">Order details could not be loaded.</div>`;
-            }
-        }
-    }
-
-    function renderOrderData(order) {
-        const total = order.formattedTotal || ("₹" + Math.round(Number(order.totalAmount || order.total || 0)).toLocaleString("en-IN"));
-        const subtotal = order.formattedSubtotal || total;
-        const ordNum = order.orderNumber || order.orderId || orderNumber;
-
-        if (displayOrderNumber) displayOrderNumber.textContent = "#" + ordNum;
-        if (displayOrderAmount) displayOrderAmount.textContent = total;
-        if (displayTotalAmount) displayTotalAmount.textContent = total;
-        if (displaySubtotal) displaySubtotal.textContent = subtotal;
-        if (displayOrderDate) displayOrderDate.textContent = order.orderDate || order.date || "Today";
-
-        // Payment status badge
-        const status = (order.paymentStatus || "PENDING_PAYMENT").toUpperCase().replace(/\s+/g, "_");
-        if (displayPaymentStatus) {
-            displayPaymentStatus.textContent = order.paymentStatus || "PENDING_PAYMENT";
-            displayPaymentStatus.className = "payment-status-badge";
-            if (status.includes("PAID")) {
-                displayPaymentStatus.classList.add("status-paid");
-            } else if (status.includes("VERIF")) {
-                displayPaymentStatus.classList.add("status-verification");
-            } else if (status.includes("REJECT")) {
-                displayPaymentStatus.classList.add("status-rejected");
-            } else {
-                displayPaymentStatus.classList.add("status-pending");
-            }
-        }
-
-        // Render products
-        if (displayOrderItems) {
-            displayOrderItems.innerHTML = "";
-            const items = order.products || [];
-            if (items.length === 0) {
-                displayOrderItems.innerHTML = `<div class="items-loading">FIRQUI JEWELS Product Order</div>`;
-            } else {
-                items.forEach(function (p) {
-                    const row = document.createElement("div");
-                    row.className = "summary-item-row";
-
-                    let imgUrl = p.image || p.imageUrl || "../assets/Logo Pink 1.png";
-                    if (imgUrl.startsWith("/")) imgUrl = ".." + imgUrl;
-
-                    const pName = p.name || p.productName || "Jewellery Item";
-                    const pQty = p.quantity || 1;
-                    const pSize = p.selectedSize ? ` • Size: ${window.FirquiHtml.escape(p.selectedSize)}` : "";
-                    const pPrice = "₹" + Math.round(Number(p.unitPrice || p.price || 0) * pQty).toLocaleString("en-IN");
-
-                    row.innerHTML = `
-                        <img src="${window.FirquiHtml.escape(imgUrl)}" alt="${window.FirquiHtml.escape(pName)}" class="summary-item-img" onerror="this.src='../assets/Logo Pink 1.png'">
-                        <div class="summary-item-info">
-                            <div class="summary-item-name">${window.FirquiHtml.escape(pName)}</div>
-                            <div class="summary-item-sub">Qty: ${pQty}${pSize}</div>
-                        </div>
-                        <div class="summary-item-price">${pPrice}</div>
-                    `;
-                    displayOrderItems.appendChild(row);
-                });
-            }
-        }
-
-        // If order is already paid, notify customer
-        if (status === "PAID") {
-            showAlert("This order is already verified and marked as PAID. Thank you!", "success");
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                if (btnText) btnText.textContent = "Payment Verified & Paid";
-            }
-        } else if (status === "PENDING_VERIFICATION") {
-            showAlert("Payment details have already been submitted and are pending verification by admin.", "success");
-        } else if (status === "REJECTED" && order.rejectionReason) {
-            showAlert("Previous payment submission was rejected: " + order.rejectionReason + ". Please resubmit with correct details.", "error");
-        }
-    }
-
-
-    /* =====================================================
-       6. SCREENSHOT SELECTION & PREVIEW MANAGEMENT
-    ====================================================== */
-    if (screenshotInput) {
-        screenshotInput.addEventListener("change", function (e) {
-            handleFileSelection(e.target.files ? e.target.files[0] : null);
-        });
-    }
-
-    if (uploadDropzone) {
-        ["dragenter", "dragover"].forEach(function (eventName) {
-            uploadDropzone.addEventListener(eventName, function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                uploadDropzone.classList.add("drag-active");
-            });
-        });
-
-        ["dragleave", "drop"].forEach(function (eventName) {
-            uploadDropzone.addEventListener(eventName, function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                uploadDropzone.classList.remove("drag-active");
-            });
-        });
-
-        uploadDropzone.addEventListener("drop", function (e) {
-            if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                handleFileSelection(e.dataTransfer.files[0]);
-            }
-        });
-    }
-
-    let previewUrl = null;
-    let selectionToken = 0;
-
-    async function handleFileSelection(picked) {
-        clearScreenshotError();
-        const token = ++selectionToken;
-
-        // Large phone screenshots are shrunk first so the preview and upload stay quick
-        let file = picked;
-        if (picked && window.FirquiImage) {
-            file = await window.FirquiImage.compress(picked, { maxDimension: 2400, quality: 0.9, output: "jpeg" });
-            if (token !== selectionToken) return; // a newer file was chosen meanwhile
-        }
-
-        if (!file) {
-            selectedFile = null;
-            hidePreview();
-            return;
-        }
-
-        const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-        const lowerName = file.name.toLowerCase();
-        const hasValidExt = lowerName.endsWith(".jpg") || lowerName.endsWith(".jpeg") || lowerName.endsWith(".png");
-
-        if (!validTypes.includes(file.type) && !hasValidExt) {
-            showScreenshotError("Invalid file type. Only JPG, JPEG, and PNG images are allowed.");
-            selectedFile = null;
-            if (screenshotInput) screenshotInput.value = "";
-            hidePreview();
-            return;
-        }
-
-        const maxSize = 10 * 1024 * 1024;
-        if (file.size > maxSize) {
-            showScreenshotError("Image size exceeds the 10 MB limit (" + formatBytes(file.size) + "). Please choose a smaller image.");
-            selectedFile = null;
-            if (screenshotInput) screenshotInput.value = "";
-            hidePreview();
-            return;
-        }
-
-        selectedFile = file;
-
-        // An object URL avoids building a multi-megabyte base64 string on the main thread
-        if (previewUrl) URL.revokeObjectURL(previewUrl);
-        previewUrl = URL.createObjectURL(file);
-        if (previewImg) previewImg.src = previewUrl;
-        if (previewFilename) previewFilename.textContent = picked.name;
-        if (previewFilesize) previewFilesize.textContent = formatBytes(file.size);
-
-        if (uploadDropzone) uploadDropzone.style.display = "none";
-        if (previewContainer) previewContainer.style.display = "flex";
-    }
-
-    function hidePreview() {
-        if (previewContainer) previewContainer.style.display = "none";
-        if (uploadDropzone) uploadDropzone.style.display = "block";
-        if (previewImg) previewImg.removeAttribute("src");
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-            previewUrl = null;
-        }
-    }
-
-    if (replaceFileBtn) {
-        replaceFileBtn.addEventListener("click", function () {
-            if (screenshotInput) screenshotInput.click();
-        });
-    }
-
-    if (removeFileBtn) {
-        removeFileBtn.addEventListener("click", function () {
-            selectedFile = null;
-            if (screenshotInput) screenshotInput.value = "";
-            hidePreview();
-            clearScreenshotError();
-        });
-    }
-
-    function formatBytes(bytes) {
-        if (!bytes || bytes === 0) return "0 Bytes";
-        const k = 1024;
-        const sizes = ["Bytes", "KB", "MB"];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
-    }
-
-    function showScreenshotError(msg) {
-        if (screenshotError) screenshotError.textContent = msg;
-    }
-
-    function clearScreenshotError() {
-        if (screenshotError) screenshotError.textContent = "";
-    }
-
-    /* =====================================================
-       7. SUBMIT PAYMENT DETAILS (TRANSACTION ID & SCREENSHOT)
-       ORDERS ARE PLACED HERE AT PAYMENT SUBMISSION!
-    ====================================================== */
-    if (paymentForm) {
-        paymentForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
-
-            if (transactionIdError) transactionIdError.textContent = "";
-            clearScreenshotError();
-            hideAlert();
-
-            const txnId = transactionIdInput ? transactionIdInput.value.trim() : "";
-
-            let hasErrors = false;
-
-            if (!txnId) {
-                if (transactionIdError) transactionIdError.textContent = "UPI Transaction ID / UTR Number is required.";
-                hasErrors = true;
-            } else if (txnId.length < 6 || txnId.length > 60) {
-                if (transactionIdError) transactionIdError.textContent = "Please enter a valid Transaction reference (6 to 60 characters).";
-                hasErrors = true;
-            }
-
-            if (!selectedFile) {
-                showScreenshotError("Please upload a payment screenshot as proof of payment.");
-                hasErrors = true;
-            }
-
-            if (hasErrors) return;
-
-            setSubmitting(true);
-
-            // CASE A: NEW ORDER (Pending checkout from Checkout Page)
-            if (pendingCheckout) {
-                const formData = new FormData();
-                const orderBlob = new Blob([JSON.stringify(pendingCheckout)], { type: "application/json" });
-                formData.append("orderData", orderBlob);
-                formData.append("transactionId", txnId);
-                formData.append("screenshot", selectedFile);
-
-                try {
-                    const headers = {};
-                    if (token) {
-                        headers["Authorization"] = `Bearer ${token}`;
-                    }
-                    const response = await fetch(`${API_BASE}/api/orders/place-payment`, {
-                        method: "POST",
-                        headers: headers,
-                        body: formData
-                    });
-
-                    const data = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(data.message || "Failed to place order and submit payment details.");
-                    }
-
-                    // SUCCESS: Clear cart and pending checkout now that the order has been placed in backend!
-                    try {
-                        localStorage.removeItem("firquiCart");
-                        sessionStorage.removeItem("firqui_pending_checkout");
-                    } catch (e) {}
-
-                    // Update UI state with created order details
-                    renderOrderData(data);
-
-                    // Show confirmation modal
-                    const createdOrderNum = data.orderNumber || data.orderId || data.id;
-                    if (modalOrderNumber) modalOrderNumber.textContent = "#" + createdOrderNum;
-                    if (modalTxnId) modalTxnId.textContent = txnId;
-                    if (confirmationModal) confirmationModal.style.display = "flex";
-
-                } catch (err) {
-                    console.error("Order placement and payment submission error:", err);
-                    showAlert(err.message || "Unable to submit payment details. Please try again.", "error");
-                } finally {
-                    setSubmitting(false);
-                }
-                return;
-            }
-
-            // CASE B: EXISTING ORDER (Re-submitting from profile)
-            const formData = new FormData();
-            formData.append("transactionId", txnId);
-            formData.append("screenshot", selectedFile);
-
-            try {
-                const headers = {};
-                if (token) {
-                    headers["Authorization"] = `Bearer ${token}`;
-                }
-                const response = await fetch(`${API_BASE}/api/orders/${encodeURIComponent(orderNumber)}/payment`, {
-                    method: "POST",
-                    headers: headers,
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || "Failed to submit payment details.");
-                }
-
-                try {
-                    localStorage.removeItem("firquiCart");
-                } catch (e) {}
-
-                renderOrderData(data);
-
-                if (modalOrderNumber) modalOrderNumber.textContent = "#" + (data.orderNumber || orderNumber);
-                if (modalTxnId) modalTxnId.textContent = txnId;
-                if (confirmationModal) confirmationModal.style.display = "flex";
-
-            } catch (err) {
-                console.error("Payment submission error:", err);
-                showAlert(err.message || "Unable to submit payment details. Please try again.", "error");
-            } finally {
-                setSubmitting(false);
-            }
-        });
-    }
-
-    function setSubmitting(loading) {
-        if (!submitBtn) return;
-        submitBtn.disabled = loading;
-        if (btnText) btnText.style.display = loading ? "none" : "inline-flex";
-        if (btnLoader) btnLoader.style.display = loading ? "inline-flex" : "none";
-    }
-
-    function showAlert(msg, type) {
+    function showAlert(message, type) {
         if (!paymentAlert) return;
-        paymentAlert.textContent = msg;
-        paymentAlert.className = `payment-alert ${type === "error" ? "alert-error" : "alert-success"}`;
         paymentAlert.style.display = "block";
+        if (type === "danger" || type === "error") {
+            paymentAlert.style.background = "#fde8e8";
+            paymentAlert.style.color = "#9b1c1c";
+            paymentAlert.style.border = "1px solid #f8b4b4";
+            paymentAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + window.FirquiHtml.escape(message);
+        } else if (type === "warning") {
+            paymentAlert.style.background = "#fef08a";
+            paymentAlert.style.color = "#854d0e";
+            paymentAlert.style.border = "1px solid #fde047";
+            paymentAlert.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + window.FirquiHtml.escape(message);
+        } else {
+            paymentAlert.style.background = "#def7ec";
+            paymentAlert.style.color = "#03543f";
+            paymentAlert.style.border = "1px solid #bcf0da";
+            paymentAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + window.FirquiHtml.escape(message);
+        }
+        paymentAlert.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
 
     function hideAlert() {
-        if (!paymentAlert) return;
-        paymentAlert.style.display = "none";
-        paymentAlert.textContent = "";
+        if (paymentAlert) paymentAlert.style.display = "none";
     }
 
-    // Initialize Page
-    if (orderNumber) {
-        fetchOrderDetails().then(function () {
-            const status = currentOrder ? String(currentOrder.paymentStatus || currentOrder.payment || "").toUpperCase() : "";
-            if (!currentOrder) return;
-            if (status === "PAID" || status === "PENDING_VERIFICATION") {
-                showQrError("Payment for this order has already been submitted.");
+    function setBtnLoading(loading, message) {
+        if (!payButton) return;
+        payButton.disabled = loading;
+        if (btnText && btnLoader) {
+            btnText.style.display = loading ? "none" : "inline";
+            btnLoader.style.display = loading ? "inline" : "none";
+            if (message && loading) {
+                btnLoader.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + window.FirquiHtml.escape(message);
+            }
+        }
+    }
+
+    function clearCart() {
+        try {
+            localStorage.removeItem("firquiCart");
+            sessionStorage.removeItem("firqui_pending_checkout");
+        } catch (e) {}
+
+        if (token) {
+            fetch(`${API_BASE}/api/cart/items`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            }).catch(function () {});
+        }
+    }
+
+    /* =====================================================
+       3. LOAD ORDER DETAILS
+    ====================================================== */
+    async function loadOrderDetails() {
+        if (pendingCheckout) {
+            const addr = pendingCheckout.shippingAddress || {};
+            customerPrefill.name = addr.fullName || "";
+            customerPrefill.email = addr.email || "";
+            customerPrefill.contact = addr.phone || "";
+
+            payableAmount = pendingCheckout.total || pendingCheckout.subtotal || 0;
+            if (!currentOrderNumber) {
+                // Payment needs a saved order; never invent an order number in the browser
+                showAlert("We couldn't find your order. Please go back to your cart and check out again.", "danger");
+                if (payButton) payButton.disabled = true;
                 return;
             }
-            loadUpiPayment({ orderNumber: currentOrder.orderNumber || orderNumber });
-        });
-    } else if (pendingCheckout) {
-        renderPendingCheckout(pendingCheckout);
-        loadUpiPayment({ items: pendingCheckout.items || [] });
+
+            renderOrderSummary({
+                orderNumber: currentOrderNumber,
+                totalAmount: payableAmount,
+                subtotal: pendingCheckout.subtotal || payableAmount,
+                paymentStatus: "Pending",
+                items: pendingCheckout.items || []
+            });
+            return;
+        }
+
+        if (orderNumberParam) {
+            try {
+                const headers = {};
+                if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                const res = await fetch(`${API_BASE}/api/orders/${orderNumberParam}`, { headers: headers });
+                if (res.ok) {
+                    const data = await res.json();
+                    currentOrderNumber = data.orderNumber || orderNumberParam;
+                    payableAmount = data.totalAmount || 0;
+                    customerPrefill.name = data.shippingFullName || "";
+                    customerPrefill.email = data.shippingEmail || "";
+                    customerPrefill.contact = data.shippingPhone || "";
+
+                    renderOrderSummary(data);
+                    return;
+                }
+            } catch (err) {
+                console.warn("Unable to fetch backend order:", err);
+            }
+        }
+
+        if (displayOrderAmount) displayOrderAmount.textContent = "₹0";
     }
+
+    function renderOrderSummary(order) {
+        if (displayOrderNumber) displayOrderNumber.textContent = order.orderNumber || currentOrderNumber || "--";
+        if (modalOrderNumber) modalOrderNumber.textContent = order.orderNumber || currentOrderNumber || "--";
+
+        const amtStr = formatPrice(order.totalAmount != null ? order.totalAmount : payableAmount);
+        if (displayOrderAmount) displayOrderAmount.textContent = amtStr;
+        if (displayTotalAmount) displayTotalAmount.textContent = amtStr;
+        if (displaySubtotal) displaySubtotal.textContent = formatPrice(order.subtotal != null ? order.subtotal : payableAmount);
+
+        if (displayPaymentStatus) {
+            const status = (order.paymentStatus || "PENDING").toUpperCase();
+            displayPaymentStatus.textContent = status;
+            if (status === "PAID") {
+                displayPaymentStatus.className = "payment-status-badge status-paid";
+                if (payButton) payButton.disabled = true;
+            }
+        }
+
+        if (displayOrderDate) {
+            displayOrderDate.textContent = order.createdAt ? new Date(order.createdAt).toLocaleDateString("en-IN") : "Today";
+        }
+
+        if (displayOrderItems && order.items && order.items.length > 0) {
+            displayOrderItems.innerHTML = "";
+            order.items.forEach(function (item) {
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "order-item-row";
+                itemDiv.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem;";
+                itemDiv.innerHTML = `
+                    <div>
+                        <strong>${window.FirquiHtml.escape(item.name || item.productName || 'Product')}</strong>
+                        <div style="font-size: 0.8rem; color: #64748b;">Qty: ${item.quantity || 1}</div>
+                    </div>
+                    <div>${formatPrice(item.price || item.unitPrice || 0)}</div>
+                `;
+                displayOrderItems.appendChild(itemDiv);
+            });
+        } else if (displayOrderItems) {
+            displayOrderItems.innerHTML = '<div style="color: #64748b; font-size: 0.9rem;">Cart items</div>';
+        }
+    }
+
+    /* =====================================================
+       4. RAZORPAY CHECKOUT TRIGGER
+    ====================================================== */
+    if (payButton) {
+        payButton.addEventListener("click", async function () {
+            hideAlert();
+
+            if (payableAmount <= 0) {
+                showAlert("Invalid payable amount. Please checkout from cart again.", "danger");
+                return;
+            }
+
+            const amountInPaise = Math.round(payableAmount * 100);
+            if (amountInPaise < 100) {
+                showAlert("Payable amount must be at least ₹1.00.", "warning");
+                return;
+            }
+
+            setBtnLoading(true, "Connecting to Razorpay...");
+
+            let razorpayOrder = null;
+            try {
+                // Call Step 1: POST /api/create-order
+                const createRes = await fetch(`${API_BASE}/api/create-order`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    // The server charges the saved order total; no amount is sent from the browser
+                    body: JSON.stringify({ orderNumber: currentOrderNumber })
+                });
+
+                if (!createRes.ok) {
+                    const errJson = await createRes.json().catch(function () { return {}; });
+                    throw new Error(errJson.message || ("Server error: " + createRes.status));
+                }
+
+                razorpayOrder = await createRes.json();
+            } catch (err) {
+                showAlert("Failed to initiate Razorpay order: " + err.message, "danger");
+                setBtnLoading(false);
+                return;
+            }
+
+            const rzpOrderId = razorpayOrder.order_id || razorpayOrder.orderId;
+            const rzpKeyId = razorpayOrder.key_id || razorpayOrder.keyId;
+
+            if (!rzpOrderId) {
+                showAlert("Razorpay did not return a valid order ID.", "danger");
+                setBtnLoading(false);
+                return;
+            }
+
+            if (typeof window.Razorpay !== "function") {
+                showAlert("Razorpay checkout SDK failed to load. Please verify your internet connection.", "danger");
+                setBtnLoading(false);
+                return;
+            }
+
+            // Step 2: Open Razorpay checkout modal
+            const options = {
+                key: rzpKeyId,
+                amount: razorpayOrder.amount || amountInPaise,
+                currency: razorpayOrder.currency || "INR",
+                name: "FIRQUI JEWELS",
+                description: "Order #" + currentOrderNumber,
+                image: "../assets/lastfirqui.png",
+                order_id: rzpOrderId,
+                prefill: {
+                    name: customerPrefill.name,
+                    email: customerPrefill.email,
+                    contact: customerPrefill.contact
+                },
+                theme: {
+                    color: "#0A373B"
+                },
+                modal: {
+                    ondismiss: async function () {
+                        // In UPI flow, user might finish on phone while modal closes
+                        setBtnLoading(true, "Checking status with gateway...");
+                        try {
+                            const checkRes = await fetch(`${API_BASE}/api/orders/${currentOrderNumber}/reconcile-payment`);
+                            if (checkRes.ok) {
+                                const checkData = await checkRes.json();
+                                if (checkData.paid) {
+                                    clearCart();
+                                    if (modalOrderNumber) modalOrderNumber.textContent = currentOrderNumber;
+                                    if (modalTxnId) modalTxnId.textContent = checkData.paymentId || "Verified";
+                                    if (confirmationModal) confirmationModal.style.display = "flex";
+                                    if (displayPaymentStatus) {
+                                        displayPaymentStatus.textContent = "PAID";
+                                        displayPaymentStatus.className = "payment-status-badge status-paid";
+                                    }
+                                    return;
+                                }
+                            }
+                        } catch (e) {}
+
+                        showAlert("Payment cancelled or pending confirmation. If your account was debited, click 'Check Payment Status' below.", "warning");
+                        showReconcileCheckButton(currentOrderNumber);
+                        setBtnLoading(false);
+                    }
+                },
+                handler: async function (response) {
+                    // Receive razorpay_payment_id, razorpay_order_id, razorpay_signature
+                    // Step 3: Call backend verify endpoint: POST /api/verify-payment
+                    setBtnLoading(true, "Verifying payment signature...");
+
+                    try {
+                        const verifyRes = await fetch(`${API_BASE}/api/verify-payment`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderNumber: currentOrderNumber
+                            })
+                        });
+
+                        const verifyData = await verifyRes.json().catch(function () { return {}; });
+
+                        if (verifyRes.ok && verifyData.success) {
+                            // Verified!
+                            clearCart();
+
+                            if (modalOrderNumber) modalOrderNumber.textContent = currentOrderNumber;
+                            if (modalTxnId) modalTxnId.textContent = response.razorpay_payment_id;
+                            if (confirmationModal) confirmationModal.style.display = "flex";
+
+                            if (displayPaymentStatus) {
+                                displayPaymentStatus.textContent = "PAID";
+                                displayPaymentStatus.className = "payment-status-badge status-paid";
+                            }
+                        } else {
+                            showAlert("Signature verification failed: " + (verifyData.message || "Payment not credited."), "danger");
+                            showReconcileCheckButton(currentOrderNumber);
+                            setBtnLoading(false);
+                        }
+                    } catch (err) {
+                        showAlert("Error verifying payment signature: " + err.message, "danger");
+                        showReconcileCheckButton(currentOrderNumber);
+                        setBtnLoading(false);
+                    }
+                }
+            };
+
+            const rzp = new window.Razorpay(options);
+
+            // Handle payment.failed event
+            rzp.on("payment.failed", function (response) {
+                const err = response.error || {};
+                let desc = err.description || err.reason || err.step || "Transaction failed.";
+                if (desc.indexOf("registered website") !== -1 || (err.step === "payment_initiation" && rzpKeyId.startsWith("rzp_live_"))) {
+                    desc += " (Note: In Razorpay Live Mode, payments must originate from your registered website domain. Testing on localhost / 127.0.0.1 is blocked by Razorpay's security risk filter. To test payments locally, use a Razorpay Test Key or test directly on your live domain).";
+                }
+                showAlert("Payment failed: " + desc, "danger");
+                showReconcileCheckButton(currentOrderNumber);
+                setBtnLoading(false);
+            });
+
+            rzp.open();
+        });
+    }
+
+    function showReconcileCheckButton(ordNum) {
+        if (!paymentAlert || !ordNum) return;
+        const existing = document.getElementById("reconcile-check-btn-payment");
+        if (existing) existing.remove();
+
+        const btn = document.createElement("button");
+        btn.id = "reconcile-check-btn-payment";
+        btn.type = "button";
+        btn.style.cssText = "display: inline-block; margin-top: 10px; padding: 7px 16px; background: #0A373B; color: #fff; border: none; border-radius: 4px; font-size: 0.85rem; font-weight: 500; cursor: pointer;";
+        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Check Payment Status';
+        btn.addEventListener("click", async function () {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Checking gateway...';
+            try {
+                const res = await fetch(`${API_BASE}/api/orders/${ordNum}/reconcile-payment`);
+                const data = await res.json();
+                if (data.paid) {
+                    clearCart();
+                    if (modalOrderNumber) modalOrderNumber.textContent = ordNum;
+                    if (modalTxnId) modalTxnId.textContent = data.paymentId || "Verified";
+                    if (confirmationModal) confirmationModal.style.display = "flex";
+                    if (displayPaymentStatus) {
+                        displayPaymentStatus.textContent = "PAID";
+                        displayPaymentStatus.className = "payment-status-badge status-paid";
+                    }
+                } else {
+                    showAlert(data.message || "Payment is still pending or not confirmed by Razorpay.", "warning");
+                    showReconcileCheckButton(ordNum);
+                }
+            } catch (e) {
+                showAlert("Could not reach server: " + e.message, "danger");
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Check Payment Status';
+            }
+        });
+        paymentAlert.appendChild(btn);
+    }
+
+    // Initialize
+    loadOrderDetails();
 
 });

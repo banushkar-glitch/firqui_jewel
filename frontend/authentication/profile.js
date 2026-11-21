@@ -564,7 +564,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     Payment Method
                 </span>
                 <span class="order-info-value">
-                    ${order.paymentMethod || "Cash on Delivery"}
+                    <strong>${window.FirquiHtml.escape(order.paymentMethod || "Razorpay Secure Checkout")}</strong>
                 </span>
             `;
 
@@ -576,8 +576,9 @@ document.addEventListener("DOMContentLoaded", function () {
             let payStatusBadgeStyle = "font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;";
             let payStatusText = order.paymentStatus || "Pending";
 
-            if (rawPayStatus.includes("PAID")) {
+            if (rawPayStatus.includes("PAID") || rawPayStatus.includes("CONFIRMED")) {
                 payStatusBadgeStyle += " background: #D4EDDA; color: #155724;";
+                payStatusText = "Paid (Razorpay)";
             } else if (rawPayStatus.includes("VERIF")) {
                 payStatusBadgeStyle += " background: #CCE5FF; color: #004085;";
                 payStatusText = "Awaiting Verification";
@@ -590,6 +591,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 payStatusBadgeStyle += " background: #E2E3E5; color: #383D41;";
             }
 
+            const paymentTxnId = order.razorpayPaymentId || order.transactionId;
+
             payStatusItem.innerHTML = `
                 <span class="order-info-label">
                     Payment Status
@@ -598,7 +601,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <span style="${payStatusBadgeStyle}">
                         ${payStatusText}
                     </span>
-                    ${order.transactionId ? `<br><small style="color: #666; font-size: 0.75rem;">Ref: ${window.FirquiHtml.escape(order.transactionId)}</small>` : ""}
+                    ${paymentTxnId ? `<br><small style="color: #475569; font-size: 0.78rem;"><strong>Txn ID:</strong> ${window.FirquiHtml.escape(paymentTxnId)}</small>` : ""}
                     ${order.rejectionReason ? `<br><small style="color: #D32F2F; font-size: 0.75rem;">Reason: ${window.FirquiHtml.escape(order.rejectionReason)}</small>` : ""}
                 </span>
             `;
@@ -621,49 +624,56 @@ document.addEventListener("DOMContentLoaded", function () {
             orderInfo.appendChild(payStatusItem);
             orderInfo.appendChild(statusItem);
 
-            /* CANCELLATION REQUEST STATUS DISPLAY */
+            /* RAZORPAY AUTOMATED REFUND STATUS DISPLAY */
+            const refundStatus = (order.refundStatus || "").toUpperCase();
+            if (["REFUNDED", "PROCESSED", "PENDING_REFUND", "PARTIALLY_REFUNDED", "REFUND_FAILED"].includes(refundStatus) || order.razorpayRefundId) {
+                const refundItem = document.createElement("div");
+                refundItem.className = "order-info-item";
+                refundItem.style.cssText = "background: #f0fdf4; padding: 10px; border-radius: 6px; border: 1px solid #bbf7d0; margin-top: 6px;";
+
+                const isProcessed = refundStatus === "REFUNDED" || refundStatus === "PROCESSED";
+                const isPartial = refundStatus === "PARTIALLY_REFUNDED";
+                const isFailed = refundStatus === "REFUND_FAILED";
+                // A failed refund is retried by the shop, so the customer sees it as still in progress
+                const badgeBg = isProcessed || isPartial ? "#dcfce7" : (isFailed ? "#fef9c3" : "#e0f2fe");
+                const badgeColor = isProcessed || isPartial ? "#166534" : (isFailed ? "#854d0e" : "#0369a1");
+                const badgeText = isProcessed ? "REFUND PROCESSED"
+                    : isPartial ? "PARTIALLY REFUNDED"
+                    : isFailed ? "REFUND DELAYED - WE ARE ON IT" : "REFUND INITIATED";
+
+                refundItem.innerHTML = `
+                    <span class="order-info-label" style="color: #166534;">
+                        <i class="fa-solid fa-rotate-left"></i> Razorpay Refund
+                    </span>
+                    <span class="order-info-value">
+                        <span style="font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; background: ${badgeBg}; color: ${badgeColor};">
+                            ${badgeText}
+                        </span>
+                        <br>
+                        <small style="color: #15803d; font-size: 0.78rem;">
+                            <strong>Amount:</strong> ${order.formattedRefundAmount || totalDisplay}
+                            ${order.razorpayRefundId ? `<br><strong>Refund ID:</strong> ${window.FirquiHtml.escape(order.razorpayRefundId)}` : ""}
+                            <br>Credited back to your original payment method in 5-7 bank working days.
+                        </small>
+                    </span>
+                `;
+                orderInfo.appendChild(refundItem);
+            }
+
+            /* CANCELLATION REQUEST STATUS DISPLAY (IF PENDING) */
             const cleanOrderNum = String(orderNum).replace("#", "");
             const cancelReq = cancellationMap[cleanOrderNum];
-            if (cancelReq) {
+            if (cancelReq && cancelReq.status === "PENDING") {
                 const cancelStatusItem = document.createElement("div");
                 cancelStatusItem.className = "order-info-item";
-
-                let cBadgeStyle = "font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;";
-                let cStatusText = "Cancellation Request " + cancelReq.status;
-
-                if (cancelReq.status === "PENDING") {
-                    cBadgeStyle += " background: #FFF3CD; color: #856404;";
-                    cStatusText = "Cancellation Request Pending";
-                } else if (cancelReq.status === "APPROVED") {
-                    cBadgeStyle += " background: #D4EDDA; color: #155724;";
-                    cStatusText = "Cancellation Request Approved";
-                } else if (cancelReq.status === "REJECTED") {
-                    cBadgeStyle += " background: #F8D7DA; color: #721C24;";
-                    cStatusText = "Cancellation Request Rejected";
-                }
-
-                let refundNoteHtml = "";
-                if (cancelReq.refundStatus === "PENDING_REFUND") {
-                    refundNoteHtml = `<br><small style="color: #0A373B; font-weight: 600; font-size: 0.75rem;"><i class="fa-solid fa-rotate"></i> Refund Status: Processing (Manual UPI)</small>`;
-                } else if (cancelReq.refundStatus === "REFUNDED") {
-                    refundNoteHtml = `<br><small style="color: #155724; font-weight: 600; font-size: 0.75rem;"><i class="fa-solid fa-check-circle"></i> Refund Status: Completed</small>`;
-                }
-
-                let rejectionReasonHtml = "";
-                if (cancelReq.status === "REJECTED" && cancelReq.adminNotes) {
-                    rejectionReasonHtml = `<br><small style="color: #721C24; font-size: 0.75rem;">Reason: ${cancelReq.adminNotes}</small>`;
-                }
-
                 cancelStatusItem.innerHTML = `
                     <span class="order-info-label">
                         Cancellation
                     </span>
                     <span class="order-info-value">
-                        <span style="${cBadgeStyle}">
-                            ${cStatusText}
+                        <span style="font-weight: 700; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; background: #FFF3CD; color: #856404;">
+                            Cancellation Request Pending
                         </span>
-                        ${refundNoteHtml}
-                        ${rejectionReasonHtml}
                     </span>
                 `;
                 orderInfo.appendChild(cancelStatusItem);
@@ -676,36 +686,93 @@ document.addEventListener("DOMContentLoaded", function () {
                 payUpiBtn.className = "shop-button";
                 payUpiBtn.style.cssText = "display: inline-block; margin-right: 10px; margin-top: 10px; padding: 8px 16px; font-size: 0.85rem; background: #0A373B; color: #FAF5EE; text-decoration: none; border-radius: 6px; font-weight: 600;";
                 payUpiBtn.innerHTML = rawPayStatus === "REJECTED"
-                    ? `<i class="fa-solid fa-rotate-right"></i> Re-submit UPI Payment`
-                    : `<i class="fa-solid fa-qrcode"></i> Complete UPI Payment`;
+                    ? `<i class="fa-solid fa-rotate-right"></i> Retry Payment`
+                    : `<i class="fa-solid fa-lock"></i> Complete Payment`;
                 orderInfo.appendChild(payUpiBtn);
             }
 
-            /* CANCEL ORDER BUTTON */
-            const cancelButton = document.createElement("button");
-            cancelButton.type = "button";
-            cancelButton.className = "cancel-order-button";
-            cancelButton.innerHTML = `
-                <i class="fa-regular fa-circle-xmark"></i>
-                Cancel Order
-            `;
+            /* CANCEL ORDER & INSTANT REFUND BUTTON */
+            const cancelWrapper = document.createElement("div");
+            cancelWrapper.style.cssText = "margin-top: 12px;";
 
-            // Hide Cancel Order if already Cancelled, Delivered, or if a cancellation request is already PENDING or APPROVED
-            if (currentStatus === "Cancelled" || currentStatus === "Delivered" || (cancelReq && (cancelReq.status === "PENDING" || cancelReq.status === "APPROVED"))) {
-                cancelButton.style.display = "none";
+            const isAlreadyCancelled = currentStatus === "Cancelled" || order.cancellationStatus === "CANCELLED" || refundStatus === "REFUNDED";
+            const isDeliveredOrShipped = currentStatus === "Delivered" || currentStatus === "Shipped";
+
+            if (!isAlreadyCancelled && !isDeliveredOrShipped) {
+                if (order.cancellationEligible) {
+                    const cancelButton = document.createElement("button");
+                    cancelButton.type = "button";
+                    cancelButton.className = "cancel-order-button";
+                    cancelButton.style.cssText = "background: #b91c1c; color: #FAF5EE; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;";
+                    cancelButton.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> Cancel Order & Instant Refund`;
+
+                    const timeNotice = document.createElement("div");
+                    timeNotice.style.cssText = "font-size: 0.78rem; color: #047857; margin-top: 6px; font-weight: 500;";
+                    timeNotice.innerHTML = `<i class="fa-solid fa-clock"></i> Eligible for 24-hour instant cancellation & automated refund (~${order.cancellationHoursRemaining || 24}h remaining)`;
+
+                    cancelButton.addEventListener("click", async function () {
+                        const reason = prompt(
+                            `Cancel Order #${cleanOrderNum}\n\n` +
+                            `Are you sure you want to cancel this order?\n` +
+                            `The full order amount of ${totalDisplay} will be automatically refunded through Razorpay to your original payment method.\n\n` +
+                            `Please enter your reason for cancellation:\n` +
+                            `(e.g., Ordered by mistake, Want to change product, Delivery timing)`
+                        );
+                        if (reason === null) return;
+                        const trimmedReason = reason.trim() || "Ordered by mistake";
+
+                        cancelButton.disabled = true;
+                        cancelButton.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Processing Instant Refund...`;
+
+                        try {
+                            const res = await fetch(`${API_BASE}/api/cancellation-requests/auto-cancel`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "Authorization": `Bearer ${token}`
+                                },
+                                body: JSON.stringify({
+                                    orderNumber: cleanOrderNum,
+                                    reason: trimmedReason,
+                                    additionalDetails: "Customer requested instant cancellation within 24 hours"
+                                })
+                            });
+
+                            const data = await res.json();
+                            if (!res.ok) {
+                                throw new Error(data.message || "Failed to process cancellation.");
+                            }
+
+                            alert(
+                                `Order #${cleanOrderNum} Cancelled Successfully!\n\n` +
+                                `Refund Status: Initiated via Razorpay\n` +
+                                `Refund ID: ${data.razorpayRefundId || 'Generated'}\n` +
+                                `Amount: ${data.formattedRefundAmount || totalDisplay}\n\n` +
+                                `The amount will be credited back to your original payment source within 5-7 bank working days.`
+                            );
+                            loadOrders();
+                        } catch (err) {
+                            alert("Cancellation notice: " + err.message);
+                            cancelButton.disabled = false;
+                            cancelButton.innerHTML = `<i class="fa-regular fa-circle-xmark"></i> Cancel Order & Instant Refund`;
+                        }
+                    });
+
+                    cancelWrapper.appendChild(cancelButton);
+                    cancelWrapper.appendChild(timeNotice);
+                } else {
+                    const notice = document.createElement("div");
+                    notice.style.cssText = "font-size: 0.8rem; color: #64748b; margin-top: 6px;";
+                    notice.innerHTML = `<i class="fa-solid fa-circle-info"></i> 24-hour cancellation window has ended. Please contact customer care for support.`;
+                    cancelWrapper.appendChild(notice);
+                }
             }
-
-            cancelButton.addEventListener("click", function () {
-                // Save order details to sessionStorage and redirect to Contact page cancellation form
-                sessionStorage.setItem("firqui_cancel_order", JSON.stringify(order));
-                window.location.href = `../contact.html?action=cancel&orderNumber=${encodeURIComponent(orderNum)}`;
-            });
 
             /* BUILD ORDER CARD */
             orderCard.appendChild(orderHeader);
             orderCard.appendChild(productsContainer);
             orderCard.appendChild(orderInfo);
-            orderCard.appendChild(cancelButton);
+            orderCard.appendChild(cancelWrapper);
 
             ordersContainer.appendChild(orderCard);
         });

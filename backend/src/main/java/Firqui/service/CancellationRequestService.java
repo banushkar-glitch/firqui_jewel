@@ -45,6 +45,9 @@ public class CancellationRequestService {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private RefundService refundService;
+
     /* =====================================================
        1. SUBMIT CANCELLATION REQUEST (CUSTOMER)
        Order status MUST NOT change automatically upon submission.
@@ -92,27 +95,16 @@ public class CancellationRequestService {
         if ("Delivered".equalsIgnoreCase(currentOrderStatus)) {
             throw new IllegalStateException("Delivered orders cannot be cancelled. Please contact customer support for returns.");
         }
-        if ("Cancelled".equalsIgnoreCase(currentOrderStatus)) {
+        if ("Shipped".equalsIgnoreCase(currentOrderStatus)) {
+            throw new IllegalStateException("Order #" + orderNum + " has already been shipped and cannot be cancelled.");
+        }
+        if ("Cancelled".equalsIgnoreCase(currentOrderStatus) || "CANCELLED".equalsIgnoreCase(order.getCancellationStatus())) {
             throw new IllegalStateException("Order #" + orderNum + " is already cancelled.");
         }
 
-        // Prevent duplicate pending cancellation requests for the same order
-        if (cancellationRequestRepository.existsByOrderNumberAndStatus(orderNum, "PENDING")) {
-            throw new IllegalStateException("A cancellation request for Order #" + orderNum + " is already pending admin review.");
-        }
-
-        // Create cancellation request with PENDING status
-        // NOTE: Original order status (e.g. CONFIRMED, PROCESSING) is strictly PRESERVED
-        CancellationRequest cancellation = new CancellationRequest(order, user, reason, additionalDetails);
-        cancellation.setStatus("PENDING");
-        cancellation.setRefundStatus("NOT_APPLICABLE");
-        cancellation.setCreatedAt(LocalDateTime.now());
-
-        CancellationRequest saved = cancellationRequestRepository.save(cancellation);
-        if (shopNotifications != null) shopNotifications.cancellationRequested(saved);
-        logger.info("Customer {} submitted cancellation request #{} for order #{}", user.getEmail(), saved.getId(), orderNum);
-
-        return CancellationResponseDTO.fromEntity(saved);
+        // Cancels immediately (within the cancellation window), restores stock and refunds
+        // Razorpay payments automatically. Ownership and the window are checked again under a row lock.
+        return refundService.cancelByCustomer(user, orderNum, reason, additionalDetails);
     }
 
     /* =====================================================
@@ -186,31 +178,13 @@ public class CancellationRequestService {
         request.setReviewedAt(LocalDateTime.now());
         request.setReviewedBy(adminIdentifier);
 
-        // Track refund status separately
-        String payStatus = order.getPaymentStatus() != null ? order.getPaymentStatus().toUpperCase() : "";
-        if (payStatus.contains("PAID") || payStatus.contains("VERIF")) {
-            request.setRefundStatus("PENDING_REFUND");
-        } else {
-            request.setRefundStatus("NOT_APPLICABLE");
+        // Cancel, restore stock once, and refund the Razorpay payment (if any)
+        Order locked = refundService.lockOrder(order.getOrderNumber());
+        if (!RefundService.isCancelled(locked)) {
+            refundService.cancelOrderAndRefund(locked, request.getReason(), request.getAdditionalDetails(),
+                    "ADMIN:" + adminIdentifier);
         }
-
-        // Cancel order through existing order management logic
-        order.setOrderStatus("Cancelled");
-        order.setUpdatedAt(LocalDateTime.now());
-
-        // Restore stock to catalogue products
-        if (order.getItems() != null) {
-            for (OrderItem item : order.getItems()) {
-                if (item.getProduct() != null && item.getQuantity() != null) {
-                    Product prod = item.getProduct();
-                    int currentStock = prod.getStockQuantity() != null ? prod.getStockQuantity() : 0;
-                    prod.setStockQuantity(currentStock + item.getQuantity());
-                    productRepository.save(prod);
-                    logger.info("Restored {} units of stock for product '{}' (New stock: {})",
-                            item.getQuantity(), prod.getName(), prod.getStockQuantity());
-                }
-            }
-        }
+        request.setRefundStatus(locked.getRefundStatus());
 
         orderRepository.save(order);
         CancellationRequest saved = cancellationRequestRepository.save(request);

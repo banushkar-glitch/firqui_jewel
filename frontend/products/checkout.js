@@ -18,6 +18,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const subtotalElement = document.getElementById("checkout-subtotal");
     const totalElement = document.getElementById("checkout-total");
     const checkoutForm = document.getElementById("checkout-form");
+    const paymentAlert = document.getElementById("payment-alert");
+    const successModal = document.getElementById("checkout-success-modal");
+    const modalOrderNumber = document.getElementById("modal-order-number");
+    const modalPaymentId = document.getElementById("modal-payment-id");
+    const modalAmountPaid = document.getElementById("modal-amount-paid");
+    const modalOrdersLink = document.getElementById("modal-orders-link");
 
     // Guest checkout: offer (not require) logging in
     if (checkoutForm && window.FirquiAuth && !window.FirquiAuth.isSignedIn()) {
@@ -25,10 +31,56 @@ document.addEventListener("DOMContentLoaded", function () {
         note.className = "guest-checkout-note";
         note.innerHTML = 'Checking out as a guest. <a href="' + window.FirquiAuth.loginUrl() + '">Log in</a> to save your details and track orders.';
         checkoutForm.insertAdjacentElement("afterbegin", note);
+
+        if (modalOrdersLink) {
+            modalOrdersLink.href = "../index.html";
+            modalOrdersLink.textContent = "Back to Home";
+        }
     }
     const submitButton = checkoutForm ? checkoutForm.querySelector(".place-order-button") : null;
 
     let cart = [];
+
+    /* =========================================
+       ALERT HELPERS
+    ========================================= */
+    function showPaymentAlert(message, type) {
+        if (!paymentAlert) return;
+        paymentAlert.style.display = "block";
+        if (type === "danger" || type === "error") {
+            paymentAlert.style.background = "#fde8e8";
+            paymentAlert.style.color = "#9b1c1c";
+            paymentAlert.style.border = "1px solid #f8b4b4";
+            paymentAlert.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ' + window.FirquiHtml.escape(message);
+        } else if (type === "warning") {
+            paymentAlert.style.background = "#fef08a";
+            paymentAlert.style.color = "#854d0e";
+            paymentAlert.style.border = "1px solid #fde047";
+            paymentAlert.innerHTML = '<i class="fa-solid fa-circle-exclamation"></i> ' + window.FirquiHtml.escape(message);
+        } else {
+            paymentAlert.style.background = "#def7ec";
+            paymentAlert.style.color = "#03543f";
+            paymentAlert.style.border = "1px solid #bcf0da";
+            paymentAlert.innerHTML = '<i class="fa-solid fa-circle-check"></i> ' + window.FirquiHtml.escape(message);
+        }
+        paymentAlert.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function hidePaymentAlert() {
+        if (paymentAlert) paymentAlert.style.display = "none";
+    }
+
+    function setButtonLoading(text) {
+        if (!submitButton) return;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ' + (text || 'Processing...');
+    }
+
+    function resetButton() {
+        if (!submitButton) return;
+        submitButton.disabled = false;
+        submitButton.innerHTML = '<i class="fa-solid fa-lock"></i> Pay with Razorpay';
+    }
 
     /* =========================================
        PRICE HELPERS
@@ -59,7 +111,6 @@ document.addEventListener("DOMContentLoaded", function () {
        PRE-FILL LOGGED-IN USER INFORMATION
     ========================================= */
     async function loadUserProfile() {
-        // 1. Initial pre-fill from cached data if present
         try {
             const cachedUser = JSON.parse(localStorage.getItem("firquiCustomer")) ||
                                JSON.parse(localStorage.getItem("firqui_user"));
@@ -68,7 +119,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         } catch (e) {}
 
-        // 2. Fetch fresh profile from Spring Boot backend if logged in
         if (token) {
             try {
                 const response = await fetch(`${API_BASE}/api/users/me`, {
@@ -117,7 +167,6 @@ document.addEventListener("DOMContentLoaded", function () {
     async function loadCartData() {
         if (token) {
             try {
-                // First try fetching live cart from authenticated user backend
                 const response = await fetch(`${API_BASE}/api/cart`, {
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -137,7 +186,6 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         }
 
-        // Fallback to localStorage if backend cart is not populated yet
         try {
             cart = JSON.parse(localStorage.getItem("firquiCart")) || [];
         } catch (e) {
@@ -145,6 +193,21 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         renderCartSummary(cart);
+    }
+
+    function clearCart() {
+        cart = [];
+        try {
+            localStorage.removeItem("firquiCart");
+            sessionStorage.removeItem("firqui_pending_checkout");
+        } catch (e) {}
+
+        if (token) {
+            fetch(`${API_BASE}/api/cart/items`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            }).catch(function () {});
+        }
     }
 
     /* =========================================
@@ -216,14 +279,15 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     /* =========================================
-       HANDLE ORDER SUBMISSION
+       RAZORPAY STANDARD CHECKOUT INTEGRATION
     ========================================= */
     if (checkoutForm) {
         checkoutForm.addEventListener("submit", async function (event) {
             event.preventDefault();
+            hidePaymentAlert();
 
             if (!cart || cart.length === 0) {
-                alert("Your cart is empty. Please add a product before checkout.");
+                showPaymentAlert("Your cart is empty. Please add items before checking out.", "warning");
                 return;
             }
 
@@ -234,20 +298,13 @@ document.addEventListener("DOMContentLoaded", function () {
             const address1 = document.getElementById("address-1").value.trim();
             const address2 = document.getElementById("address-2").value.trim();
 
-            // Guests have no account email, so the confirmation goes to this address
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
-                alert("Please enter a valid email address. We send your order confirmation there.");
+                showPaymentAlert("Please enter a valid email address for order confirmation.", "warning");
                 document.getElementById("customer-email").focus();
                 return;
             }
 
-            const selectedPayment = document.querySelector('input[name="payment"]:checked');
-            if (!selectedPayment) {
-                alert("Please select a payment method.");
-                return;
-            }
-
-            // Save customer address in local storage for future visits
+            // Save address locally
             try {
                 localStorage.setItem("firquiCustomer", JSON.stringify({
                     name: name,
@@ -259,9 +316,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }));
             } catch (e) {}
 
-            const paymentMethodStr = selectedPayment.value === "pay-now" ? "Pay Now" : "Cash on Delivery";
-
-            // Prepare items payload with productId, size, and quantities
+            // Calculate total
             const itemsPayload = cart.map(function (p) {
                 return {
                     productId: p.productId || p.id,
@@ -274,33 +329,231 @@ document.addEventListener("DOMContentLoaded", function () {
                 };
             });
 
-            // Calculate total for order summary display
             let currentTotal = 0;
             itemsPayload.forEach(function (it) {
                 currentTotal += (it.price || 0) * (it.quantity || 1);
             });
 
-            const pendingCheckout = {
-                shippingAddress: {
-                    fullName: name,
-                    phone: phone,
+            const amountInPaise = Math.round(currentTotal * 100);
+            if (amountInPaise < 100) {
+                showPaymentAlert("Order total must be at least ₹1.00.", "warning");
+                return;
+            }
+
+            setButtonLoading("Initiating secure payment...");
+
+            let orderNumber = null;
+
+            // 1. Create order in Firqui database
+            try {
+                const headers = { "Content-Type": "application/json" };
+                if (token) headers["Authorization"] = `Bearer ${token}`;
+
+                const orderCreateRes = await fetch(`${API_BASE}/api/orders`, {
+                    method: "POST",
+                    headers: headers,
+                    body: JSON.stringify({
+                        shippingAddress: {
+                            fullName: name,
+                            phone: phone,
+                            email: email,
+                            pincode: pincode,
+                            address1: address1,
+                            address2: address2
+                        },
+                        paymentMethod: "Razorpay",
+                        items: itemsPayload
+                    })
+                });
+
+                if (orderCreateRes.ok) {
+                    const orderResult = await orderCreateRes.json();
+                    orderNumber = orderResult.orderNumber;
+                } else {
+                    const errData = await orderCreateRes.json().catch(function () { return {}; });
+                    throw new Error(errData.message || "Failed to place order record");
+                }
+            } catch (err) {
+                showPaymentAlert("Could not initialize order: " + err.message, "danger");
+                resetButton();
+                return;
+            }
+
+            // 2. Call backend Razorpay endpoint: POST /api/create-order
+            let razorpayOrderData = null;
+            try {
+                const rzpCreateRes = await fetch(`${API_BASE}/api/create-order`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    // The server charges the saved order total; no amount is sent from the browser
+                    body: JSON.stringify({ orderNumber: orderNumber })
+                });
+
+                if (!rzpCreateRes.ok) {
+                    const errorJson = await rzpCreateRes.json().catch(function () { return {}; });
+                    throw new Error(errorJson.message || ("Server returned error " + rzpCreateRes.status));
+                }
+
+                razorpayOrderData = await rzpCreateRes.json();
+            } catch (err) {
+                showPaymentAlert("Could not initiate Razorpay payment: " + err.message, "danger");
+                resetButton();
+                return;
+            }
+
+            const razorpayOrderId = razorpayOrderData.order_id || razorpayOrderData.orderId;
+            const razorpayKeyId = razorpayOrderData.key_id || razorpayOrderData.keyId;
+
+            if (!razorpayOrderId) {
+                showPaymentAlert("Invalid response from payment gateway. Please try again.", "danger");
+                resetButton();
+                return;
+            }
+
+            // Check if Razorpay SDK script loaded
+            if (typeof window.Razorpay !== "function") {
+                showPaymentAlert("Razorpay checkout SDK failed to load. Please check your network connection.", "danger");
+                resetButton();
+                return;
+            }
+
+            // 3. Configure and open Razorpay Standard Modal
+            const options = {
+                key: razorpayKeyId,
+                amount: razorpayOrderData.amount || amountInPaise,
+                currency: razorpayOrderData.currency || "INR",
+                name: "FIRQUI JEWELS",
+                description: "Order #" + orderNumber,
+                image: "../assets/lastfirqui.png",
+                order_id: razorpayOrderId,
+                prefill: {
+                    name: name,
                     email: email,
-                    pincode: pincode,
-                    address1: address1,
-                    address2: address2
+                    contact: phone
                 },
-                paymentMethod: "Pay Now",
-                items: itemsPayload,
-                subtotal: currentTotal,
-                total: currentTotal
+                theme: {
+                    color: "#0A373B"
+                },
+                modal: {
+                    ondismiss: async function () {
+                        // User may have completed payment on phone right as modal was closed
+                        setButtonLoading("Checking payment status with gateway...");
+                        try {
+                            const checkRes = await fetch(`${API_BASE}/api/orders/${orderNumber}/reconcile-payment`);
+                            if (checkRes.ok) {
+                                const checkData = await checkRes.json();
+                                if (checkData.paid) {
+                                    clearCart();
+                                    renderCartSummary([]);
+                                    if (modalOrderNumber) modalOrderNumber.textContent = orderNumber;
+                                    if (modalPaymentId) modalPaymentId.textContent = checkData.paymentId || "Verified";
+                                    if (modalAmountPaid) modalAmountPaid.textContent = formatPrice(currentTotal);
+                                    if (successModal) successModal.style.display = "flex";
+                                    return;
+                                }
+                            }
+                        } catch (e) {}
+
+                        showPaymentAlert("Payment modal closed. If your bank account was debited, please click 'Verify Payment Status' below.", "warning");
+                        showStatusCheckButton(orderNumber, currentTotal);
+                        resetButton();
+                    }
+                },
+                handler: async function (response) {
+                    // On success: receive razorpay_payment_id, razorpay_order_id, razorpay_signature
+                    // Send all three to verify endpoint: POST /api/verify-payment
+                    setButtonLoading("Verifying payment signature...");
+
+                    try {
+                        const verifyRes = await fetch(`${API_BASE}/api/verify-payment`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                orderNumber: orderNumber
+                            })
+                        });
+
+                        const verifyData = await verifyRes.json().catch(function () { return {}; });
+
+                        if (verifyRes.ok && verifyData.success) {
+                            // Payment confirmed and verified!
+                            clearCart();
+                            renderCartSummary([]);
+
+                            if (modalOrderNumber) modalOrderNumber.textContent = orderNumber;
+                            if (modalPaymentId) modalPaymentId.textContent = response.razorpay_payment_id;
+                            if (modalAmountPaid) modalAmountPaid.textContent = formatPrice(currentTotal);
+                            if (successModal) successModal.style.display = "flex";
+
+                        } else {
+                            // Signature mismatch or verification error
+                            showPaymentAlert("Payment verification failed: " + (verifyData.message || "Invalid signature. Payment has NOT been credited."), "danger");
+                            showStatusCheckButton(orderNumber, currentTotal);
+                            resetButton();
+                        }
+                    } catch (err) {
+                        showPaymentAlert("Network error while verifying payment: " + err.message, "danger");
+                        showStatusCheckButton(orderNumber, currentTotal);
+                        resetButton();
+                    }
+                }
             };
 
-            // Save pending checkout in session storage
-            sessionStorage.setItem("firqui_pending_checkout", JSON.stringify(pendingCheckout));
+            const rzp = new window.Razorpay(options);
 
-            // Smoothly navigate directly to payment page — order is placed upon clicking Submit Payment Details
-            window.location.href = "payment.html";
+            // Handle payment.failed event
+            rzp.on("payment.failed", function (response) {
+                const err = response.error || {};
+                let reason = err.description || err.reason || err.step || "Transaction failed";
+                if (reason.indexOf("registered website") !== -1 || (err.step === "payment_initiation" && razorpayKeyId.startsWith("rzp_live_"))) {
+                    reason += " (Note: In Razorpay Live Mode, payments are strictly verified against your registered website domain. Testing from localhost / 127.0.0.1 is blocked by Razorpay's security risk filter. To test payments locally, use a Razorpay Test Key or test directly on your live domain).";
+                }
+                showPaymentAlert("Payment failed: " + reason, "danger");
+                showStatusCheckButton(orderNumber, currentTotal);
+                resetButton();
+            });
+
+            rzp.open();
         });
+    }
+
+    function showStatusCheckButton(ordNum, total) {
+        if (!paymentAlert || !ordNum) return;
+        const existingBtn = document.getElementById("reconcile-check-btn");
+        if (existingBtn) existingBtn.remove();
+
+        const btn = document.createElement("button");
+        btn.id = "reconcile-check-btn";
+        btn.type = "button";
+        btn.style.cssText = "display: inline-block; margin-top: 10px; padding: 7px 16px; background: #0A373B; color: #fff; border: none; border-radius: 4px; font-size: 0.85rem; font-weight: 500; cursor: pointer;";
+        btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Check Payment Status';
+        btn.addEventListener("click", async function () {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Checking gateway...';
+            try {
+                const res = await fetch(`${API_BASE}/api/orders/${ordNum}/reconcile-payment`);
+                const data = await res.json();
+                if (data.paid) {
+                    clearCart();
+                    renderCartSummary([]);
+                    if (modalOrderNumber) modalOrderNumber.textContent = ordNum;
+                    if (modalPaymentId) modalPaymentId.textContent = data.paymentId || "Verified";
+                    if (modalAmountPaid) modalAmountPaid.textContent = formatPrice(total);
+                    if (successModal) successModal.style.display = "flex";
+                } else {
+                    showPaymentAlert(data.message || "Payment is still pending or not confirmed by Razorpay.", "warning");
+                    showStatusCheckButton(ordNum, total);
+                }
+            } catch (e) {
+                showPaymentAlert("Could not reach server: " + e.message, "danger");
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Check Payment Status';
+            }
+        });
+        paymentAlert.appendChild(btn);
     }
 
     // Initialize

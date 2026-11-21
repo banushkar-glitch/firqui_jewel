@@ -18,12 +18,15 @@
     <!-- Payment Page Styles -->
     <link rel="stylesheet" href="payment.css?v=20261018a">
     <link rel="stylesheet" href="../css/site.css?v=20261018a">
+
+    <!-- Razorpay Standard Web Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 <body>
 
     <!-- =====================================================
-         HEADER (Identical to Checkout, Cart & Brand Pages)
+         HEADER
     ====================================================== -->
     <header class="header">
         <a href="bracelets_cuffs.html" class="header-logo" aria-label="FIRQUI JEWELS Home">
@@ -63,170 +66,71 @@
     ====================================================== -->
     <main class="payment-page">
 
-        <!-- SECTION A: PAGE HEADING -->
+        <!-- PAGE HEADING -->
         <div class="payment-header-section">
-            <span class="payment-badge-pill">FIRQUI JEWELS • SECURE UPI</span>
+            <span class="payment-badge-pill">FIRQUI JEWELS • SECURE CHECKOUT</span>
             <h1 class="payment-title">Complete Your Payment</h1>
             <p class="payment-instructions">
-                Scan the QR code using your UPI application or pay using the UPI ID below.
+                Pay securely using Razorpay with Cards, UPI, Netbanking, or Wallets.
             </p>
         </div>
 
         <!-- MAIN LAYOUT GRID -->
         <div class="payment-grid-container">
 
-            <!-- LEFT COLUMN: UPI PAYMENT (QR CODE, UPI ID & SUBMISSION FORM) -->
+            <!-- LEFT COLUMN: RAZORPAY STANDARD CHECKOUT -->
             <div class="payment-left-column">
 
-                <!-- SECTION C & D: QR CODE & UPI ID CARD -->
-                <section class="payment-card qr-card" aria-labelledby="qr-section-heading">
+                <section class="payment-card submission-card" aria-labelledby="payment-section-heading">
                     <div class="card-header">
                         <div>
-                            <span class="step-indicator">STEP 1</span>
-                            <h2 id="qr-section-heading">Scan & Pay via UPI</h2>
+                            <span class="step-indicator">ONLINE PAYMENT</span>
+                            <h2 id="payment-section-heading">Razorpay Standard Checkout</h2>
                         </div>
                         <div class="upi-logos-badge">
-                            <span>GPay • PhonePe • Paytm • BHIM</span>
+                            <span>Cards • UPI • Netbanking • Wallets</span>
                         </div>
                     </div>
 
                     <!-- PROMINENT AMOUNT DISPLAY -->
                     <div class="amount-banner">
-                        <span class="amount-label">Exact Payable Amount</span>
+                        <span class="amount-label">Payable Amount</span>
                         <span class="amount-value" id="display-order-amount">Loading...</span>
                     </div>
 
-                    <!-- QR CODE: generated for this cart, amount fixed by the server -->
-                    <div class="qr-code-wrapper">
-                        <div class="qr-amount" id="qr-amount" aria-live="polite">Calculating amount...</div>
-                        <div class="qr-image-frame" id="qr-image-container">
-                            <img
-                                id="upi-qr-image"
-                                alt="UPI QR code for this order"
-                                class="qr-image"
-                                hidden
-                            >
-                            <div class="qr-status" id="qr-status">
-                                <i class="fa-solid fa-circle-notch fa-spin"></i> Preparing your payment QR...
-                            </div>
-                        </div>
-                        <p class="qr-helper-text">
-                            <i class="fa-solid fa-camera"></i> Scan with any UPI app (Google Pay, PhonePe, Paytm, BHIM). The amount is filled in for you and cannot be changed.
-                        </p>
+                    <div style="margin: 20px 0; padding: 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                        <ul style="list-style: none; padding: 0; margin: 0; font-size: 0.95rem; color: #475569; display: flex; flex-direction: column; gap: 10px;">
+                            <li style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-circle-check" style="color: #0A373B;"></i>
+                                Instant automated payment verification
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-shield-halved" style="color: #0A373B;"></i>
+                                256-bit bank-grade encryption powered by Razorpay
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-credit-card" style="color: #0A373B;"></i>
+                                Visa, MasterCard, RuPay, GPay, PhonePe, Paytm, Netbanking
+                            </li>
+                            <li style="display: flex; align-items: center; gap: 10px; color: #047857; background: #ecfdf5; padding: 6px 8px; border-radius: 4px; border: 1px solid #a7f3d0; font-size: 0.85rem;">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span><strong>Live Payment:</strong> Secure checkout with real-time UPI, Card, and Netbanking verification.</span>
+                            </li>
+                        </ul>
                     </div>
 
-                    <!-- On a phone: open the UPI app directly with the same fixed amount -->
-                    <div class="upi-id-box">
-                        <a class="upi-app-btn" id="upi-app-link" href="#" hidden>
-                            <i class="fa-solid fa-mobile-screen-button"></i>
-                            <span id="upi-app-text">Pay in UPI app</span>
-                        </a>
-                        <div class="upi-id-label">Paying to <code class="upi-id-text" id="upi-id-display"></code></div>
-                    </div>
-                </section>
+                    <!-- ALERT / NOTIFICATION -->
+                    <div class="payment-alert" id="payment-alert" style="display: none;" role="alert"></div>
 
-                <!-- SECTION E, F & G: SUBMIT TRANSACTION DETAILS FORM -->
-                <section class="payment-card submission-card" aria-labelledby="submission-section-heading">
-                    <div class="card-header">
-                        <div>
-                            <span class="step-indicator">STEP 2</span>
-                            <h2 id="submission-section-heading">Submit Payment Verification</h2>
-                        </div>
-                    </div>
-
-                    <p class="submission-instructions">
-                        Once paid from your UPI app, enter your 12-digit UPI UTR / Transaction ID and attach the payment screenshot below for manual admin verification.
-                    </p>
-
-                    <form id="upi-payment-form" novalidate>
-
-                        <!-- SECTION E: TRANSACTION ID / UTR FIELD -->
-                        <div class="form-group">
-                            <label for="transaction-id" class="input-label">
-                                UPI Transaction ID / UTR Number <span class="required-star">*</span>
-                            </label>
-                            <div class="input-wrapper">
-                                <i class="fa-solid fa-receipt input-icon"></i>
-                                <input
-                                    type="text"
-                                    id="transaction-id"
-                                    name="transactionId"
-                                    class="text-input"
-                                    placeholder="e.g., 428938192837 (12-digit UTR)"
-                                    maxlength="60"
-                                    autocomplete="off"
-                                    required
-                                >
-                            </div>
-                            <span class="field-error" id="transaction-id-error"></span>
-                            <small class="field-hint">
-                                You can find this reference in your UPI payment receipt (Google Pay, PhonePe, Paytm, BHIM).
-                            </small>
-                        </div>
-
-                        <!-- SECTION F: PAYMENT SCREENSHOT UPLOAD -->
-                        <div class="form-group screenshot-group">
-                            <label class="input-label">
-                                Payment Screenshot <span class="required-star">*</span>
-                            </label>
-
-                            <!-- FILE UPLOAD DROP / BUTTON ZONE -->
-                            <div class="upload-dropzone" id="upload-dropzone">
-                                <input
-                                    type="file"
-                                    id="screenshot-input"
-                                    name="screenshot"
-                                    accept="image/png, image/jpeg, image/jpg"
-                                    class="hidden-file-input"
-                                >
-                                <div class="dropzone-content" id="dropzone-prompt">
-                                    <i class="fa-solid fa-cloud-arrow-up dropzone-icon"></i>
-                                    <div class="dropzone-text">
-                                        <button type="button" class="choose-file-btn" id="choose-file-btn">
-                                            Choose Screenshot
-                                        </button>
-                                        <span class="dropzone-hint">or drag & drop your image here</span>
-                                    </div>
-                                    <small class="upload-restrictions">Supported: PNG, JPG, JPEG (Max 10 MB)</small>
-                                </div>
-                            </div>
-
-                            <!-- PREVIEW CONTAINER (Hidden until file selected) -->
-                            <div class="screenshot-preview-container" id="screenshot-preview-container" style="display: none;">
-                                <div class="preview-thumbnail-wrap">
-                                    <img id="screenshot-preview-img" src="" alt="Screenshot Preview" class="preview-img">
-                                </div>
-                                <div class="preview-meta">
-                                    <span class="preview-filename" id="preview-filename">image.png</span>
-                                    <span class="preview-filesize" id="preview-filesize">0 KB</span>
-                                    <div class="preview-actions">
-                                        <button type="button" class="preview-action-btn replace-btn" id="replace-file-btn">
-                                            <i class="fa-solid fa-arrows-rotate"></i> Replace
-                                        </button>
-                                        <button type="button" class="preview-action-btn remove-btn" id="remove-file-btn">
-                                            <i class="fa-solid fa-trash-can"></i> Remove
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <span class="field-error" id="screenshot-error"></span>
-                        </div>
-
-                        <!-- SUBMIT STATUS / ALERT MESSAGE -->
-                        <div class="payment-alert" id="payment-alert" style="display: none;" role="alert"></div>
-
-                        <!-- SECTION G: SUBMIT BUTTON -->
-                        <button type="submit" class="submit-payment-btn" id="submit-payment-btn">
-                            <span class="btn-text">
-                                <i class="fa-solid fa-shield-halved"></i> Submit Payment Details
-                            </span>
-                            <span class="btn-loader" style="display: none;">
-                                <i class="fa-solid fa-circle-notch fa-spin"></i> Submitting Details...
-                            </span>
-                        </button>
-
-                    </form>
+                    <!-- RAZORPAY CHECKOUT BUTTON -->
+                    <button type="button" class="submit-payment-btn" id="pay-razorpay-btn">
+                        <span class="btn-text">
+                            <i class="fa-solid fa-lock"></i> Pay Now with Razorpay
+                        </span>
+                        <span class="btn-loader" style="display: none;">
+                            <i class="fa-solid fa-circle-notch fa-spin"></i> Initializing Payment...
+                        </span>
+                    </button>
 
                 </section>
 
@@ -235,7 +139,6 @@
             <!-- RIGHT COLUMN: ORDER INFORMATION CARD -->
             <div class="payment-right-column">
 
-                <!-- SECTION B: ORDER INFORMATION -->
                 <aside class="payment-card order-info-card" aria-labelledby="order-info-heading">
                     <h2 id="order-info-heading" class="summary-heading">Order Summary</h2>
 
@@ -289,7 +192,7 @@
                     <div class="security-notice">
                         <i class="fa-solid fa-lock"></i>
                         <p>
-                            FIRQUI JEWELS manual UPI verification ensures your transaction is verified directly against bank receipts.
+                            Payments are securely processed via Razorpay. Your card and banking credentials are never stored.
                         </p>
                     </div>
                 </aside>
@@ -304,9 +207,9 @@
                 <div class="modal-success-icon">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
-                <h2 id="modal-title" class="modal-title">Payment Details Submitted</h2>
+                <h2 id="modal-title" class="modal-title">Payment Verified Successfully!</h2>
                 <p class="modal-message">
-                    Your payment details have been submitted successfully. Your order is awaiting payment verification.
+                    Thank you! Your payment has been received and verified. Your order is now confirmed.
                 </p>
                 <div class="modal-order-details">
                     <div class="modal-detail-row">
@@ -314,17 +217,14 @@
                         <strong id="modal-order-number">--</strong>
                     </div>
                     <div class="modal-detail-row">
-                        <span>Transaction Reference:</span>
+                        <span>Razorpay Payment ID:</span>
                         <strong id="modal-txn-id">--</strong>
                     </div>
                     <div class="modal-detail-row">
                         <span>Payment Status:</span>
-                        <span class="payment-status-badge status-verification">PENDING_VERIFICATION</span>
+                        <span class="payment-status-badge status-paid" style="background: #def7ec; color: #03543f;">PAID</span>
                     </div>
                 </div>
-                <p class="modal-notice">
-                    Our team will verify the payment against bank records. Once verified, your order status will be updated to <strong>PAID</strong>.
-                </p>
                 <div class="modal-buttons">
                     <a href="../authentication/profile.html" class="modal-btn modal-btn-primary">
                         View Order in Profile
@@ -339,7 +239,7 @@
     </main>
 
     <!-- =====================================================
-         FOOTER (Identical to Checkout / Website)
+         FOOTER
     ====================================================== -->
     <footer class="footer" id="contact">
         <div class="footer-copy">
@@ -351,11 +251,8 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="../js/vendor/qrcode.min.js?v=20261018a"></script>
-    <script src="../js/image-compress.js?v=20261018a"></script>
     <script src="payment.js?v=20261018a"></script>
     <script src="../js/search.js?v=20261018a"></script>
-
     <script src="../js/site-nav.js?v=20261018a"></script>
 </body>
 

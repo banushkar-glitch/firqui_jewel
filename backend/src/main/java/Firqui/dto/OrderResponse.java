@@ -25,6 +25,25 @@ public class OrderResponse {
     private String verifiedBy;
     private String rejectionReason;
 
+    private String razorpayOrderId;
+    private String razorpayPaymentId;
+    private String razorpaySignature;
+    private String cancellationStatus;
+    private LocalDateTime cancelledAt;
+    private String formattedCancelledAt;
+    private String cancellationReason;
+    private String cancellationDetails;
+    private String refundStatus;
+    private Double refundAmount = 0.0;
+    private String formattedRefundAmount;
+    private String razorpayRefundId;
+    private LocalDateTime refundInitiatedAt;
+    private String formattedRefundInitiatedAt;
+    private LocalDateTime refundProcessedAt;
+    private String formattedRefundProcessedAt;
+    private Boolean cancellationEligible = false;
+    private Long cancellationHoursRemaining = 0L;
+
     private Double subtotal = 0.0;
     private String formattedSubtotal;
     private Double shipping = 0.0;
@@ -175,6 +194,61 @@ public class OrderResponse {
         }
         response.setItems(totalCount);
         response.setProducts(itemResponses);
+
+        // Razorpay, Cancellation & Refund details
+        response.setRazorpayOrderId(order.getRazorpayOrderId());
+        response.setRazorpayPaymentId(order.getRazorpayPaymentId());
+        response.setRazorpaySignature(order.getRazorpaySignature());
+        response.setCancellationStatus(order.getCancellationStatus());
+        response.setCancelledAt(order.getCancelledAt());
+        DateTimeFormatter dtfTime = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a", Locale.ENGLISH);
+        if (order.getCancelledAt() != null) {
+            response.setFormattedCancelledAt(order.getCancelledAt().format(dtfTime));
+        }
+        response.setCancellationReason(order.getCancellationReason());
+        response.setCancellationDetails(order.getCancellationDetails());
+
+        response.setRefundStatus(order.getRefundStatus());
+        response.setRefundAmount(order.getRefundAmount());
+        if (order.getRefundAmount() != null && order.getRefundAmount() > 0) {
+            response.setFormattedRefundAmount("₹" + formatter.format(Math.round(order.getRefundAmount())));
+        } else {
+            response.setFormattedRefundAmount("₹0");
+        }
+        response.setRazorpayRefundId(order.getRazorpayRefundId());
+        response.setRefundInitiatedAt(order.getRefundInitiatedAt());
+        if (order.getRefundInitiatedAt() != null) {
+            response.setFormattedRefundInitiatedAt(order.getRefundInitiatedAt().format(dtfTime));
+        }
+        response.setRefundProcessedAt(order.getRefundProcessedAt());
+        if (order.getRefundProcessedAt() != null) {
+            response.setFormattedRefundProcessedAt(order.getRefundProcessedAt().format(dtfTime));
+        }
+
+        // 24-Hour Cancellation Eligibility calculation
+        boolean eligible = false;
+        long hoursRemaining = 0L;
+        String curOrderStatus = order.getOrderStatus() != null ? order.getOrderStatus() : "";
+        String curPayStatus = order.getPaymentStatus() != null ? order.getPaymentStatus() : "";
+        boolean isPaid = curPayStatus.equalsIgnoreCase("PAID") || curPayStatus.equalsIgnoreCase("CONFIRMED");
+        boolean isNotTerminal = !curOrderStatus.equalsIgnoreCase("Delivered")
+                && !curOrderStatus.equalsIgnoreCase("Shipped")
+                && !curOrderStatus.equalsIgnoreCase("Cancelled")
+                && !"CANCELLED".equalsIgnoreCase(order.getCancellationStatus());
+
+        LocalDateTime paymentTime = order.getPaymentVerifiedAt() != null ? order.getPaymentVerifiedAt()
+                : (order.getPaymentSubmittedAt() != null ? order.getPaymentSubmittedAt() : order.getCreatedAt());
+
+        if (isPaid && isNotTerminal && paymentTime != null) {
+            java.time.Duration diff = java.time.Duration.between(paymentTime, LocalDateTime.now());
+            long hoursElapsed = diff.toHours();
+            if (hoursElapsed < 24) {
+                eligible = true;
+                hoursRemaining = Math.max(0, 24 - hoursElapsed);
+            }
+        }
+        response.setCancellationEligible(eligible);
+        response.setCancellationHoursRemaining(hoursRemaining);
 
         return response;
     }
@@ -500,5 +574,149 @@ public class OrderResponse {
 
     public void setRejectionReason(String rejectionReason) {
         this.rejectionReason = rejectionReason;
+    }
+
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
+
+    public String getRazorpayPaymentId() {
+        return razorpayPaymentId;
+    }
+
+    public void setRazorpayPaymentId(String razorpayPaymentId) {
+        this.razorpayPaymentId = razorpayPaymentId;
+    }
+
+    public String getRazorpaySignature() {
+        return razorpaySignature;
+    }
+
+    public void setRazorpaySignature(String razorpaySignature) {
+        this.razorpaySignature = razorpaySignature;
+    }
+
+    public String getCancellationStatus() {
+        return cancellationStatus;
+    }
+
+    public void setCancellationStatus(String cancellationStatus) {
+        this.cancellationStatus = cancellationStatus;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
+
+    public String getFormattedCancelledAt() {
+        return formattedCancelledAt;
+    }
+
+    public void setFormattedCancelledAt(String formattedCancelledAt) {
+        this.formattedCancelledAt = formattedCancelledAt;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public String getCancellationDetails() {
+        return cancellationDetails;
+    }
+
+    public void setCancellationDetails(String cancellationDetails) {
+        this.cancellationDetails = cancellationDetails;
+    }
+
+    public String getRefundStatus() {
+        return refundStatus;
+    }
+
+    public void setRefundStatus(String refundStatus) {
+        this.refundStatus = refundStatus;
+    }
+
+    public Double getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(Double refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
+    public String getFormattedRefundAmount() {
+        return formattedRefundAmount;
+    }
+
+    public void setFormattedRefundAmount(String formattedRefundAmount) {
+        this.formattedRefundAmount = formattedRefundAmount;
+    }
+
+    public String getRazorpayRefundId() {
+        return razorpayRefundId;
+    }
+
+    public void setRazorpayRefundId(String razorpayRefundId) {
+        this.razorpayRefundId = razorpayRefundId;
+    }
+
+    public LocalDateTime getRefundInitiatedAt() {
+        return refundInitiatedAt;
+    }
+
+    public void setRefundInitiatedAt(LocalDateTime refundInitiatedAt) {
+        this.refundInitiatedAt = refundInitiatedAt;
+    }
+
+    public String getFormattedRefundInitiatedAt() {
+        return formattedRefundInitiatedAt;
+    }
+
+    public void setFormattedRefundInitiatedAt(String formattedRefundInitiatedAt) {
+        this.formattedRefundInitiatedAt = formattedRefundInitiatedAt;
+    }
+
+    public LocalDateTime getRefundProcessedAt() {
+        return refundProcessedAt;
+    }
+
+    public void setRefundProcessedAt(LocalDateTime refundProcessedAt) {
+        this.refundProcessedAt = refundProcessedAt;
+    }
+
+    public String getFormattedRefundProcessedAt() {
+        return formattedRefundProcessedAt;
+    }
+
+    public void setFormattedRefundProcessedAt(String formattedRefundProcessedAt) {
+        this.formattedRefundProcessedAt = formattedRefundProcessedAt;
+    }
+
+    public Boolean getCancellationEligible() {
+        return cancellationEligible != null ? cancellationEligible : false;
+    }
+
+    public void setCancellationEligible(Boolean cancellationEligible) {
+        this.cancellationEligible = cancellationEligible;
+    }
+
+    public Long getCancellationHoursRemaining() {
+        return cancellationHoursRemaining != null ? cancellationHoursRemaining : 0L;
+    }
+
+    public void setCancellationHoursRemaining(Long cancellationHoursRemaining) {
+        this.cancellationHoursRemaining = cancellationHoursRemaining;
     }
 }

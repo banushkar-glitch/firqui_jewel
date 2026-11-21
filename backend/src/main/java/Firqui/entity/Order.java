@@ -95,6 +95,45 @@ public class Order {
     @Column(name = "rejection_email_sent_at")
     private LocalDateTime rejectionEmailSentAt;
 
+    @Column(name = "razorpay_order_id", length = 100)
+    private String razorpayOrderId;
+
+    @Column(name = "razorpay_payment_id", length = 100)
+    private String razorpayPaymentId;
+
+    @Column(name = "razorpay_signature", length = 255)
+    private String razorpaySignature;
+
+    @Column(name = "cancellation_status", length = 30)
+    private String cancellationStatus = "NONE";
+
+    @Column(name = "cancelled_at")
+    private LocalDateTime cancelledAt;
+
+    @Column(name = "cancellation_reason", length = 500)
+    private String cancellationReason;
+
+    @Column(name = "cancellation_details", length = 2000)
+    private String cancellationDetails;
+
+    @Column(name = "refund_status", length = 30)
+    private String refundStatus = "NONE";
+
+    @Column(name = "refund_amount")
+    private Double refundAmount = 0.0;
+
+    @Column(name = "razorpay_refund_id", length = 100)
+    private String razorpayRefundId;
+
+    @Column(name = "refund_initiated_at")
+    private LocalDateTime refundInitiatedAt;
+
+    @Column(name = "refund_processed_at")
+    private LocalDateTime refundProcessedAt;
+
+    @Column(name = "stock_restored")
+    private Boolean stockRestored = false;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<OrderItem> items = new ArrayList<>();
 
@@ -376,5 +415,109 @@ public class Order {
 
     public void setRejectionEmailSentAt(LocalDateTime rejectionEmailSentAt) {
         this.rejectionEmailSentAt = rejectionEmailSentAt;
+    }
+
+    public String getRazorpayOrderId() {
+        return razorpayOrderId;
+    }
+
+    public void setRazorpayOrderId(String razorpayOrderId) {
+        this.razorpayOrderId = razorpayOrderId;
+    }
+
+    public String getRazorpayPaymentId() {
+        return razorpayPaymentId;
+    }
+
+    public void setRazorpayPaymentId(String razorpayPaymentId) {
+        this.razorpayPaymentId = razorpayPaymentId;
+    }
+
+    public String getRazorpaySignature() {
+        return razorpaySignature;
+    }
+
+    public void setRazorpaySignature(String razorpaySignature) {
+        this.razorpaySignature = razorpaySignature;
+    }
+
+    public String getCancellationStatus() {
+        return cancellationStatus;
+    }
+
+    public void setCancellationStatus(String cancellationStatus) {
+        this.cancellationStatus = cancellationStatus;
+    }
+
+    public LocalDateTime getCancelledAt() {
+        return cancelledAt;
+    }
+
+    public void setCancelledAt(LocalDateTime cancelledAt) {
+        this.cancelledAt = cancelledAt;
+    }
+
+    public String getCancellationReason() {
+        return cancellationReason;
+    }
+
+    public void setCancellationReason(String cancellationReason) {
+        this.cancellationReason = cancellationReason;
+    }
+
+    public String getCancellationDetails() {
+        return cancellationDetails;
+    }
+
+    public void setCancellationDetails(String cancellationDetails) {
+        this.cancellationDetails = cancellationDetails;
+    }
+
+    public String getRefundStatus() {
+        return refundStatus;
+    }
+
+    public void setRefundStatus(String refundStatus) {
+        this.refundStatus = refundStatus;
+    }
+
+    public Double getRefundAmount() {
+        return refundAmount;
+    }
+
+    public void setRefundAmount(Double refundAmount) {
+        this.refundAmount = refundAmount;
+    }
+
+    public String getRazorpayRefundId() {
+        return razorpayRefundId;
+    }
+
+    public void setRazorpayRefundId(String razorpayRefundId) {
+        this.razorpayRefundId = razorpayRefundId;
+    }
+
+    public LocalDateTime getRefundInitiatedAt() {
+        return refundInitiatedAt;
+    }
+
+    public void setRefundInitiatedAt(LocalDateTime refundInitiatedAt) {
+        this.refundInitiatedAt = refundInitiatedAt;
+    }
+
+    public LocalDateTime getRefundProcessedAt() {
+        return refundProcessedAt;
+    }
+
+    public void setRefundProcessedAt(LocalDateTime refundProcessedAt) {
+        this.refundProcessedAt = refundProcessedAt;
+    }
+
+    public Boolean getStockRestored() {
+        return stockRestored != null ? stockRestored : false;
+    }
+
+    public void setStockRestored(Boolean stockRestored) {
+        this.stockRestored = stockRestored;
     }
 }

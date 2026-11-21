@@ -29,6 +29,10 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     @Autowired
+    private RefundService refundService;
+
+
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
@@ -461,26 +465,15 @@ public class OrderService {
         Order order = orderRepository.findByOrderNumberAndUser(cleanNum, user)
                 .orElseThrow(() -> new IllegalArgumentException("Order not found or does not belong to user."));
 
-        if ("Delivered".equalsIgnoreCase(order.getOrderStatus()) || "Cancelled".equalsIgnoreCase(order.getOrderStatus())) {
-            throw new IllegalStateException("Cannot cancel an order that is already " + order.getOrderStatus() + ".");
+        RefundService.ensureCancellable(order);
+        if ("PAID".equalsIgnoreCase(order.getPaymentStatus())) {
+            // Paid orders go through the cancellation flow so the refund is issued with the cancellation
+            throw new IllegalStateException("This order is paid. Please use \"Cancel Order\" in your profile so the refund is processed.");
         }
 
-        order.setOrderStatus("Cancelled");
-
-        // Restore stock to products
-        if (order.getItems() != null) {
-            for (OrderItem item : order.getItems()) {
-                if (item.getProduct() != null && item.getQuantity() != null) {
-                    Product prod = item.getProduct();
-                    int currentStock = prod.getStockQuantity() != null ? prod.getStockQuantity() : 0;
-                    prod.setStockQuantity(currentStock + item.getQuantity());
-                    if (ProductRules.OUT_OF_STOCK.equals(prod.getAvailability()) && prod.getStockQuantity() > 0) {
-                        prod.setAvailability(ProductRules.IN_STOCK);
-                    }
-                    productRepository.save(prod);
-                }
-            }
-        }
+        RefundService.markCancelled(order, "Cancelled by customer", null);
+        order.setRefundStatus("NOT_APPLICABLE");
+        refundService.restoreStock(order);
 
         Order updated = orderRepository.save(order);
         return OrderResponse.fromEntity(updated);
