@@ -237,6 +237,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     <span class="payment-badge ${getPaymentClass(order.payment)}">
                         ${order.payment}
                     </span>
+                    ${order.transactionId && order.transactionId !== "N/A" ? `<br><small style="color: #64748b; font-size: 11px; font-family: monospace;">${window.FirquiHtml.escape(order.transactionId)}</small>` : ""}
+                    ${order.refundStatus === "REFUNDED" ? `<br><span style="color: #166534; font-size: 10px; font-weight: 700; background: #dcfce7; padding: 1px 5px; border-radius: 3px;">REFUNDED</span>` : ""}
+                    ${order.refundStatus === "PENDING_REFUND" ? `<br><span style="color: #0369a1; font-size: 10px; font-weight: 700; background: #e0f2fe; padding: 1px 5px; border-radius: 3px;">REFUND PENDING</span>` : ""}
 
                 </td>
 
@@ -641,6 +644,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 items: o.items || (o.products ? o.products.length : 1),
                 amount: Number(o.totalAmount || o.total || o.amount || 0),
                 payment: o.paymentStatus || o.payment || "Pending",
+                paymentMethod: o.paymentMethod || "Razorpay",
+                transactionId: o.transactionId || o.razorpayPaymentId || null,
+                refundStatus: o.refundStatus || null,
                 status: o.orderStatus || o.status || "Processing"
             }));
 
@@ -667,5 +673,108 @@ document.addEventListener("DOMContentLoaded", () => {
     renderOrders(orders);
 
     fetchLiveOrders();
+
+    /* =====================================================
+       PAYMENT & REFUND RECONCILIATION MODAL
+    ===================================================== */
+    const reconcileBtn = document.getElementById("reconcileBtn");
+    const reconciliationModal = document.getElementById("reconciliationModal");
+    const closeReconcileBtn = document.getElementById("closeReconcileBtn");
+    const reconciliationContent = document.getElementById("reconciliationContent");
+
+    if (reconcileBtn && reconciliationModal) {
+        reconcileBtn.addEventListener("click", async () => {
+            reconciliationModal.style.display = "flex";
+            if (!token) {
+                reconciliationContent.innerHTML = `<p style="color: #991b1b;">Unauthorized: Please log in with admin account.</p>`;
+                return;
+            }
+
+            reconciliationContent.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color: #0A373B;"></i>
+                    <p style="margin-top: 10px;">Reconciling Razorpay transactions with PostgreSQL orders...</p>
+                </div>
+            `;
+
+            try {
+                const res = await fetch(`${API_BASE}/api/admin/reconciliation`, {
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+
+                const formatR = (val) => "₹" + Math.round(val || 0).toLocaleString("en-IN");
+
+                let discHtml = "";
+                if (data.discrepancies && data.discrepancies.length > 0) {
+                    discHtml = `
+                        <div style="margin-top: 16px; padding: 12px; background: #fee2e2; border-radius: 8px; border: 1px solid #fecaca;">
+                            <strong style="color: #991b1b; display: block; margin-bottom: 6px;"><i class="fa-solid fa-triangle-exclamation"></i> Discrepancies Found (${data.discrepancyCount}):</strong>
+                            <ul style="margin: 0; padding-left: 20px; color: #7f1d1d; font-size: 0.85rem;">
+                                ${data.discrepancies.map(d => `<li><strong>Order #${d.orderNumber}:</strong> ${d.issue}</li>`).join("")}
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    discHtml = `
+                        <div style="margin-top: 16px; padding: 12px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0; color: #065f46; font-size: 0.88rem; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <strong>All orders and Razorpay payments are 100% reconciled and consistent.</strong>
+                        </div>
+                    `;
+                }
+
+                reconciliationContent.innerHTML = `
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 16px;">
+                        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                            <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">TOTAL ORDERS</span>
+                            <h4 style="margin: 4px 0 0; color: #0A373B; font-size: 1.2rem;">${data.totalOrders || 0}</h4>
+                        </div>
+                        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                            <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">PAID ORDERS</span>
+                            <h4 style="margin: 4px 0 0; color: #059669; font-size: 1.2rem;">${data.paidOrders || 0}</h4>
+                        </div>
+                        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                            <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">REFUNDED</span>
+                            <h4 style="margin: 4px 0 0; color: #0284c7; font-size: 1.2rem;">${data.refundedOrders || 0}</h4>
+                        </div>
+                        <div style="background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center;">
+                            <span style="font-size: 0.75rem; color: #64748b; font-weight: 600;">FAILED REFUNDS</span>
+                            <h4 style="margin: 4px 0 0; color: #dc2626; font-size: 1.2rem;">${data.failedRefunds || 0}</h4>
+                        </div>
+                    </div>
+
+                    <div style="background: #fff; padding: 14px; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem;">
+                        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
+                            <span>Gross Captured Revenue:</span>
+                            <strong>${formatR(data.totalRevenue)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #b91c1c;">
+                            <span>Total Refunds Processed:</span>
+                            <strong>- ${formatR(data.totalRefunded)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; padding: 8px 0 4px; border-top: 1px dashed #cbd5e1; font-size: 1rem; color: #0A373B;">
+                            <span><strong>Net Settled Revenue:</strong></span>
+                            <strong>${formatR(data.netRevenue)}</strong>
+                        </div>
+                    </div>
+
+                    ${discHtml}
+                `;
+            } catch (err) {
+                reconciliationContent.innerHTML = `<p style="color: #991b1b;"><i class="fa-solid fa-triangle-exclamation"></i> Reconciliation fetch failed: ${err.message}</p>`;
+            }
+        });
+
+        if (closeReconcileBtn) {
+            closeReconcileBtn.addEventListener("click", () => {
+                reconciliationModal.style.display = "none";
+            });
+        }
+        reconciliationModal.addEventListener("click", (e) => {
+            if (e.target === reconciliationModal) reconciliationModal.style.display = "none";
+        });
+    }
 
 });

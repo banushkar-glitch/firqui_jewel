@@ -197,6 +197,70 @@ function loadOrder() {
         }
     }
 
+    // Razorpay Order ID Row
+    const rzpOrderRow = document.getElementById("razorpayOrderRow");
+    const rzpOrderIdEl = document.getElementById("razorpayOrderId");
+    if (rzpOrderRow && rzpOrderIdEl) {
+        if (order.payment.razorpayOrderId) {
+            rzpOrderRow.style.display = "flex";
+            rzpOrderIdEl.textContent = order.payment.razorpayOrderId;
+        } else {
+            rzpOrderRow.style.display = "none";
+        }
+    }
+
+    // Refund Details Row
+    const refundDetailsRow = document.getElementById("refundDetailsRow");
+    const refundBadge = document.getElementById("refundBadge");
+    const refundInfoText = document.getElementById("refundInfoText");
+    const retryRefundBox = document.getElementById("adminRetryRefundBox");
+
+    // Issue refund: any Razorpay-paid order with something left to refund
+    const issueRefundBox = document.getElementById("adminIssueRefundBox");
+    if (issueRefundBox) {
+        const paidOnline = String(order.payment.status || "").toUpperCase() === "PAID"
+            && String(order.payment.razorpayPaymentId || "").startsWith("pay_");
+        const refundedSoFar = Number(order.payment.refundAmount) || 0;
+        const fullyRefunded = String(order.payment.refundStatus || "").toUpperCase() === "REFUNDED";
+        issueRefundBox.style.display = paidOnline && !fullyRefunded && refundedSoFar < (Number(order.payment.totalAmount) || 0) ? "block" : "none";
+    }
+
+    if (refundDetailsRow && refundBadge && refundInfoText) {
+        const rfStat = (order.payment.refundStatus || "").toUpperCase();
+        if (rfStat === "REFUNDED" || rfStat === "PROCESSED") {
+            refundDetailsRow.style.display = "flex";
+            refundBadge.textContent = "REFUNDED";
+            refundBadge.style.background = "#dcfce7";
+            refundBadge.style.color = "#166534";
+            refundInfoText.textContent = (order.payment.formattedRefundAmount || "") + (order.payment.razorpayRefundId ? ` • Ref: ${order.payment.razorpayRefundId}` : "");
+            if (retryRefundBox) retryRefundBox.style.display = "none";
+        } else if (rfStat === "PARTIALLY_REFUNDED") {
+            refundDetailsRow.style.display = "flex";
+            refundBadge.textContent = "PARTIALLY REFUNDED";
+            refundBadge.style.background = "#fef9c3";
+            refundBadge.style.color = "#854d0e";
+            refundInfoText.textContent = (order.payment.formattedRefundAmount || "") + (order.payment.razorpayRefundId ? ` • Ref: ${order.payment.razorpayRefundId}` : "");
+            if (retryRefundBox) retryRefundBox.style.display = "none";
+        } else if (rfStat === "PENDING_REFUND" || rfStat === "PENDING") {
+            refundDetailsRow.style.display = "flex";
+            refundBadge.textContent = "REFUND PENDING";
+            refundBadge.style.background = "#e0f2fe";
+            refundBadge.style.color = "#0369a1";
+            refundInfoText.textContent = (order.payment.formattedRefundAmount || "") + (order.payment.razorpayRefundId ? ` • Ref: ${order.payment.razorpayRefundId}` : "");
+            if (retryRefundBox) retryRefundBox.style.display = "none";
+        } else if (rfStat === "REFUND_FAILED" || rfStat === "FAILED") {
+            refundDetailsRow.style.display = "flex";
+            refundBadge.textContent = "REFUND FAILED";
+            refundBadge.style.background = "#fee2e2";
+            refundBadge.style.color = "#991b1b";
+            refundInfoText.textContent = "Gateway error during automated refund. Click below to retry.";
+            if (retryRefundBox) retryRefundBox.style.display = "block";
+        } else {
+            refundDetailsRow.style.display = "none";
+            if (retryRefundBox) retryRefundBox.style.display = "none";
+        }
+    }
+
     // Screenshot button
     const screenshotBox = document.getElementById("adminScreenshotBox");
     if (screenshotBox) {
@@ -822,8 +886,15 @@ document.addEventListener(
                         date: data.orderDate || data.date || "Today",
                         payment: {
                             status: data.paymentStatus || data.payment || "Pending",
-                            method: data.paymentMethod || "UPI",
-                            transactionId: data.transactionId || "N/A",
+                            method: data.paymentMethod || "Razorpay",
+                            transactionId: data.transactionId || data.razorpayPaymentId || "N/A",
+                            razorpayOrderId: data.razorpayOrderId || null,
+                            razorpayPaymentId: data.razorpayPaymentId || null,
+                            totalAmount: data.totalAmount || 0,
+                            refundStatus: data.refundStatus || null,
+                            refundAmount: data.refundAmount || null,
+                            formattedRefundAmount: data.formattedRefundAmount || null,
+                            razorpayRefundId: data.razorpayRefundId || null,
                             submittedAt: data.formattedPaymentSubmittedAt || data.paymentSubmittedAt || null,
                             verifiedBy: data.verifiedBy || null,
                             verifiedAt: data.formattedPaymentVerifiedAt || data.paymentVerifiedAt || null,
@@ -1043,6 +1114,106 @@ document.addEventListener(
                     alert("Error rejecting payment: " + err.message);
                     adminRejectPayBtn.disabled = false;
                     adminRejectPayBtn.innerHTML = `<i class="fa-solid fa-xmark"></i> Reject Payment`;
+                }
+            });
+        }
+
+        /* ---------------------------------------------
+           ADMIN RETRY RAZORPAY REFUND
+        --------------------------------------------- */
+        const adminRetryRefundBtn = document.getElementById("adminRetryRefundBtn");
+        if (adminRetryRefundBtn) {
+            adminRetryRefundBtn.addEventListener("click", async function () {
+                if (!token) {
+                    alert("Unauthorized: Please log in with admin credentials.");
+                    window.location.href = "../authentication/login.html";
+                    return;
+                }
+                const confirmed = confirm(
+                    `Retry Razorpay Automated Refund\n\n` +
+                    `Order: #${orderId}\n` +
+                    `This will call Razorpay Refund API to process the refund against the payment ID.\n\n` +
+                    `Proceed with refund retry?`
+                );
+                if (!confirmed) return;
+
+                adminRetryRefundBtn.disabled = true;
+                adminRetryRefundBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Refund...`;
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/orders/${orderId}/retry-refund`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+                    if (!response.ok) {
+                        throw new Error(data.message || "Refund retry failed.");
+                    }
+
+                    alert(`Refund processed successfully!\nRefund ID: ${data.razorpayRefundId || 'Generated'}\nStatus: ${data.refundStatus || 'Refunded'}`);
+                    window.location.reload();
+                } catch (err) {
+                    alert("Error retrying refund: " + err.message);
+                    adminRetryRefundBtn.disabled = false;
+                    adminRetryRefundBtn.innerHTML = `<i class="fa-solid fa-rotate"></i> Retry Razorpay Refund`;
+                }
+            });
+        }
+
+        /* ---------------------------------------------
+           ADMIN ISSUE RAZORPAY REFUND (full or partial)
+        --------------------------------------------- */
+        const adminIssueRefundBtn = document.getElementById("adminIssueRefundBtn");
+        if (adminIssueRefundBtn) {
+            adminIssueRefundBtn.addEventListener("click", async function () {
+                if (!token) {
+                    window.location.href = "../authentication/login.html";
+                    return;
+                }
+                const amountText = prompt(
+                    `Refund order #${orderId} through Razorpay
+
+` +
+                    `Enter the amount in rupees (e.g. 1499.50),
+or leave empty to refund everything still refundable:`
+                );
+                if (amountText === null) return;
+                const reason = prompt("Reason for the refund (shown in Razorpay):", "Refund issued by Firqui Jewels");
+                if (reason === null) return;
+
+                const body = { reason: reason };
+                if (amountText.trim() !== "") {
+                    const amount = Number(amountText.trim());
+                    if (!isFinite(amount) || amount < 1) {
+                        alert("Please enter a valid amount of at least ₹1.");
+                        return;
+                    }
+                    body.amount = amount;
+                }
+                if (!confirm(`Refund ${body.amount ? "₹" + body.amount : "the full remaining amount"} for order #${orderId}?`)) return;
+
+                adminIssueRefundBtn.disabled = true;
+                adminIssueRefundBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Processing Refund...`;
+                try {
+                    const response = await fetch(`${API_BASE}/api/admin/orders/${orderId}/refund`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+                        body: JSON.stringify(body)
+                    });
+                    const data = await response.json().catch(function () { return {}; });
+                    if (!response.ok) throw new Error(data.message || "Refund failed.");
+                    alert(`Refund ${data.refundStatus === "PROCESSED" ? "processed" : "initiated"}.
+Refund ID: ${data.razorpayRefundId || "pending"}
+Amount: ${data.formattedRefundAmount || ""}`);
+                    window.location.reload();
+                } catch (err) {
+                    alert("Refund error: " + err.message);
+                    adminIssueRefundBtn.disabled = false;
+                    adminIssueRefundBtn.innerHTML = `<i class="fa-solid fa-money-bill-transfer"></i> Issue Razorpay Refund`;
                 }
             });
         }

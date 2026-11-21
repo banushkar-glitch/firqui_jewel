@@ -56,8 +56,17 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/contact").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/newsletter/subscribe").permitAll()
-                // Guest checkout
-                .requestMatchers(HttpMethod.POST, "/api/orders", "/api/orders/place-payment", "/api/payments/upi").permitAll()
+                // Guest checkout & Razorpay. Amounts come from the database and payments are
+                // re-read from Razorpay, so these only need identifiers; the webhook is signature-checked.
+                .requestMatchers(HttpMethod.POST,
+                        "/api/orders",
+                        "/api/orders/place-payment",
+                        "/api/payments/upi",
+                        "/api/create-order",
+                        "/api/verify-payment",
+                        "/api/razorpay/webhook").permitAll()
+                .requestMatchers("/api/orders/*/reconcile-payment").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/razorpay/config").permitAll()
                 .requestMatchers("/error").permitAll()
                 .requestMatchers("/uploads/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()

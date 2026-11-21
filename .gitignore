@@ -2,6 +2,7 @@
 /uploads/
 
 # Secrets: real environment files and SSH keys never go into Git
+.env
 *.env
 !*.env.example
 *.pem

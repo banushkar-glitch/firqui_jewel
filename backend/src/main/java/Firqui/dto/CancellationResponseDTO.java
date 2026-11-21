@@ -31,6 +31,9 @@ public class CancellationResponseDTO {
     private String additionalDetails;
     private String status; // PENDING, APPROVED, REJECTED
     private String refundStatus; // NOT_APPLICABLE, PENDING_REFUND, REFUNDED
+    private String razorpayRefundId;
+    private Double refundAmount;
+    private String formattedRefundAmount;
     private String adminNotes;
 
     private LocalDateTime createdAt;
@@ -82,6 +85,13 @@ public class CancellationResponseDTO {
             dto.setPaymentStatus(o.getPaymentStatus());
             dto.setPaymentMethod(o.getPaymentMethod());
             dto.setOrderStatus(o.getOrderStatus());
+            dto.setRazorpayRefundId(o.getRazorpayRefundId());
+            dto.setRefundAmount(o.getRefundAmount());
+            if (o.getRefundAmount() != null && o.getRefundAmount() > 0) {
+                dto.setFormattedRefundAmount("₹" + Math.round(o.getRefundAmount()));
+            } else if (o.getTotalAmount() != null) {
+                dto.setFormattedRefundAmount("₹" + Math.round(o.getTotalAmount()));
+            }
 
             if (dto.getCustomerName() == null && o.getShippingFullName() != null) {
                 dto.setCustomerName(o.getShippingFullName());
@@ -171,6 +181,12 @@ public class CancellationResponseDTO {
     public void setStatus(String status) { this.status = status; }
     public String getRefundStatus() { return refundStatus; }
     public void setRefundStatus(String refundStatus) { this.refundStatus = refundStatus; }
+    public String getRazorpayRefundId() { return razorpayRefundId; }
+    public void setRazorpayRefundId(String razorpayRefundId) { this.razorpayRefundId = razorpayRefundId; }
+    public Double getRefundAmount() { return refundAmount; }
+    public void setRefundAmount(Double refundAmount) { this.refundAmount = refundAmount; }
+    public String getFormattedRefundAmount() { return formattedRefundAmount; }
+    public void setFormattedRefundAmount(String formattedRefundAmount) { this.formattedRefundAmount = formattedRefundAmount; }
     public String getAdminNotes() { return adminNotes; }
     public void setAdminNotes(String adminNotes) { this.adminNotes = adminNotes; }
     public LocalDateTime getCreatedAt() { return createdAt; }

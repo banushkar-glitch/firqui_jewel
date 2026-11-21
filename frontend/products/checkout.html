@@ -37,6 +37,9 @@
           href="checkout.css?v=20261018a">
 
     <link rel="stylesheet" href="../css/site.css?v=20261018a">
+
+    <!-- Razorpay Standard Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 
 
@@ -97,7 +100,7 @@
             <span class="nav-dot"></span>
 
 
-            <a href="#about"
+            <a href="../about.html"
                class="nav-link">
                 About
             </a>
@@ -106,7 +109,7 @@
             <span class="nav-dot"></span>
 
 
-            <a href="#contact"
+            <a href="../contact.html"
                class="nav-link">
                 Contact
             </a>
@@ -316,37 +319,34 @@
 
                     <div class="payment-section">
 
-
                         <h2>Payment Method</h2>
-
 
                         <div class="payment-options">
 
-
-                            <!-- PAY NOW -->
+                            <!-- RAZORPAY PAYMENT -->
 
                             <label class="payment-option">
 
                                 <input
                                     type="radio"
                                     name="payment"
-                                    value="pay-now"
+                                    value="razorpay"
                                     checked
                                     required>
 
                                 <span class="payment-content">
 
                                     <span class="payment-icon">
-                                        <i class="fa-solid fa-credit-card"></i>
+                                        <i class="fa-solid fa-shield-halved"></i>
                                     </span>
 
                                     <span>
                                         <strong>
-                                            Pay Now
+                                            Razorpay Secure Checkout
                                         </strong>
 
                                         <small>
-                                            Pay securely via UPI (QR Code / UPI ID)
+                                            Cards (Visa, Master, RuPay), UPI (GPay, PhonePe, Paytm), Netbanking, Wallets
                                         </small>
                                     </span>
 
@@ -354,25 +354,23 @@
 
                             </label>
 
-
-                          
-
-
                         </div>
 
                     </div>
 
+                    <!-- Payment alert / error notification -->
+                    <div id="payment-alert" class="payment-alert" style="display: none; padding: 12px 16px; margin: 15px 0; border-radius: 8px; font-size: 0.95rem; line-height: 1.4;"></div>
 
-                    <!-- PLACE ORDER -->
+                    <!-- PLACE ORDER BUTTON -->
 
                     <button
                         type="submit"
-                        class="place-order-button">
+                        class="place-order-button"
+                        id="place-order-button">
 
-                        Place Order
+                        <i class="fa-solid fa-lock"></i> Pay with Razorpay
 
                     </button>
-
 
                 </form>
 
@@ -451,6 +449,39 @@
     </main>
 
 
+
+    <!-- =====================================================
+         PAYMENT SUCCESS CONFIRMATION MODAL
+    ====================================================== -->
+    <div id="checkout-success-modal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 9999; align-items: center; justify-content: center; padding: 20px;">
+        <div class="modal-content-card" style="background: #fff; max-width: 520px; width: 100%; border-radius: 12px; padding: 32px 28px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+            <div style="width: 72px; height: 72px; background: #e6f7ed; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; color: #107e3e; font-size: 32px;">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h2 style="font-size: 1.6rem; color: #0A373B; margin-bottom: 8px;">Payment Successful!</h2>
+            <p style="color: #555; margin-bottom: 24px; font-size: 0.95rem;">Your order has been placed and payment verified via Razorpay.</p>
+            
+            <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: left; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #666;">Order Number:</span>
+                    <strong id="modal-order-number" style="color: #0A373B;"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="color: #666;">Razorpay Payment ID:</span>
+                    <code id="modal-payment-id" style="color: #0A373B; font-size: 0.85rem;"></code>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #666;">Amount Paid:</span>
+                    <strong id="modal-amount-paid" style="color: #0A373B;"></strong>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                <a href="../authentication/profile.html" id="modal-orders-link" class="modal-action-btn" style="background: #0A373B; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">View Orders</a>
+                <a href="../index.html" class="modal-action-btn" style="background: #f1f3f5; color: #333; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
 
     <!-- =========================
          FOOTER
